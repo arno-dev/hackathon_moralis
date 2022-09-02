@@ -3,7 +3,8 @@
 import 'dart:math';
 import 'package:bip32/bip32.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hackathon_moralis/eth.dart';
+import 'package:hackathon_moralis/utilities/eth.dart';
+import 'package:hackathon_moralis/utilities/file_handler.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import "package:crypto/crypto.dart" show sha256;
@@ -93,6 +94,17 @@ void main() {
     final decrypted = aliceBox
         .decrypt(EncryptedMessage.fromList(encryptedAsList.asTypedList));
     debugPrint(String.fromCharCodes(decrypted));
-    expect(message, decrypted);
+    final predictMessage = String.fromCharCodes(decrypted);
+    expect(message, predictMessage);
+  });
+
+  test("Encrypt file", () async {
+    String actual = "This is image base 64";
+    final fileHandler = FileHandler();
+    final encryptImage = fileHandler.encryption(actual, "passwordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpassword");
+    debugPrint(encryptImage);
+    final baseImage = fileHandler.decryption(encryptImage, "passwordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpassword");
+    debugPrint(baseImage);
+    expect(actual, baseImage);
   });
 }
