@@ -1,21 +1,16 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// ignore_for_file: depend_on_referenced_packages
 
 import 'dart:math';
-import 'dart:typed_data';
-import 'package:basic_utils/basic_utils.dart';
-import 'package:cryptography/cryptography.dart';
-import 'package:ed25519_hd_key/ed25519_hd_key.dart';
-import 'package:pointycastle/export.dart';
+import 'package:bip32/bip32.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hackathon_moralis/eth.dart';
 import 'package:web3dart/web3dart.dart';
-import 'package:encrypt/encrypt.dart';
 import 'package:bip39/bip39.dart' as bip39;
-import 'package:convert/convert.dart';
+import "package:crypto/crypto.dart" show sha256;
+import "package:convert/convert.dart";
 
+import 'package:pinenacl/x25519.dart' show Box, PrivateKey, EncryptedMessage;
+import 'package:pinenacl/api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class WalletGenerator {
@@ -31,42 +26,6 @@ class WalletGenerator {
   }
 }
 
-class Codable {
-  String encryptionRsa(String publicKey, String content) {
-    String pem =
-        '-----BEGIN RSA PUBLIC KEY-----\n$publicKey\n-----END RSA PUBLIC KEY-----';
-    RSAPublicKey public = CryptoUtils.rsaPublicKeyFromPem(pem);
-    return CryptoUtils.rsaEncrypt(content, public);
-  }
-
-  String decryptionRsa(String privateKey, String content) {
-    String pem =
-        '-----BEGIN RSA PRIVATE KEY-----\n$privateKey\n-----END RSA PRIVATE KEY-----';
-    RSAPrivateKey private = CryptoUtils.rsaPrivateKeyFromPem(pem);
-    return CryptoUtils.rsaDecrypt(content, private);
-  }
-
-  String encryptionAes(String plainText, String password) {
-    // final key = Key.fromUtf8(password);
-    final key = Key.fromUtf8('my 32 length key................');
-    final iv = IV.fromLength(16);
-
-    final encrypter = Encrypter(AES(key));
-    final encrypted = encrypter.encrypt(plainText, iv: iv);
-    return encrypted.base64;
-  }
-
-  String decryptionAes(Encrypted encrypted, String password) {
-    // final key = Key.fromUtf8(password);
-    final key = Key.fromUtf8('my 32 length key..............');
-    final iv = IV.fromLength(16);
-
-    final encrypter = Encrypter(AES(key));
-    final decrypted = encrypter.decrypt(encrypted, iv: iv);
-    return decrypted;
-  }
-}
-
 void main() {
   test("Generate credential", () async {
     final WalletGenerator walletGenerator = WalletGenerator();
@@ -79,47 +38,61 @@ void main() {
     expect(keys.first, public.hex);
   });
 
-  test("Get private key from mnemonic", () async {
+  test("Get private and public key by bip32", () async {
+    const actual = "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8";
+    final eth = Eth();
     final seedBytes = bip39.mnemonicToSeed(
         "toward paper enemy brother man achieve coconut dad tent amateur advance copper");
-
-    final hdk = await ED25519_HD_KEY.getMasterKeyFromSeed(seedBytes);
-    KeyData addr_node =
-        await ED25519_HD_KEY.derivePath("m/44'/60'/0'/0'/0'", seedBytes);
-    print("data key: ${hex.encode(addr_node.key)}");
-    print("data chainCode: ${hex.encode(addr_node.chainCode)}");
-    var pb = await ED25519_HD_KEY.getPublicKey(addr_node.key, false);
-    print(hex.encode(pb));
-    final digest = KeccakDigest(256);
-    Uint8List publicKey = Uint8List.fromList(pb);
-    final hash = digest.process(publicKey);
-    print(hex.encode(hash));
-    expect(1, 1);
+    BIP32 node = BIP32.fromSeed(seedBytes);
+    BIP32 child = node.derivePath("m/44'/60'/0'/0/0");
+    debugPrint("private key: ${hex.encode(child.privateKey!.toList())}");
+    debugPrint("public key: ${hex.encode(child.publicKey)}");
+    debugPrint("address: ${eth.ethereumAddressFromPublicKey(child.publicKey)}");
+    expect(actual, eth.ethereumAddressFromPublicKey(child.publicKey));
   });
 
-  test("Encrypt content by x25519", () async {
-    final algorithm = Cryptography.instance.x25519();
+  test("Encrypt ipfs key by pinenacl", () async {
+    debugPrint('\n### Public Key Encryption - Box Example ###\n');
+    final seedBytes = bip39.mnemonicToSeed(
+        "toward paper enemy brother man achieve coconut dad tent amateur advance copper");
+    final digest = sha256.convert(seedBytes.toList());
+    // Generate Bob's private key, which must be kept secret
+    final skbob = PrivateKey.fromSeed(Uint8List.fromList(digest.bytes));
 
-    // Let's generate two keypairs.
-    final keyPair = await algorithm.newKeyPair();
-     final publicKey = await keyPair.extractPublicKey();
-    final remoteKeyPair = await algorithm.newKeyPair();
-    final remotePublicKey = await remoteKeyPair.extractPublicKey();
+    // Bob's public key can be given to anyone wishing to send
+    // Bob an encrypted message
+    final pkbob = skbob.publicKey;
 
-    // We can now calculate the shared secret key
-    final sharedSecretKey = await algorithm.sharedSecretKey(
-      keyPair: keyPair,
-      remotePublicKey: remotePublicKey,
-    );
+    // Alice does the same and then Alice and Bob exchange public keys
+    final skalice = PrivateKey.generate();
 
-   final remoteSharedSecretKey = await algorithm.sharedSecretKey(
-      keyPair: remoteKeyPair,
-      remotePublicKey: publicKey,
-    );
+    final pkalice = skalice.publicKey;
 
-    final sharedSecretBytes = await sharedSecretKey.extractBytes();
-    print('Shared secret: ${hex.encode(sharedSecretBytes)}');
-    print('remotePublicKey.bytes: ${hex.encode(await remoteSharedSecretKey.extractBytes())}');
-    expect(1, 1);
+    // Bob wishes to send Alice an encrypted message so Bob must make a Box with
+    // his private key and Alice's public key
+    final bobBox = Box(myPrivateKey: skbob, theirPublicKey: pkalice);
+
+    // This is our message to send, it must be a bytestring as Box will treat it
+    // as just a binary blob of data.
+    const message =
+        "There is no conspiracy out there, but lack of the incentives to drive the people towards the answers.";
+
+    // TweetNaCl can automatically generate a random nonce for us, making the encryption very simple:
+    // Encrypt our message, it will be exactly 40 bytes longer than the
+    // original message as it stores authentication information and the
+    // nonce alongside it.
+    final encryptedAsList =
+        bobBox.encrypt(Uint8List.fromList(message.codeUnits)).sublist(0);
+
+    // Finally, the message is decrypted (regardless of how the nonce was generated):
+    // Alice creates a second box with her private key to decrypt the message
+    final aliceBox = Box(myPrivateKey: skalice, theirPublicKey: pkbob);
+
+    // Decrypt our message, an exception will be raised if the encryption was
+    // tampered with or there was otherwise an error.
+    final decrypted = aliceBox
+        .decrypt(EncryptedMessage.fromList(encryptedAsList.asTypedList));
+    debugPrint(String.fromCharCodes(decrypted));
+    expect(message, decrypted);
   });
 }

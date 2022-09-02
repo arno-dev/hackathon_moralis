@@ -34,14 +34,19 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  web3dart:
-  encrypt:
-  rsa_encrypt: ^2.0.0
+  encrypt: ^5.0.1
+  web3dart: ^2.3.5
   basic_utils: ^5.1.2
   bip39: ^1.0.6
-  ed25519_hd_key: ^2.2.0
-  pointycastle: ^3.6.1
-  cryptography: ^2.0.5
+  bip32: ^2.0.0
+  pinenacl: ^0.5.1
+  # tuple: ^2.0.0
+  # rsa_encrypt: ^2.0.0
+  # ed25519_hd_key: ^2.2.0
+  # pointycastle: ^3.6.1
+  # cryptography: ^2.0.5
+  # ed25519_hd_key: ^2.1.0
+  # pinenacl: ^0.3.4
   
 dev_dependencies:
   flutter_test:
