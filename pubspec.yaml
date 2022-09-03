@@ -42,13 +42,12 @@ dependencies:
   pinenacl: ^0.5.1
   path_provider: ^2.0.11
   crypto: ^3.0.2
+  convert: ^3.0.2
+  pointycastle: ^3.6.1
   # tuple: ^2.0.0
   # rsa_encrypt: ^2.0.0
   # ed25519_hd_key: ^2.2.0
-  # pointycastle: ^3.6.1
   # cryptography: ^2.0.5
-  # ed25519_hd_key: ^2.1.0
-  # pinenacl: ^0.3.4
   
 dev_dependencies:
   flutter_test:

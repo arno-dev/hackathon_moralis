@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
@@ -35,28 +33,37 @@ class FileHandler {
       rethrow;
     }
   }
-  
+
+  IV _createIV(String strIv) {
+    var iv = sha256
+        .convert(utf8.encode(strIv))
+        .toString()
+        .substring(0, 16); // Consider the first 16 bytes of all 64 bytes
+    return IV.fromUtf8(iv.toString());
+  }
+
+  Encrypter _createEncrypter(String strPwd) {
+    var key = sha256.convert(utf8.encode(strPwd)).toString().substring(0, 32);
+    Key keyObj = Key.fromUtf8(key.toString());
+    return Encrypter(AES(keyObj));
+  }
+
   String encryption(String payload, String strPwd) {
     String strIv = 'SuperSecretBLOCK';
-    var iv = sha256.convert(utf8.encode(strIv)).toString().substring(0, 16);         // Consider the first 16 bytes of all 64 bytes
-    var key = sha256.convert(utf8.encode(strPwd)).toString().substring(0, 32); 
-    IV ivObj = IV.fromUtf8(iv.toString());
-    Key keyObj = Key.fromUtf8(key.toString());
-    final encrypter = Encrypter(AES(keyObj));
+    IV ivObj = _createIV(strIv);
+    final encrypter = _createEncrypter(strPwd);
     final encrypted = encrypter.encrypt(payload, iv: ivObj);
     return encrypted.base64;
   }
 
   String decryption(String payload, String strPwd) {
     String strIv = 'SuperSecretBLOCK';
-     var iv = sha256.convert(utf8.encode(strIv)).toString().substring(0, 16);         // Consider the first 16 bytes of all 64 bytes
-    var key = sha256.convert(utf8.encode(strPwd)).toString().substring(0, 32); 
-    IV ivObj = IV.fromUtf8(iv.toString());
-    Key keyObj = Key.fromUtf8(key.toString());
-    final encrypter = Encrypter(AES(keyObj));
+    IV ivObj = _createIV(strIv);
+    final encrypter = _createEncrypter(strPwd);
     final decrypted = encrypter.decrypt(Encrypted.from64(payload), iv: ivObj);
     return decrypted;
   }
+
   Future<File> writeFile(String data, String password,
       [bool relative = true]) async {
     File? file;
@@ -65,7 +72,7 @@ class FileHandler {
     } else {
       file = await _localFile;
     }
-    final base16 = await encryption(data, password);
+    final base16 = encryption(data, password);
     return file.writeAsString(base16);
   }
 }

@@ -1,13 +1,25 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:pointycastle/export.dart' show ECCurve_secp256k1, ECPoint, KeccakDigest;
+import 'package:bip32/bip32.dart';
+import 'package:hackathon_moralis/models/wallet_credential.dart';
+import 'package:pointycastle/export.dart'
+    show ECCurve_secp256k1, ECPoint, KeccakDigest;
 import 'package:convert/convert.dart' show hex;
 
+import 'package:bip39/bip39.dart' as bip39;
 
 class Eth {
+  WalletCredential getCredential(String mnemonic) {
+    final seedBytes = bip39.mnemonicToSeed(mnemonic);
+    BIP32 node = BIP32.fromSeed(seedBytes);
+    BIP32 child = node.derivePath("m/44'/60'/0'/0/0");
+    final privateKey = hex.encode((child.privateKey ?? Uint8List(0)).toList());
+    final publicKey = hex.encode(child.publicKey);
+    final address = ethereumAddressFromPublicKey(child.publicKey);
+    return WalletCredential(privateKey, publicKey, address);
+  }
+
   /// Derives an Ethereum address from a given public key.
   String ethereumAddressFromPublicKey(Uint8List publicKey) {
     final decompressedPubKey = decompressPublicKey(publicKey);
