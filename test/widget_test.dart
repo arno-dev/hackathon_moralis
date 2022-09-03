@@ -13,44 +13,58 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test("Get credential by bip32", () async {
     const actual = "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8";
+    String mnemonic =
+        "toward paper enemy brother man achieve coconut dad tent amateur advance copper";
     final eth = Eth();
-    WalletCredential walletCredential = eth.getCredential(
-        "toward paper enemy brother man achieve coconut dad tent amateur advance copper");
+    WalletCredential walletCredential = eth.getCredential(mnemonic);
     expect(actual, walletCredential.publicKey);
   });
 
-  test("Encrypt ipfs key by pinenacl", () async {
-    debugPrint('\n### Public Key Encryption - Box Example ###\n');
+  group("Encryption of IPFS", () {
     AsymmetricEncryption asymmetricEncryption = AsymmetricEncryption();
+    const walletPrivateKey = "alkdjfj43iojklflkasdjlfksj";
+    String encrypted = "";
     const message =
         "There is no conspiracy out there, but lack of the incentives to drive the people towards the answers.";
+
     // Generate Bob's private key, which must be kept secret
-    final skbob =
-        asymmetricEncryption.generatePrivateKeyFromWalletPrivate("test");
+    final skbob = asymmetricEncryption
+        .generatePrivateKeyFromWalletPrivate(walletPrivateKey);
     // Bob's public key can be given to anyone wishing to send
     // Bob an encrypted message
     final pkbob = skbob.publicKey;
     // Alice does the same and then Alice and Bob exchange public keys
     final skalice = PrivateKey.generate();
     final pkalice = skalice.publicKey;
-    String encrypted =
-        asymmetricEncryption.encryptData(message, skbob, pkalice);
-    // Decrypt our message, an exception will be raised if the encryption was
-    // tampered with or there was otherwise an error.
-    final decrypted =
-        asymmetricEncryption.decryptData(encrypted, skalice, pkbob);
-    expect(message, decrypted);
+    test("Encrypt IPFS key by pinenacl", () {
+      String bobShareKey =
+          asymmetricEncryption.encryptData(message, skbob, pkalice);
+      encrypted = bobShareKey;
+      expect(encrypted, bobShareKey);
+    });
+
+    test("Decrypt IPFS key by pinenacl", () {
+      final decrypted =
+          asymmetricEncryption.decryptData(encrypted, skalice, pkbob);
+      expect(message, decrypted);
+    });
   });
 
-  test("Encrypt file", () async {
+  group("Encrypt Content IPFS", () {
     String actual = "This is image base 64";
+    String password =
+        "passwordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpassword";
     final fileHandler = FileHandler();
-    final encryptImage = fileHandler.encryption(actual,
-        "passwordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpassword");
-    debugPrint(encryptImage);
-    final baseImage = fileHandler.decryption(encryptImage,
-        "passwordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpasswordpassword");
-    debugPrint(baseImage);
-    expect(actual, baseImage);
+    String encryptedImage = "";
+    test("Start Encrypt Content", () {
+      final encryptImage = fileHandler.encryption(actual, password);
+      encryptedImage = encryptImage;
+      expect(encryptedImage, encryptImage);
+    });
+
+    test("Get Content from IPFS", () {
+      final baseImage = fileHandler.decryption(encryptedImage, password);
+      expect(actual, baseImage);
+    });
   });
 }
