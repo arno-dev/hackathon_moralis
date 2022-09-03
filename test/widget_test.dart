@@ -17,7 +17,7 @@ void main() {
         "toward paper enemy brother man achieve coconut dad tent amateur advance copper";
     final eth = Eth();
     WalletCredential walletCredential = eth.getCredential(mnemonic);
-    expect(actual, walletCredential.publicKey);
+    expect(actual, walletCredential.address);
   });
 
   group("Encryption of IPFS", () {
