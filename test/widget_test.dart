@@ -1,12 +1,8 @@
-import 'package:flutter/foundation.dart';
-
 import 'package:hackathon_moralis/models/wallet_credential.dart';
 
 import 'package:hackathon_moralis/utilities/asymmetic_encryption.dart';
 import 'package:hackathon_moralis/utilities/eth.dart';
 import 'package:hackathon_moralis/utilities/file_handler.dart';
-
-import 'package:pinenacl/x25519.dart' show PrivateKey;
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,7 +30,7 @@ void main() {
     // Bob an encrypted message
     final pkbob = skbob.publicKey;
     // Alice does the same and then Alice and Bob exchange public keys
-    final skalice = PrivateKey.generate();
+    final skalice = asymmetricEncryption.generatePrivateKey();
     final pkalice = skalice.publicKey;
     test("Encrypt IPFS key by pinenacl", () {
       String bobShareKey =

@@ -5,9 +5,12 @@ import 'package:pinenacl/x25519.dart' show Box, PrivateKey, EncryptedMessage;
 import 'package:pinenacl/api.dart';
 import 'package:convert/convert.dart';
 
-
-
 class AsymmetricEncryption {
+  /// this method will auto generate the AsymmetricEncryption private key
+  PrivateKey generatePrivateKey() {
+    return PrivateKey.generate();
+  }
+
   /// this method will convert mnemonic to AsymmetricEncryption key
   PrivateKey generatePrivateKeyFromSeed(String mnemonic) {
     final seedBytes = bip39.mnemonicToSeed(mnemonic);
@@ -44,12 +47,14 @@ class AsymmetricEncryption {
   /// sourcePrivateKey is your private to decrypt message
   /// destinationPublic is owner public
   /// this method will return real message
-  String decryptData(String encryptedData, AsymmetricPrivateKey sourcePrivateKey,
+  String decryptData(
+      String encryptedData,
+      AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic) {
     final box =
         Box(myPrivateKey: sourcePrivateKey, theirPublicKey: destinationPublic);
-    final decrypted = box.decrypt(
-        EncryptedMessage.fromList(Uint8List.fromList(hex.decode(encryptedData))));
+    final decrypted = box.decrypt(EncryptedMessage.fromList(
+        Uint8List.fromList(hex.decode(encryptedData))));
     final predictMessage = String.fromCharCodes(decrypted);
     return predictMessage;
   }
