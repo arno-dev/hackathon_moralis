@@ -1,14 +1,11 @@
 require("dotenv").config();
 const { default: Moralis }  = require("moralis");
 const express  = require("express");
-const { urlencoded, json } =  require('express');
+const bodyParser = require("body-parser")
 const { JsonDB, Config } = require('node-json-db');
 const app = express()
-// Parse URL-encoded bodies (as sent by HTML forms)
-app.use(urlencoded());
-
-// Parse JSON bodies (as sent by API clients)
-app.use(json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 const {
   MORALIS_API_KEY,
