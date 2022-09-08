@@ -8,8 +8,17 @@ import 'package:pointycastle/export.dart'
 import 'package:convert/convert.dart' show hex;
 
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:web3dart/web3dart.dart';
 
 class Eth {
+  WalletCredential getCredentialFromPrivate(String privateHex) {
+    final ethPrivateKey = EthPrivateKey.fromHex(privateHex);
+    final privateKey = hex.encode(ethPrivateKey.privateKey);
+    final publicKeyBytes = ethPrivateKey.publicKey.getEncoded(true);
+    final publicKey = hex.encode(publicKeyBytes);
+    final address = ethereumAddressFromPublicKey(publicKeyBytes);
+    return WalletCredential(privateKey, publicKey, address);
+  }
   WalletCredential getCredential(String mnemonic) {
     final seedBytes = bip39.mnemonicToSeed(mnemonic);
     BIP32 node = BIP32.fromSeed(seedBytes);
@@ -18,6 +27,10 @@ class Eth {
     final publicKey = hex.encode(child.publicKey);
     final address = ethereumAddressFromPublicKey(child.publicKey);
     return WalletCredential(privateKey, publicKey, address);
+  }
+
+  String generateMnemonic() {
+    return bip39.generateMnemonic();
   }
 
   /// Derives an Ethereum address from a given public key.

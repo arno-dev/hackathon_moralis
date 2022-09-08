@@ -8,13 +8,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 
 void main() {
-  test("Get credential by bip32", () async {
+  group("flow of authentication", () {
     const actual = "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8";
-    String mnemonic =
-        "toward paper enemy brother man achieve coconut dad tent amateur advance copper";
-    final eth = Eth();
-    WalletCredential walletCredential = eth.getCredential(mnemonic);
-    expect(actual, walletCredential.address);
+    late String mnemonic;
+    late Eth eth;
+    late String privateKey;
+    late String wrongPrivateKey;
+    setUpAll(() {
+      eth = Eth();
+      privateKey =
+          "1ca5e91ac36132867c3092f68fa794c19721f166c3188aa23fa739e5d30b71bf";
+      wrongPrivateKey = "34850934dfs859085as90384905890f38590fsedf38";
+      mnemonic =
+          "toward paper enemy brother man achieve coconut dad tent amateur advance copper";
+    });
+
+    test("User puts a random private key", () {
+      try {
+        eth.getCredentialFromPrivate(wrongPrivateKey);
+      } on FormatException catch (e) {
+        expect(e.message, "Invalid input length, must be even.",
+            reason: "The private is in wrong format.");
+      }
+    });
+    test("Get credential from private key", () {
+      final credential = eth.getCredentialFromPrivate(privateKey);
+      expect(actual, credential.address);
+    });
+
+    test("Get credential by mnemonic", () async {
+      WalletCredential walletCredential = eth.getCredential(mnemonic);
+      expect(actual, walletCredential.address);
+    });
   });
 
   group("Entire flow of sharing encrypted IPFS file and decryption", () {
@@ -76,7 +101,6 @@ void main() {
         String encryptedMessageFromOnetoTwo = asymmetricEncryption.encryptData(
             secretMessageFromOnetoTwo, skWallet1, skWallet2.publicKey);
 
-        print("encryptedMessageFromOnetoTwo $encryptedMessageFromOnetoTwo");
         String decipherMessageWithWalletOne = asymmetricEncryption.decryptData(
             encryptedMessageFromOnetoTwo, skWallet2, skWallet1.publicKey);
 
