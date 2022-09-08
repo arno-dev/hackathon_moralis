@@ -1,20 +1,45 @@
-import 'package:hackathon_moralis/models/wallet_credential.dart';
+import 'package:hackathon_moralis/core/models/wallet_credential.dart';
 
-import 'package:hackathon_moralis/utilities/asymmetic_encryption.dart';
-import 'package:hackathon_moralis/utilities/eth.dart';
-import 'package:hackathon_moralis/utilities/file_handler.dart';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hackathon_moralis/core/services/asymmetic_encryption.dart';
+import 'package:hackathon_moralis/core/services/file_handler.dart';
+import 'package:hackathon_moralis/core/services/wallet_service.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 
 void main() {
-  test("Get credential by bip32", () async {
+  group("flow of authentication", () {
     const actual = "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8";
-    String mnemonic =
-        "toward paper enemy brother man achieve coconut dad tent amateur advance copper";
-    final eth = Eth();
-    WalletCredential walletCredential = eth.getCredential(mnemonic);
-    expect(actual, walletCredential.address);
+    late String mnemonic;
+    late WalletService walletService;
+    late String privateKey;
+    late String wrongPrivateKey;
+    setUpAll(() {
+      walletService = WalletService();
+      privateKey =
+          "1ca5e91ac36132867c3092f68fa794c19721f166c3188aa23fa739e5d30b71bf";
+      wrongPrivateKey = "34850934dfs859085as90384905890f38590fsedf38";
+      mnemonic =
+          "toward paper enemy brother man achieve coconut dad tent amateur advance copper";
+    });
+
+    test("User puts a random private key", () {
+      try {
+        walletService.getCredentialFromPrivate(wrongPrivateKey);
+      } on FormatException catch (e) {
+        expect(e.message, "Invalid input length, must be even.",
+            reason: "The private is in wrong format.");
+      }
+    });
+    test("Get credential from private key", () {
+      final credential = walletService.getCredentialFromPrivate(privateKey);
+      expect(actual, credential.address);
+    });
+
+    test("Get credential by mnemonic", () async {
+      WalletCredential walletCredential = walletService.getCredential(mnemonic);
+      expect(actual, walletCredential.address);
+    });
   });
 
   group("Entire flow of sharing encrypted IPFS file and decryption", () {
@@ -22,10 +47,10 @@ void main() {
     late String mnemonic1;
     late String mnemonic2;
     late String mnemonic3;
-    final eth = Eth();
+    final walletService = WalletService();
     late WalletCredential walletCredential1;
     late WalletCredential walletCredential2;
-    late WalletCredential walletCredential3 = eth.getCredential(mnemonic3);
+    late WalletCredential walletCredential3 = walletService.getCredential(mnemonic3);
     late PrivateKey skWallet1;
     late PrivateKey skWallet2;
     late PrivateKey skWallet3;
@@ -40,9 +65,9 @@ void main() {
           "copper paper enemy brother man achieve coconut dad tent amateur advance toward";
       mnemonic3 =
           "copper paper enemy man brother achieve coconut dad tent amateur advance toward";
-      walletCredential1 = eth.getCredential(mnemonic1);
-      walletCredential2 = eth.getCredential(mnemonic2);
-      walletCredential3 = eth.getCredential(mnemonic3);
+      walletCredential1 = walletService.getCredential(mnemonic1);
+      walletCredential2 = walletService.getCredential(mnemonic2);
+      walletCredential3 = walletService.getCredential(mnemonic3);
 
       // Generate a private key as it will be used as IPFS key from Wallet 1
       skWallet1 = asymmetricEncryption
@@ -76,7 +101,6 @@ void main() {
         String encryptedMessageFromOnetoTwo = asymmetricEncryption.encryptData(
             secretMessageFromOnetoTwo, skWallet1, skWallet2.publicKey);
 
-        print("encryptedMessageFromOnetoTwo $encryptedMessageFromOnetoTwo");
         String decipherMessageWithWalletOne = asymmetricEncryption.decryptData(
             encryptedMessageFromOnetoTwo, skWallet2, skWallet1.publicKey);
 

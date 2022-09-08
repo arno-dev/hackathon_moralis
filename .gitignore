@@ -31,6 +31,10 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+# igore generate file
+*.g.dart
+*.config.dart
+*.lock
 
 # Web related
 lib/generated_plugin_registrant.dart
