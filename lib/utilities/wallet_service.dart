@@ -10,7 +10,7 @@ import 'package:convert/convert.dart' show hex;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:web3dart/web3dart.dart';
 
-class Eth {
+class WalletService {
   WalletCredential getCredentialFromPrivate(String privateHex) {
     final ethPrivateKey = EthPrivateKey.fromHex(privateHex);
     final privateKey = hex.encode(ethPrivateKey.privateKey);
