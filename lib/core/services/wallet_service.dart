@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bip32/bip32.dart';
-import 'package:hackathon_moralis/models/wallet_credential.dart';
+import 'package:hackathon_moralis/core/models/wallet_credential.dart';
 import 'package:pointycastle/export.dart'
     show ECCurve_secp256k1, ECPoint, KeccakDigest;
 import 'package:convert/convert.dart' show hex;

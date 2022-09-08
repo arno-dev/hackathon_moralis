@@ -1,10 +1,10 @@
-import 'package:hackathon_moralis/models/wallet_credential.dart';
+import 'package:hackathon_moralis/core/models/wallet_credential.dart';
 
-import 'package:hackathon_moralis/utilities/asymmetic_encryption.dart';
-import 'package:hackathon_moralis/utilities/wallet_service.dart';
-import 'package:hackathon_moralis/utilities/file_handler.dart';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hackathon_moralis/core/services/asymmetic_encryption.dart';
+import 'package:hackathon_moralis/core/services/file_handler.dart';
+import 'package:hackathon_moralis/core/services/wallet_service.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 
 void main() {
