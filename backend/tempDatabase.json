@@ -1,1 +1,84 @@
-{"images":{"0xFE2b19a3545f25420E3a5DAd1154ed5011w852ex":{"imagePath":[{"path":"https://ipfs.moralis.io:2053/ipfs/QmSJU84fKLchg1P9pgYzbR6A8zFULZB1K8FTaYtxFs7AsU/QmVH1D8x5tUhpehBKgL8mZLdL62jqkEg1afQCVnqCM8Jae/moralis/logo5.jpg"},{"path":"https://ipfs.moralis.io:2053/ipfs/QmSJU84fKLchg1P9pgYzbR6A8zFULZB1K8FTaYtxFs7AsU/QmVH1D8x5tUhpehBKgL8mZLdL62jqkEg1afQCVnqCM8Jae/moralis/logo4.jpg"}],"ipfsKey":"encryptIpfsKey"}}}
+{
+    "images": {
+        "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew": {
+            "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
+            "imagePath": [
+                {
+                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo5.jpg"
+                },
+                {
+                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo4.jpg"
+                }
+            ],
+            "ipfsKey": "test"
+        }
+    },
+    "ownership": {
+        "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew": [
+            "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
+            "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP"
+        ]
+    },
+    "ipfs": {
+        "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP": {
+            "paths": [
+                {
+                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo5.jpg"
+                },
+                {
+                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo4.jpg"
+                }
+            ],
+            "ipfsKey": "test"
+        }
+    },
+    "links": {
+        "lxJgjAMjDLDPPZUtfcP96": {
+            "origin": "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew",
+            "dest": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+            "ipfsKey": "test+ananothertest"
+        },
+        "L7b-njfRd5z-_b016AQ0c": {
+            "origin": "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew",
+            "dest": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+            "ipfsKey": "test+ananothertest",
+            "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP"
+        },
+        "jeRTi5kItmvSaGYY7r0Rt": {
+            "origin": "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew",
+            "dest": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+            "ipfsKey": "test+ananothertest",
+            "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
+            "link": "jeRTi5kItmvSaGYY7r0Rt"
+        },
+        "rk1h2EsoH-D7nwJkmMZgy": {
+            "origin": "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew",
+            "dest": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+            "ipfsKey": "test+ananothertest",
+            "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
+            "link": "rk1h2EsoH-D7nwJkmMZgy"
+        }
+    },
+    "sharing": {
+        "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew": {
+            "0x71C7656EC7ab88b098defB751B7401B5f6d8976F": {
+                "origin": "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew",
+                "dest": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+                "ipfsKey": "test+ananothertest",
+                "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
+                "link": "rk1h2EsoH-D7nwJkmMZgy"
+            }
+        }
+    },
+    "cid": {
+        "links": {
+            "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP": {
+                "origin": "0xFE2b19a3545f25420E3a5DAd1154ed5011w852ew",
+                "dest": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+                "ipfsKey": "test+ananothertest",
+                "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
+                "link": "rk1h2EsoH-D7nwJkmMZgy"
+            }
+        }
+    }
+}
