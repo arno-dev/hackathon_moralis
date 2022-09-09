@@ -36,6 +36,7 @@ migrate_working_dir/
 *.config.dart
 *.lock
 *.mocks.dart
+*.gen.dart
 
 # Web related
 lib/generated_plugin_registrant.dart

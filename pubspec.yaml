@@ -67,6 +67,21 @@ dev_dependencies:
   json_serializable: ^6.3.1
   retrofit_generator: ^4.0.3+1
   mockito: ^5.3.0
+  flutter_gen_runner: ^4.3.0
+
+flutter_gen:
+  output: lib/generated/ # Optional (default: lib/gen/)
+  line_length: 80 # Optional (default: 80)
+
+  # Optional
+  integrations:
+    flutter_svg: true
+    flare_flutter: true
+    rive: true
+
+  # colors:
+  #   inputs:
+  #     - assets/color/colors.xml
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
