@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const { urlencoded, json } = require('express');
 const { default: Moralis }  = require("moralis");
-const express  = require("express");
 const bodyParser = require("body-parser")
 const { JsonDB, Config } = require('node-json-db');
 const codec = require('json-url')('lzw');
