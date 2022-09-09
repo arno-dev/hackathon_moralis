@@ -2,9 +2,56 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
+@lazySingleton
 class FileHandler {
+  final FilePicker filePicker;
+  final http.Client client;
+
+  FileHandler(this.filePicker, this.client);
+
+  Future<String?> getSingleFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    String? path = result?.files.single.path;
+    if (path != null) {
+      File file = File(path);
+      String base64 = await _convertFileToBase64(file);
+      return base64;
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<String>> getMultiFiles() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+    List<String> files = [];
+    if (result != null) {
+      for (var path in result.paths) {
+        if (path != null) {
+          final imageBase64 = await _convertFileToBase64(File(path));
+          files.add(imageBase64);
+        }
+      }
+    }
+    return files;
+  }
+
+  Future<String> _convertFileToBase64(File file) async {
+    List<int> imageBytes = await file.readAsBytes();
+    return base64Encode(imageBytes);
+  }
+
+  Future<String> networkImageToBase64(String imageUrl) async {
+    http.Response response = await client.get(Uri.parse(imageUrl));
+    final bytes = response.bodyBytes;
+    return base64Encode(bytes);
+  }
+
   Future<String?> get _localPath async {
     final directory = await getTemporaryDirectory();
     return directory.path;

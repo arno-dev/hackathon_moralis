@@ -1,12 +1,17 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:hackathon_moralis/core/models/wallet_credential.dart';
-
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hackathon_moralis/core/services/asymmetic_encryption.dart';
 import 'package:hackathon_moralis/core/services/file_handler.dart';
 import 'package:hackathon_moralis/core/services/wallet_service.dart';
+import 'package:mockito/annotations.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
+import 'package:http/http.dart' as http;
 
+import 'widget_test.mocks.dart';
+
+@GenerateMocks([http.Client, FilePicker])
 void main() {
   group("flow of authentication", () {
     const actual = "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8";
@@ -50,11 +55,14 @@ void main() {
     final walletService = WalletService();
     late WalletCredential walletCredential1;
     late WalletCredential walletCredential2;
-    late WalletCredential walletCredential3 = walletService.getCredential(mnemonic3);
+    late WalletCredential walletCredential3 =
+        walletService.getCredential(mnemonic3);
     late PrivateKey skWallet1;
     late PrivateKey skWallet2;
     late PrivateKey skWallet3;
     late FileHandler fileHandler;
+    late MockFilePicker mockFilePicker;
+    late MockClient mockClient;
 
     setUpAll(() {
       asymmetricEncryption = AsymmetricEncryption();
@@ -81,11 +89,16 @@ void main() {
       skWallet3 = asymmetricEncryption
           .generatePrivateKeyFromWalletPrivate(walletCredential3.privateKey);
 
+      // mock injection
+      mockFilePicker = MockFilePicker();
+      mockClient = MockClient();
       // For handling file
-      fileHandler = FileHandler();
+      fileHandler = FileHandler(mockFilePicker, mockClient);
     });
 
     group("Test integrity of the keys", () {
+      late MockFilePicker mockFilePicker;
+      late MockClient mockClient;
       setUpAll(() {});
       test("if address are expected from mneumonics", () {
         expect("0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8",
@@ -125,8 +138,11 @@ void main() {
         // This will be shared / retrieved along the future encrypted IPFS File
         String encryptedMessageFromOnetoTwo = asymmetricEncryption.encryptData(
             secretMessageFromOnetoTwo, skWallet1, skWallet2.publicKey);
+        // mock injection
+        mockFilePicker = MockFilePicker();
+        mockClient = MockClient();
 
-        fileHandler = FileHandler();
+        fileHandler = FileHandler(mockFilePicker, mockClient);
         final encryptImage =
             fileHandler.encryption(actual, secretMessageFromOnetoTwo);
 
