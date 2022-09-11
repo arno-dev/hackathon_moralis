@@ -34,12 +34,13 @@ function getIPFSCid(url) {
 /// New version of saving images on IPFS
 app.post('/v2/saveImages', imagesController.uploadImagesToIpfs, imagesController.saveIpfsPathToDB)
 app.get('/v2/getImagesFromIPFS/:cid', imagesController.getIpfsFromCID);
-app.get('/v2/getImageFromShareableLink/:link', imagesController.getShareableLink, imagesController.getImageFromShareableLink);
+// app.get('/v2/getImageFromShareableLink/:link', imagesController.getShareableLink, imagesController.getImageFromShareableLink);
 app.get('/v2/getImagesFromAddress/:address', imagesController.getIpfsFromAddress);
 app.post('/v2/share', imagesController.createShareableLink);
 app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
 app.get('/v2/share/cid', imagesController.getShareableLinkByCID);
 app.get('/v2/share/:link', imagesController.getShareableLink);
+app.get('/v2/getImagesFromLink/:link', imagesController.getImagesFromLink);
 
 /// Old version below
 
