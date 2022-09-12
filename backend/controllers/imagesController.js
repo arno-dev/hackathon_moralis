@@ -9,8 +9,6 @@ const { admin, notification_options } = require("../utils/firebase-config")
 
 var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
 
-exports.uploadImagesToIpfs = async (request, response, next) => {
-    const { images, origin, dest, encryptIpfsKey } = request.body;
 // save firebase token
 exports.saveRegistrationToken = async (request, response) => {
     const { address, token } = request.body;
@@ -37,7 +35,7 @@ exports.getRegistrationTokenFromAddress = async (request, response) => {
 exports.sendNotifications = async (request, response) => {
     const { registrationToken, message } = request.body
     const options = notification_options
-    if(!registrationToken || !message){
+    if (!registrationToken || !message) {
         return response.status(400)
     }
     admin.messaging().sendToDevice(registrationToken, message, options)
@@ -50,7 +48,7 @@ exports.sendNotifications = async (request, response) => {
 }
 
 exports.uploadImagesToIpfs = async (request, res, next) => {
-    const { images, address, encryptIpfsKey } = request.body;
+    const { images, origin, dest, encryptIpfsKey } = request.body;
     var data = {};
     if (!images || !origin || !dest || !encryptIpfsKey) {
         return response.sendStatus(400);
