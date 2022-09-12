@@ -1,7 +1,7 @@
-import 'package:DBox/core/models/wallet_credential.dart';
-import 'package:DBox/core/services/asymmetic_encryption.dart';
-import 'package:DBox/core/services/file_handler.dart';
-import 'package:DBox/core/services/wallet_service.dart';
+import 'package:d_box/core/models/wallet_credential.dart';
+import 'package:d_box/core/services/asymmetic_encryption.dart';
+import 'package:d_box/core/services/file_handler.dart';
+import 'package:d_box/core/services/wallet_service.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter_test/flutter_test.dart';
