@@ -102,31 +102,20 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
     response.send(request.ipfs);
 }
 
-// TODO: in the future we want it to be retrieved from a smart contract
-exports.getIpfsFromCID = async (request, response) => {
-    const { cid } = request.params;
-    if (!cid) {
-        return response.sendStatus(400);
-    }
-    const images = await db.getData("/ipfs/" + cid);
-    return response.send(images);
-}
-
-// TODO: in the future we want it to be retrieved from a smart contract
-exports.getIpfsFromAddress = async (request, response) => {
+exports.getSharedUsers = async (request, response) => {
     const { address } = request.params;
     if (!address) {
         return response.sendStatus(400);
     }
 
-    const cids = await db.getData("/ownership/" + address);
-    var totalImages = [];
-    for (var i = 0; i < cids.length; i++) {
-
-        const images = await db.getData("/ipfs/" + cids[i]);
-        totalImages.push(images);
+    try {
+        const sharedUsers = await db.getData("/sharing/" + address + "/users");
+        const sharedUserAddresses = sharedUsers.map((e) => e["user"]);
+        return response.send(sharedUserAddresses);
     }
-    return response.send(totalImages);
+    catch (e) {
+        return response.sendStatus(204);
+    }
 }
 
 exports.createShareableLink = async (request, response) => {
@@ -135,13 +124,33 @@ exports.createShareableLink = async (request, response) => {
         return response.sendStatus(400);
     }
     var ID = nanoid();
-    // Check if it exist already ; if it does it means that most likely we coant 
-    var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID };
-    await db.push("/links/" + ID, shareData, true);
-    await db.push("/cid/links/" + cid, shareData, true);
-    await db.push("/sharing/" + origin + "/" + dest, shareData, true);
 
-    return response.send(shareData);
+    // We want to save the list of users somewhere
+    try {
+        const sharedUsers = await db.getData("/sharing/" + origin + "/users");
+        const sharedUserAddresses = sharedUsers.map((e) => e["user"]);
+        if (sharedUserAddresses.indexOf(dest) < 0) {
+            // Doesn't exist so we can push it
+            await db.push("/sharing/" + origin + "/users[]/user", dest);
+        }
+    }
+    catch (e) {
+        // Doesn't exist so we can push it
+        await db.push("/sharing/" + origin + "/users[]/user", dest);
+    }
+
+    try {
+        const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
+        return response.send(shareLink);
+    }
+    catch (e) {
+        var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID };
+        await db.push("/links/" + ID, shareData, true);
+        await db.push("/cid/links/" + cid, shareData, true);
+        await db.push("/sharing/" + origin + "/" + dest + "/" + cid, shareData, true);
+
+        return response.send(shareData);
+    }
 }
 
 exports.getShareableLinkByAddresses = async (request, response) => {
@@ -174,51 +183,8 @@ exports.getShareableLinkByCID = async (request, response) => {
     }
 }
 
-exports.getShareableLink = async (request, response) => {
-    const { link } = request.params;
-    if (!link) {
-        return response.sendStatus(400);
-    }
 
-    try {
-        const link = await db.getData("/links/" + link);
-        return response.send(link);
-    }
-    catch (e) {
-        return response.sendStatus(204);
-    }
-}
-
-/// Internal method
-// async function getLinks(link) {
-//     const link = await db.getData("/links/" + link);
-//     return link;
-// }
-
-// async function getLinksFromCid(cid) {
-//     const link = await db.getData("/cid/links/" + cid);
-//     return link;
-// }
-
-// async function getLinksFromAddress(origin, dest) {
-//     const link = await db.getData("/sharing/" + origin + "/" + dest);
-//     return link;
-// }
-
-exports.getIpfsFromLink = async (request, response) => {
-    const { link } = request.params;
-    if (!link) {
-        return response.sendStatus(400);
-    }
-
-    try {
-        const link = await db.getData("/links/" + link);
-    }
-    catch (e) {
-        return response.sendStatus(204);
-    }
-}
-
+// !Important : this one is the main method to retrieve a formatted filetree images
 exports.getImagesFromLink = async (request, response) => {
     const { link } = request.params;
     if (!link) {
@@ -226,10 +192,10 @@ exports.getImagesFromLink = async (request, response) => {
     }
 
     try {
-        // const link = await db.getData("/links/" + link);
-        const cid = "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP";
+        const imagesFromLink = await db.getData("/links/" + link);
+        const cid = imagesFromLink["cid"];
         const ipfsInfo = await db.getData("/ipfs/" + cid);
-        const ipfsKey = ipfsInfo["key"];
+        const ipfsKey = imagesFromLink["ipfsKey"];
         const ipfsImages = ipfsInfo["paths"];
         paths = await this.getImages(ipfsImages, cid);
 
@@ -243,6 +209,33 @@ exports.getImagesFromLink = async (request, response) => {
         return response.sendStatus(204);
     }
 }
+
+// !Important : this one is the main method to retrieve a formatted filetree images
+exports.getImagesFromAddress = async (request, response) => {
+    const { address } = request.params;
+    if (!address) {
+        return response.sendStatus(400);
+    }
+
+    try {
+        const imagesFromAddress = await db.getData("/images/" + address);
+        const cid = imagesFromAddress["cid"];
+        // const ipfsInfo = await db.getData("/ipfs/" + cid);
+        // const ipfsKey = imagesFromLink["ipfsKey"];
+        const ipfsImages = imagesFromAddress["imagePath"];
+        paths = await this.getImages(ipfsImages, cid);
+
+        response.send({
+            // "ipfsKey": ipfsKey, // We intentionally hide the ipfsKey
+            "cid": cid,
+            "filetree": paths
+        });
+    }
+    catch (e) {
+        return response.sendStatus(204);
+    }
+}
+
 exports.getImages = async (imagesPath, ipfs) => {
     const truncatedImagesPath = imagesPath.map(e => {
         const path = e["path"];
