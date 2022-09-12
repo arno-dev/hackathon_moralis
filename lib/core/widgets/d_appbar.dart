@@ -31,7 +31,7 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: (title != null)
           ? Text(
               title!,
-              style: TextStyle(color: Colors.red),
+              style: const TextStyle(color: Colors.red),
             )
           : Container(),
       centerTitle: centerTitle,

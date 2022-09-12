@@ -50,6 +50,7 @@ dependencies:
   flutter_secure_storage: ^6.0.0
   file_picker: ^5.0.1
   http: ^0.13.5
+  change_app_package_name: ^1.1.0
 
   # Encryption
   bip32: ^2.0.0
