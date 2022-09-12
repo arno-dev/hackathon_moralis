@@ -1,10 +1,12 @@
 import 'package:bip39/bip39.dart' as bip39;
 import "package:crypto/crypto.dart" show sha256;
+import 'package:injectable/injectable.dart';
 
 import 'package:pinenacl/x25519.dart' show Box, PrivateKey, EncryptedMessage;
 import 'package:pinenacl/api.dart';
 import 'package:convert/convert.dart';
 
+@lazySingleton
 class AsymmetricEncryption {
   /// this method will auto generate the AsymmetricEncryption private key
   PrivateKey generatePrivateKey() {

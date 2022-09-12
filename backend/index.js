@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const { urlencoded, json } = require('express');
 const { default: Moralis }  = require("moralis");
-const express  = require("express");
 const bodyParser = require("body-parser")
 const { JsonDB, Config } = require('node-json-db');
 const codec = require('json-url')('lzw');
@@ -34,14 +33,14 @@ function getIPFSCid(url) {
 
 /// New version of saving images on IPFS
 app.post('/v2/saveImages', imagesController.uploadImagesToIpfs, imagesController.saveIpfsPathToDB)
-app.get('/v2/getImagesFromIPFS/:cid', imagesController.getIpfsFromCID);
-app.get('/v2/getImageFromShareableLink/:link', imagesController.getShareableLink, imagesController.getImageFromShareableLink);
-app.get('/v2/getImagesFromAddress/:address', imagesController.getIpfsFromAddress);
+// !important : this one will be used
+app.get('/v2/images/link/:link', imagesController.getImagesFromLink);
+app.get('/v2/images/address/:address', imagesController.getImagesFromAddress);
 app.post('/v2/share', imagesController.createShareableLink);
-app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
-app.get('/v2/share/cid', imagesController.getShareableLinkByCID);
-app.get('/v2/share/:link', imagesController.getShareableLink);
+// WIP
 
+app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
+app.get('/v2/share/users/:address', imagesController.getSharedUsers);
 /// Old version below
 
 /// Save images on IPFS and return list of path 
@@ -98,18 +97,6 @@ app.get('/users', async function (request, response) {
   return response.send({ "ipfs-cid": ipfs });
 });
 
-// TODO: write a unit test with an extra derivated public address and test if crypto retro compabilities work
-/*
-User A want to share with User B 
-User A need to retrieve all users (we don't do invite system at the moment)
-User A need to create a shareable link from IPFS 
-  - the file is first local and not uploaded to IPFS
-  - an ipfskey is used by using User B public key
-  - a shared link is constant if User A to User B
-  - a shared link can be for User A to User A (himself to decrypt)
-  - a shared link contains the ipfskey and IPFS CID
-  - 
-*/
 /// Create shareable links
 app.post('/getLinks/:address', async function (request, response) {
   const { address } = request.params;
