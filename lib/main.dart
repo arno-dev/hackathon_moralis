@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hackathon_moralis/core/config/themes/app_theme.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
 import 'core/config/DI/configure_dependencies.dart';
 import 'core/config/routes/router.dart';
@@ -31,9 +32,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
     return MaterialApp(
       title: 'Flutter Clean Architecture',
       //set up theme
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: AppTheme.mainTheme,
       //set up localization
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
