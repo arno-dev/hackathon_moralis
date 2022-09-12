@@ -1,4 +1,4 @@
-package com.example.hackathon_moralis
+package com.comet.dbox
 
 import io.flutter.embedding.android.FlutterActivity
 

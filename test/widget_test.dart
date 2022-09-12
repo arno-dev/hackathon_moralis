@@ -1,10 +1,10 @@
+import 'package:DBox/core/models/wallet_credential.dart';
+import 'package:DBox/core/services/asymmetic_encryption.dart';
+import 'package:DBox/core/services/file_handler.dart';
+import 'package:DBox/core/services/wallet_service.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:hackathon_moralis/core/models/wallet_credential.dart';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hackathon_moralis/core/services/asymmetic_encryption.dart';
-import 'package:hackathon_moralis/core/services/file_handler.dart';
-import 'package:hackathon_moralis/core/services/wallet_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 import 'package:http/http.dart' as http;

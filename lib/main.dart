@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hackathon_moralis/core/config/themes/app_theme.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
 import 'core/config/DI/configure_dependencies.dart';
 import 'core/config/routes/router.dart';
+import 'core/config/themes/app_theme.dart';
 
 Future<void> main() async {
   await configureDependencies();

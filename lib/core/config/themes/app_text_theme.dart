@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hackathon_moralis/core/constants/colors.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../constants/colors.dart';
 
 extension CustomTextTheme on TextTheme {
   TextStyle get headline1Custom => const TextStyle(
