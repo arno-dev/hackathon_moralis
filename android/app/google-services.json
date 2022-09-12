@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "708882519813",
+    "project_id": "d-box-app",
+    "storage_bucket": "d-box-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708882519813:android:0e872ffc338d6396da496c",
+        "android_client_info": {
+          "package_name": "com.comet.dbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708882519813-2qpges4rcp9r011kupee3is85plu6gi4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlKbsOo_mpyRJyOBdWN2j8KKvTk-ky42I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708882519813-2qpges4rcp9r011kupee3is85plu6gi4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
