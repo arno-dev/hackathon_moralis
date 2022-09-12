@@ -5,8 +5,47 @@ const { getIPFSCid } = require('../utils/utils');
 const merge = require('deepmerge');
 const { nanoid } = require('nanoid');
 const e = require("express");
+const { admin, notification_options } = require("../utils/firebase-config")
 
 var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
+
+// save firebase token
+exports.saveRegistrationToken = async (request, response) => {
+    const { address, token } = request.body;
+    if (!address || !token) {
+        return response.sendStatus(400);
+    }
+    try {
+        await db.push("/token/" + address, token);
+        return response.sendStatus(200)
+    } catch (error) {
+        return response.sendStatus(500)
+    }
+}
+// get firebase token from address
+exports.getRegistrationTokenFromAddress = async (request, response) => {
+    const { address } = request.params;
+    if (!address) {
+        return response.status(400);
+    }
+    const firebaesToken = await db.getData("/token/" + address);
+    return response.send({ "token": firebaesToken });
+}
+// send invite link via firebase cloud messaging
+exports.sendNotifications = async (request, response) => {
+    const { registrationToken, message } = request.body
+    const options = notification_options
+    if(!registrationToken || !message){
+        return response.status(400)
+    }
+    admin.messaging().sendToDevice(registrationToken, message, options)
+        .then(_ => {
+            return response.status(200).send("Notification sent successfully")
+        })
+        .catch(error => {
+            return response.status(500).send(error)
+        });
+}
 
 exports.uploadImagesToIpfs = async (request, res, next) => {
     const { images, address, encryptIpfsKey } = request.body;

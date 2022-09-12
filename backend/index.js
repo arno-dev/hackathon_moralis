@@ -1,9 +1,8 @@
 require("dotenv").config();
 const express = require("express");
-const { urlencoded, json } = require('express');
+const { json } = require('express');
 const { default: Moralis }  = require("moralis");
 const bodyParser = require("body-parser")
-const { JsonDB, Config } = require('node-json-db');
 const codec = require('json-url')('lzw');
 const app = express()
 
@@ -41,6 +40,9 @@ app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
 app.get('/v2/share/cid', imagesController.getShareableLinkByCID);
 app.get('/v2/share/:link', imagesController.getShareableLink);
 app.get('/v2/getImagesFromLink/:link', imagesController.getImagesFromLink);
+app.post('/v2/saveRegistrationToken', imagesController.saveRegistrationToken)
+app.post('/v2/sendNotifications', imagesController.sendNotifications)
+app.get('/v2/getRegistrationTokenFromAddress/:address', imagesController.getRegistrationTokenFromAddress)
 
 /// Old version below
 
