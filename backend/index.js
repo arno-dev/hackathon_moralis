@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const { urlencoded, json } = require('express');
-const { default: Moralis }  = require("moralis");
+const { default: Moralis } = require("moralis");
 const bodyParser = require("body-parser")
 const { JsonDB, Config } = require('node-json-db');
 const codec = require('json-url')('lzw');
@@ -31,16 +31,15 @@ function getIPFSCid(url) {
   return "";
 }
 
-/// New version of saving images on IPFS
-app.post('/v2/saveImages', imagesController.uploadImagesToIpfs, imagesController.saveIpfsPathToDB)
 // !important : this one will be used
 app.get('/v2/images/link/:link', imagesController.getImagesFromLink);
+// This one will be used to retrieve our own images
 app.get('/v2/images/address/:address', imagesController.getImagesFromAddress);
 app.post('/v2/share', imagesController.createShareableLink);
-// WIP
-
 app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
 app.get('/v2/share/users/:address', imagesController.getSharedUsers);
+
+app.post('/v2/share/images', imagesController.uploadImagesToIpfs, imagesController.saveIpfsPathToDB, imagesController.createShareableLink);
 /// Old version below
 
 /// Save images on IPFS and return list of path 

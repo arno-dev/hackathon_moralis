@@ -8,10 +8,10 @@ const e = require("express");
 
 var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
 
-exports.uploadImagesToIpfs = async (request, res, next) => {
-    const { images, address, encryptIpfsKey } = request.body;
+exports.uploadImagesToIpfs = async (request, response, next) => {
+    const { images, origin, dest, encryptIpfsKey } = request.body;
     var data = {};
-    if (!images || !address || !encryptIpfsKey) {
+    if (!images || !origin || !dest || !encryptIpfsKey) {
         return response.sendStatus(400);
     }
     const options = { abi: request.body.images };
@@ -21,46 +21,54 @@ exports.uploadImagesToIpfs = async (request, res, next) => {
     }
     let firstImagePath = imagePath.data[0]["path"];
     let ipfs = getIPFSCid(firstImagePath);
-    request.ipfs = { "cid": ipfs, imagePath, "ipfsKey": encryptIpfsKey };
-
-    // request.ipfs = {
-    //     "cid": "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP",
-    //     "imagePath": [
-    //         {
-    //             "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo5.jpg"
-    //         },
-    //         {
-    //             "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo4.jpg"
-    //         }
-    //     ],
-    //     "ipfsKey": "test"
-    // };
+    request.ipfs = { "cid": ipfs, imagePath, "origin": origin, "dest": dest, "ipfsKey": encryptIpfsKey };
     next();
 }
 
-// TODO: in the future we want it to be stored in a smart contract
 exports.saveIpfsPathToDB = async (request, response, next) => {
-    const { address } = request.body;
-
-    const { cid, imagePath, ipfsKey } = request.ipfs;
-    if (!cid || !imagePath || !ipfsKey || !address) {
+    const { cid, imagePath, ipfsKey, origin, dest } = request.ipfs;
+    if (!cid || !imagePath || !ipfsKey || !origin || !dest) {
         return response.sendStatus(400);
     }
 
     // We want to save owner ship of IPFS along publid address
     var ownerShipData = {};
 
-    // ownerShipData[address] = ownerShipData;
-    await db.push("/ownership/" + address + "[]", cid, true);
+    await db.push("/ownership/" + origin + "[]", cid, true);
 
     var ipfsData = {};
     ipfsData[cid] = {
-        "paths": imagePath,
+        "paths": imagePath["data"],
         "ipfsKey": ipfsKey
     };
-    await db.push("/ipfs", ipfsData)
+    // TODO: remove below
+    console.log(ipfsData);
+    await db.push("/ipfs/" + cid + "/paths", ipfsData)
 
-    response.send(request.ipfs);
+    // TODO: change with that 
+    /*
+        "ipfs": {
+        "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP": {
+            "paths": [
+                {
+                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo5.jpg"
+                },
+                {
+                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo4.jpg"
+                }
+            ],
+            "ipfsKey": "test+ananothertest"
+        }
+    },
+    */
+    request.body = {
+        "cid": cid,
+        "ipfsKey": ipfsKey,
+        "origin": origin,
+        "dest": dest
+    }
+    next();
+    // return response.send(request.body)
 }
 
 exports.getSharedUsers = async (request, response) => {
@@ -80,6 +88,7 @@ exports.getSharedUsers = async (request, response) => {
 }
 
 exports.createShareableLink = async (request, response) => {
+    console.log("request.body " + request.body);
     const { dest, origin, ipfsKey, cid } = request.body;
     if (!dest || !origin || !ipfsKey || !cid) {
         return response.sendStatus(400);
@@ -155,9 +164,9 @@ exports.getImagesFromLink = async (request, response) => {
     try {
         const imagesFromLink = await db.getData("/links/" + link);
         const cid = imagesFromLink["cid"];
-        const ipfsInfo = await db.getData("/ipfs/" + cid);
+        const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
         const ipfsKey = imagesFromLink["ipfsKey"];
-        const ipfsImages = ipfsInfo["paths"];
+        const ipfsImages = ipfsInfo[cid]["paths"];
         paths = await this.getImages(ipfsImages, cid);
 
         response.send({
