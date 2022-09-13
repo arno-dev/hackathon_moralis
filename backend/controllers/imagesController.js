@@ -114,11 +114,6 @@ exports.createShareableLink = async (request, response) => {
         await db.push("/cid/links/" + cid, shareData, true);
         await db.push("/sharing/" + origin + "/" + dest + "/" + cid, shareData, true);
 
-
-        // const emitterAddress = payload["origin"];
-        // const cid = payload["cid"];
-        // const link = payload["link"];
-        // We should save the alert
         await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID });
 
         return response.send(shareData);
@@ -165,14 +160,17 @@ exports.getImagesFromLink = async (request, response) => {
 
     try {
         const imagesFromLink = await db.getData("/links/" + link);
-        const cid = imagesFromLink["cid"];
+        // const cid = imagesFromLink["cid"];
+        // const ipfsKey = imagesFromLink["ipfsKey"];
+        const { cid, ipfsKey, origin, dest } = imagesFromLink;
         const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
-        const ipfsKey = imagesFromLink["ipfsKey"];
         const ipfsImages = ipfsInfo[cid]["paths"];
         paths = await this.getImages(ipfsImages, cid);
 
         response.send({
             "ipfsKey": ipfsKey,
+            "origin": origin,
+            "dest": dest,
             "cid": cid,
             "filetree": paths
         });

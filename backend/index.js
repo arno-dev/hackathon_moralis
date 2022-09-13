@@ -28,6 +28,8 @@ app.get('/v2/images/address/:address', imagesController.getImagesFromAddress);
 app.post('/v2/share', imagesController.createShareableLink);
 
 app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
+
+// We want to have a list of users we shared links in the past
 app.get('/v2/share/users/:address', imagesController.getSharedUsers);
 
 app.post('/v2/share/images', imagesController.uploadImagesToIpfs, imagesController.saveIpfsPathToDB, imagesController.createShareableLink);
@@ -44,8 +46,6 @@ app.get('/v2/alerts/:address', alertsController.getAlerts);
 // The Get Recent will be all the shared links to myself as i'm the only one to be able to decrypt it
 
 // TODO: put the origin addres along the ipfsKey so the receiver can decypher it
-
-// TODO : FInish the alerts table
 
 
 
