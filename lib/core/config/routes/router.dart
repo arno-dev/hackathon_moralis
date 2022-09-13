@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../features/home/presentation/cubit/Home/home_cubit.dart';
+import '../../../features/home/presentation/page/home_page.dart';
 import '../../../features/todo/presentation/cubit/todo_cubit.dart';
 import '../../../features/todo/presentation/pages/todos_page.dart';
-import '../../../root_page.dart';
 import '../DI/configure_dependencies.dart';
 
 class AppRoute {
@@ -12,7 +13,13 @@ class AppRoute {
       RouteSettings settings, TickerProvider tickerProvider) {
     switch (settings.name) {
       case initialRoute:
-        return MaterialPageRoute(builder: (_) => const RootPage());
+        return MaterialPageRoute(
+            // hard code link for test
+            builder: (_) => BlocProvider(
+                  create: (context) => getIt<HomeCubit>()
+                    ..getUserFromLink('hkF9RMhB4yEICzd2B383v'),
+                  child: const HomePage(),
+                ));
       case todosRoute:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
