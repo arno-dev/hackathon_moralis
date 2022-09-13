@@ -102,19 +102,26 @@ exports.createShareableLink = async (request, response) => {
         await alertsController.saveAlert(ALERT.AddedInContact, dest, { "origin": origin, "ipfsKey": ipfsKey });
     }
 
+
+
+    // We will create our share links
+    const createdAt = new Date().toISOString();
     try {
         const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
         const { cid, link } = shareLink;
-        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link });
+        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link, "createdAt": createdAt });
         return response.send(shareLink);
     }
     catch (e) {
-        var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID };
+        var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "link": ID, "createdAt": createdAt };
         await db.push("/links/" + ID, shareData, true);
         await db.push("/cid/links/" + cid, shareData, true);
         await db.push("/sharing/" + origin + "/" + dest + "/" + cid, shareData, true);
 
-        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID });
+        // We want to store the receivers so they can retrieve all the links shared to themselves
+        await db.push("/receivers/" + dest + "/links[]", shareData, true);
+
+        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "createdAt": createdAt });
 
         return response.send(shareData);
     }
@@ -160,14 +167,12 @@ exports.getImagesFromLink = async (request, response) => {
 
     try {
         const imagesFromLink = await db.getData("/links/" + link);
-        // const cid = imagesFromLink["cid"];
-        // const ipfsKey = imagesFromLink["ipfsKey"];
         const { cid, ipfsKey, origin, dest } = imagesFromLink;
         const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
         const ipfsImages = ipfsInfo[cid]["paths"];
         paths = await this.getImages(ipfsImages, cid);
 
-        response.send({
+        return response.send({
             "ipfsKey": ipfsKey,
             "origin": origin,
             "dest": dest,
@@ -180,7 +185,42 @@ exports.getImagesFromLink = async (request, response) => {
     }
 }
 
-// !Important : this one is the main method to retrieve a formatted filetree images
+exports.getRecentImagesSharedWithMyself = async (request, response) => {
+    const { address } = request.params;
+    if (!address) {
+        return response.sendStatus(400);
+    }
+
+    try {
+        const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
+        // Now we want to grab all the files from those links
+        const linksUniqueAddressedToMyself = [...new Set(linksAddressedToMyself)];
+        var files = [];
+        for (var i = 0; i < linksUniqueAddressedToMyself.length; i++) {
+            const { link } = linksUniqueAddressedToMyself[i];
+
+            const imagesFromLink = await db.getData("/links/" + link);
+            const { cid, ipfsKey, origin, dest } = imagesFromLink;
+            const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
+            const ipfsImages = ipfsInfo[cid]["paths"];
+            paths = await this.getImages(ipfsImages, cid);
+            files.push({
+                "ipfsKey": ipfsKey,
+                "origin": origin,
+                "dest": dest,
+                "cid": cid,
+                "createdAt": createdAt,
+                "filetree": paths
+            });
+        }
+        return response.send(files);
+    }
+    catch (e) {
+        return response.sendStatus(204);
+    }
+}
+
+// !Important : this is used before to get all the filestree related to the owner address (not receievers)
 exports.getImagesFromAddress = async (request, response) => {
     const { address } = request.params;
     if (!address) {

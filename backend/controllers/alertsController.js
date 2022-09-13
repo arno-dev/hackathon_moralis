@@ -80,7 +80,7 @@ async function insertAlertInDB(address, message, payload) {
     const alertData = {
         "message": message,
         "payload": payload,
-        "date": now()
+        "createdAt": now()
     };
     await alertDB.push("/alerts/" + address + '/messages[]', alertData, true);
 }
