@@ -2,11 +2,11 @@ part of 'home_cubit.dart';
 
 @freezed
 class HomeState with _$HomeState {
-  const factory HomeState.initial() = _Initial;
-  const factory HomeState.start() = _Start;
-  const factory HomeState.loading() = _Loading;
-  const factory HomeState.loaded({
+  const factory HomeState({
+    @Default(DataStatus.initial) DataStatus dataStatus,
+    List<ImagesFromLink>? recents,
     ImagesFromLink? imagesFromLink,
+    List<Images>? currentFolder,
+    List<Images>? prevFolder,
   }) = _Loaded;
-  const factory HomeState.error(String message) = _Error;
 }

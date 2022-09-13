@@ -1,13 +1,13 @@
-import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/material.dart';
 
-import 'base_button.dart';
+import 'package:flutter/material.dart';
+import 'package:dotted_border/dotted_border.dart';
+import '../../../../core/widgets/base_button.dart';
 
 class DottedButton extends StatelessWidget {
   const DottedButton( {super.key,
       this.backgroundColor,
-       this.buttonHeight =34,
-      this.buttonWidth = 110,
+       this.buttonHeight =32,
+      this.buttonWidth = 116,
       this.borderRadius = 28,
       this.onTap,
       required this.borderColor,
@@ -29,10 +29,11 @@ class DottedButton extends StatelessWidget {
                   color: borderColor,
                   strokeWidth: strokeWidth,
                   dashPattern: const [4, 2],
-                  padding:  EdgeInsets.zero,
+                  padding: const EdgeInsets.all(0),
                   borderType: BorderType.RRect,
                   radius:  Radius.circular(borderRadius),
                   child: BaseButton(
+              
                   buttonHeight:buttonHeight,
                   buttonWidth: buttonWidth,
                   backgroundColor: backgroundColor,

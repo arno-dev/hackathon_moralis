@@ -6,4 +6,5 @@ class ApiPath {
   static const String todos = "/todos";
   static const String users = "/users";
   static const String imagesFromLink = "/v2/images/link/{link}";
+  static const String recent = "/v2/share/recents/{recents}";
 }

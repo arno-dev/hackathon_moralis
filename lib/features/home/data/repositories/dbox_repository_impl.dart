@@ -21,4 +21,15 @@ class DboxRepositoryImpl implements DboxRepository {
       return Left(ServerFailure(e.message.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<ImagesFromLink>>> getRecents(
+      String recents) async {
+    try {
+      final data = await dboxRemoteDataSource.getRecents(recents);
+      return Right(data);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
 }
