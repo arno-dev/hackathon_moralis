@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'stepper.dart';
 
 class DCustomStepper extends StatefulWidget {
-  const DCustomStepper({super.key, this.lineColor, this.stepSize,required this.listOfContent, required this.listOfContentText, required this.textWidth, required this.stepperhorizontal});
+  const DCustomStepper({super.key, this.lineColor, this.stepSize,required this.listOfContent, required this.listOfContentText, required this.textWidth, required this.stepperhorizontal, this.physics});
   final Color? lineColor;
   final double? stepSize;
   final List<Widget> listOfContent;
   final List<String> listOfContentText;
   final double textWidth;
   final double stepperhorizontal;
+  final ScrollPhysics? physics;
 
 
   @override
@@ -20,6 +21,7 @@ class _DCustomStepperState extends State<DCustomStepper> {
   @override
   Widget build(BuildContext context) {
     return Stepper(
+      physics: widget.physics,
       lineColor: widget.lineColor,
       type: StepperType.horizontal,
       currentStep: _index,
@@ -36,7 +38,6 @@ class _DCustomStepperState extends State<DCustomStepper> {
       },
       steps: [
         Step(
-
           isActive: (_index == 0),
                    label: SizedBox(
             width: widget.textWidth,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../features/Authentication/presentation/cubit/authentication_cubit_cubit.dart';
+import '../../../features/Authentication/presentation/pages/authentication_screen.dart';
 import '../../../features/home/presentation/cubit/Home/home_cubit.dart';
 import '../../../features/home/presentation/page/home_page.dart';
 import '../../../features/todo/presentation/cubit/todo_cubit.dart';
@@ -9,17 +11,24 @@ import '../DI/configure_dependencies.dart';
 class AppRoute {
   static const String initialRoute = "/";
   static const String todosRoute = "/todos";
+  static const String homeRoute = "/home";
   static Route<dynamic>? routeGenerate(
       RouteSettings settings, TickerProvider tickerProvider) {
     switch (settings.name) {
       case initialRoute:
         return MaterialPageRoute(
-            // hard code link for test
+            builder: (_) => BlocProvider(
+                  create: (context) => getIt<AuthenticationCubit>()..getMnemonicData(), 
+                  child: const AuthenticationScreen(),
+                ));          
+
+      case homeRoute:
+        return MaterialPageRoute(
             builder: (_) => BlocProvider(
                   create: (context) => getIt<HomeCubit>()
-                    ..getUserFromLink('hkF9RMhB4yEICzd2B383v'),
+                    ..getUserFromLink('_8Plp_fn71Rf70cp8b65-'), // hard code link for test
                   child: const HomePage(),
-                ));
+                ));          
       case todosRoute:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(

@@ -18,7 +18,7 @@ class GridButton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
        (index != null)? SizedBox(
-          width: 20,
+          width: 22,
           child: Text("$index.",textAlign: TextAlign.end),
         ) : Container(),
         const SizedBox(width: 5,),
