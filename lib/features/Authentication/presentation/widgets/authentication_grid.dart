@@ -1,3 +1,4 @@
+import 'package:d_box/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 import 'gird_button.dart';
@@ -6,18 +7,23 @@ class AuthenticationGrid extends StatelessWidget {
   const AuthenticationGrid(
       {super.key,
       this.isDisplay = false,
-      required this.borderColor,
+      this.borderColor = Colors.grey,
       required this.gridColor,
-      required this.data});
+      required this.data,
+      this.getIndex,
+      required this.currentIndex});
   final bool isDisplay;
   final Color borderColor;
   final Color gridColor;
   final List<String> data;
+  final int currentIndex;
+  final void Function(int)? getIndex;
+
   @override
   Widget build(BuildContext context) {
-    int rightLength =  ((data.length)/2).round();
-    int leftLength = (data.length)~/2;
-           return Container(
+    int rightLength = ((data.length) / 2).round();
+    int leftLength = (data.length) ~/ 2;
+    return Container(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 34),
         decoration: BoxDecoration(
             border: Border.all(width: 1, color: gridColor),
@@ -29,15 +35,21 @@ class AuthenticationGrid extends StatelessWidget {
                 children: [
                   Column(
                       children: List.generate(
-                         rightLength,
+                          rightLength,
                           (index) => Column(
                                 children: [
                                   const SizedBox(height: 16),
                                   GridButton(
+                                    onTap: (_) {
+                                      getIndex!(index);
+                                    },
                                     index: index + 1,
-                                    borderColor: borderColor,
+                                    borderColor: currentIndex == index ||
+                                            data[index].isNotEmpty
+                                        ? AppColors.backgroundColor
+                                        : borderColor,
                                     isDottedButton: data[index].isEmpty,
-                                    text: data[index]
+                                    text: data[index],
                                   ),
                                 ],
                               ))),
@@ -48,15 +60,25 @@ class AuthenticationGrid extends StatelessWidget {
                                 children: [
                                   const SizedBox(height: 16),
                                   GridButton(
-                                      index: index+1+ rightLength,
-                                      borderColor: borderColor,
-                                      isDottedButton: data[index + rightLength].isEmpty,text: data[index + rightLength],),
+                                    onTap: (_) {
+                                      getIndex!(index + rightLength);
+                                    },
+                                    index: index + 1 + rightLength,
+                                    borderColor: currentIndex ==
+                                                index + rightLength ||
+                                            data[index + rightLength].isNotEmpty
+                                        ? AppColors.backgroundColor
+                                        : borderColor,
+                                    isDottedButton:
+                                        data[index + rightLength].isEmpty,
+                                    text: data[index + rightLength],
+                                  ),
                                 ],
                               ))),
                 ],
               )
             : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
@@ -67,7 +89,8 @@ class AuthenticationGrid extends StatelessWidget {
                                   const SizedBox(height: 16),
                                   GridButton(
                                     borderColor: borderColor,
-                                    isDottedButton: data[index].isEmpty,text: data[index],
+                                    isDottedButton: data[index].isEmpty,
+                                    text: data[index],
                                   ),
                                 ],
                               ))),
@@ -78,8 +101,11 @@ class AuthenticationGrid extends StatelessWidget {
                                 children: [
                                   const SizedBox(height: 16),
                                   GridButton(
-                                      borderColor: borderColor,
-                                      isDottedButton: data[index + rightLength].isEmpty,text: data[index + rightLength],),
+                                    borderColor: borderColor,
+                                    isDottedButton:
+                                        data[index + rightLength].isEmpty,
+                                    text: data[index + rightLength],
+                                  ),
                                 ],
                               ))),
                 ],
