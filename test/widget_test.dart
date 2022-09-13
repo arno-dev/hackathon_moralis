@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 import 'package:http/http.dart' as http;
-
 import 'widget_test.mocks.dart';
 
 @GenerateMocks([http.Client, FilePicker])
@@ -107,6 +106,52 @@ void main() {
             walletCredential2.address);
         expect("0xd477b5E16473793909DD84f559e17a794060e644",
             walletCredential3.address);
+      });
+
+      test("Encrypting IPFS file by assymetric key", () {
+        // file as base64
+        String fileContent = "a file content";
+
+        // in case you don't want to share image to other
+        String myEncryptedContent = asymmetricEncryption.encryptData(
+            fileContent, skWallet1, skWallet1.publicKey);
+
+        String decipherContent = asymmetricEncryption.decryptData(
+            myEncryptedContent, skWallet1, skWallet1.publicKey);
+
+        expect(decipherContent, fileContent,
+            reason: "You should get a raw content");
+
+        // if other user try to access
+        try {
+          asymmetricEncryption.decryptData(
+              myEncryptedContent, skWallet3, skWallet1.publicKey);
+        } catch (e) {
+          expect(e,
+              "The message is forged or malformed or the shared secret is invalid",
+              reason:
+                  "Wallet 3 shouldn't be able to decipher the secret message");
+        }
+
+        // in case you want to share content to wallet2
+        String wallet2EncryptedContent = asymmetricEncryption.encryptData(
+            fileContent, skWallet1, skWallet2.publicKey);
+
+        String wallet2DecipherContent = asymmetricEncryption.decryptData(
+            wallet2EncryptedContent, skWallet2, skWallet1.publicKey);
+
+        expect(wallet2DecipherContent, fileContent,
+            reason: "You should get a raw content");
+        // if other user try to access
+        try {
+          asymmetricEncryption.decryptData(
+              wallet2EncryptedContent, skWallet3, skWallet1.publicKey);
+        } catch (e) {
+          expect(e,
+              "The message is forged or malformed or the shared secret is invalid",
+              reason:
+                  "Wallet 3 shouldn't be able to decipher the secret message");
+        }
       });
 
       test("Sharing key from wallet 1 to wallet 2", () {
