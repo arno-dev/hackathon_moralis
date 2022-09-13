@@ -3,5 +3,6 @@
     "todosTitle": "Todos",
     "rootTitle": "Root",
     "somethingWrong": "Error occured",
-    "laucherError": "Could not launch {}"
+    "laucherError": "Could not launch {}", 
+    "extensionNotSupport": "The app can read this file, will be support as soon as posible!"
  }

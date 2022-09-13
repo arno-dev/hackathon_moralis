@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:injectable/injectable.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 @lazySingleton
 class FileHandler {
@@ -13,6 +15,16 @@ class FileHandler {
   final http.Client client;
 
   FileHandler(this.filePicker, this.client);
+
+  Future<void> getPreviewFile(String base64String, String filename) async {
+    Directory dir = await getTemporaryDirectory();
+    dir.deleteSync(recursive: true);
+    dir.create();
+    File file = File('${dir.path}/$filename');
+    Uint8List bytes = base64Decode(base64String);
+    await file.writeAsBytes(bytes);
+    OpenFilex.open(file.path);
+  }
 
   Future<String?> getSingleFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -46,39 +58,10 @@ class FileHandler {
     return base64Encode(imageBytes);
   }
 
-  Future<String> networkImageToBase64(String imageUrl) async {
+  Future<String> networkFileToBase64(String imageUrl) async {
     http.Response response = await client.get(Uri.parse(imageUrl));
     final bytes = response.bodyBytes;
     return base64Encode(bytes);
-  }
-
-  Future<String?> get _localPath async {
-    final directory = await getTemporaryDirectory();
-    return directory.path;
-  }
-
-  File get testFile {
-    return File('assets/images/metamask.png');
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/fineName.txt');
-  }
-
-  Future<String?> readData(String password, [bool relative = true]) async {
-    try {
-      File? file;
-      if (relative) {
-        file = testFile;
-      } else {
-        file = await _localFile;
-      }
-      final data = await file.readAsString();
-      return decryption(data, password);
-    } catch (e) {
-      rethrow;
-    }
   }
 
   IV _createIV(String strIv) {
@@ -109,17 +92,5 @@ class FileHandler {
     final encrypter = _createEncrypter(strPwd);
     final decrypted = encrypter.decrypt(Encrypted.from64(payload), iv: ivObj);
     return decrypted;
-  }
-
-  Future<File> writeFile(String data, String password,
-      [bool relative = true]) async {
-    File? file;
-    if (relative) {
-      file = testFile;
-    } else {
-      file = await _localFile;
-    }
-    final base16 = encryption(data, password);
-    return file.writeAsString(base16);
   }
 }
