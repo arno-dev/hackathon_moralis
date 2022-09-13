@@ -59,12 +59,12 @@ class HomePage extends StatelessWidget {
                     CustomButtonRecent(
                       onPressed: () {},
                     ),
-                    recents.length > 0
+                    recents.isNotEmpty
                         ? Expanded(
                             child: ListView.builder(
                               itemCount: recents.length,
                               itemBuilder: (BuildContext context, int index) {
-                                DateTime modified = recents[index].createdAt;
+                                DateTime modified = recents[index].createdAtEntity;
                                 List<Images>? folders = recents[index]
                                         .filetreeEntity
                                         ?.childrenEntity ??
@@ -103,9 +103,8 @@ class HomePage extends StatelessWidget {
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Text(
-                                                  'Modified ' +
-                                                      DateFormat.yMMMd()
-                                                          .format(modified),
+                                                  'Modified ${DateFormat.yMMMd()
+                                                          .format(modified)}',
                                                 )
                                               ],
                                             )
@@ -119,7 +118,7 @@ class HomePage extends StatelessWidget {
                             ),
                           )
                         : const EmtryFileWidget(),
-                    Text("End")
+                    const Text("End")
                   ],
                 ),
               ),
@@ -132,7 +131,7 @@ class HomePage extends StatelessWidget {
               ),
             );
           }
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         },
       ),
     );

@@ -16,61 +16,14 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$HomeState {
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() start,
-    required TResult Function() loading,
-    required TResult Function(ImagesFromLink? imagesFromLink) loaded,
-    required TResult Function(String message) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Start value) start,
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Loaded value) loaded,
-    required TResult Function(_Error value) error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) =>
+  DataStatus get dataStatus => throw _privateConstructorUsedError;
+  List<ImagesFromLink>? get recents => throw _privateConstructorUsedError;
+  ImagesFromLink? get imagesFromLink => throw _privateConstructorUsedError;
+  List<Images>? get currentFolder => throw _privateConstructorUsedError;
+  List<Images>? get prevFolder => throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $HomeStateCopyWith<HomeState> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -78,6 +31,12 @@ mixin _$HomeState {
 abstract class $HomeStateCopyWith<$Res> {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) then) =
       _$HomeStateCopyWithImpl<$Res>;
+  $Res call(
+      {DataStatus dataStatus,
+      List<ImagesFromLink>? recents,
+      ImagesFromLink? imagesFromLink,
+      List<Images>? currentFolder,
+      List<Images>? prevFolder});
 }
 
 /// @nodoc
@@ -87,375 +46,51 @@ class _$HomeStateCopyWithImpl<$Res> implements $HomeStateCopyWith<$Res> {
   final HomeState _value;
   // ignore: unused_field
   final $Res Function(HomeState) _then;
+
+  @override
+  $Res call({
+    Object? dataStatus = freezed,
+    Object? recents = freezed,
+    Object? imagesFromLink = freezed,
+    Object? currentFolder = freezed,
+    Object? prevFolder = freezed,
+  }) {
+    return _then(_value.copyWith(
+      dataStatus: dataStatus == freezed
+          ? _value.dataStatus
+          : dataStatus // ignore: cast_nullable_to_non_nullable
+              as DataStatus,
+      recents: recents == freezed
+          ? _value.recents
+          : recents // ignore: cast_nullable_to_non_nullable
+              as List<ImagesFromLink>?,
+      imagesFromLink: imagesFromLink == freezed
+          ? _value.imagesFromLink
+          : imagesFromLink // ignore: cast_nullable_to_non_nullable
+              as ImagesFromLink?,
+      currentFolder: currentFolder == freezed
+          ? _value.currentFolder
+          : currentFolder // ignore: cast_nullable_to_non_nullable
+              as List<Images>?,
+      prevFolder: prevFolder == freezed
+          ? _value.prevFolder
+          : prevFolder // ignore: cast_nullable_to_non_nullable
+              as List<Images>?,
+    ));
+  }
 }
 
 /// @nodoc
-abstract class _$$_InitialCopyWith<$Res> {
-  factory _$$_InitialCopyWith(
-          _$_Initial value, $Res Function(_$_Initial) then) =
-      __$$_InitialCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$_InitialCopyWithImpl<$Res> extends _$HomeStateCopyWithImpl<$Res>
-    implements _$$_InitialCopyWith<$Res> {
-  __$$_InitialCopyWithImpl(_$_Initial _value, $Res Function(_$_Initial) _then)
-      : super(_value, (v) => _then(v as _$_Initial));
-
-  @override
-  _$_Initial get _value => super._value as _$_Initial;
-}
-
-/// @nodoc
-
-class _$_Initial implements _Initial {
-  const _$_Initial();
-
-  @override
-  String toString() {
-    return 'HomeState.initial()';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$_Initial);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() start,
-    required TResult Function() loading,
-    required TResult Function(ImagesFromLink? imagesFromLink) loaded,
-    required TResult Function(String message) error,
-  }) {
-    return initial();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-  }) {
-    return initial?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Start value) start,
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Loaded value) loaded,
-    required TResult Function(_Error value) error,
-  }) {
-    return initial(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-  }) {
-    return initial?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (initial != null) {
-      return initial(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Initial implements HomeState {
-  const factory _Initial() = _$_Initial;
-}
-
-/// @nodoc
-abstract class _$$_StartCopyWith<$Res> {
-  factory _$$_StartCopyWith(_$_Start value, $Res Function(_$_Start) then) =
-      __$$_StartCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$_StartCopyWithImpl<$Res> extends _$HomeStateCopyWithImpl<$Res>
-    implements _$$_StartCopyWith<$Res> {
-  __$$_StartCopyWithImpl(_$_Start _value, $Res Function(_$_Start) _then)
-      : super(_value, (v) => _then(v as _$_Start));
-
-  @override
-  _$_Start get _value => super._value as _$_Start;
-}
-
-/// @nodoc
-
-class _$_Start implements _Start {
-  const _$_Start();
-
-  @override
-  String toString() {
-    return 'HomeState.start()';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$_Start);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() start,
-    required TResult Function() loading,
-    required TResult Function(ImagesFromLink? imagesFromLink) loaded,
-    required TResult Function(String message) error,
-  }) {
-    return start();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-  }) {
-    return start?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (start != null) {
-      return start();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Start value) start,
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Loaded value) loaded,
-    required TResult Function(_Error value) error,
-  }) {
-    return start(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-  }) {
-    return start?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (start != null) {
-      return start(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Start implements HomeState {
-  const factory _Start() = _$_Start;
-}
-
-/// @nodoc
-abstract class _$$_LoadingCopyWith<$Res> {
-  factory _$$_LoadingCopyWith(
-          _$_Loading value, $Res Function(_$_Loading) then) =
-      __$$_LoadingCopyWithImpl<$Res>;
-}
-
-/// @nodoc
-class __$$_LoadingCopyWithImpl<$Res> extends _$HomeStateCopyWithImpl<$Res>
-    implements _$$_LoadingCopyWith<$Res> {
-  __$$_LoadingCopyWithImpl(_$_Loading _value, $Res Function(_$_Loading) _then)
-      : super(_value, (v) => _then(v as _$_Loading));
-
-  @override
-  _$_Loading get _value => super._value as _$_Loading;
-}
-
-/// @nodoc
-
-class _$_Loading implements _Loading {
-  const _$_Loading();
-
-  @override
-  String toString() {
-    return 'HomeState.loading()';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$_Loading);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() start,
-    required TResult Function() loading,
-    required TResult Function(ImagesFromLink? imagesFromLink) loaded,
-    required TResult Function(String message) error,
-  }) {
-    return loading();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-  }) {
-    return loading?.call();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading();
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Start value) start,
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Loaded value) loaded,
-    required TResult Function(_Error value) error,
-  }) {
-    return loading(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-  }) {
-    return loading?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (loading != null) {
-      return loading(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Loading implements HomeState {
-  const factory _Loading() = _$_Loading;
-}
-
-/// @nodoc
-abstract class _$$_LoadedCopyWith<$Res> {
+abstract class _$$_LoadedCopyWith<$Res> implements $HomeStateCopyWith<$Res> {
   factory _$$_LoadedCopyWith(_$_Loaded value, $Res Function(_$_Loaded) then) =
       __$$_LoadedCopyWithImpl<$Res>;
-  $Res call({ImagesFromLink? imagesFromLink});
+  @override
+  $Res call(
+      {DataStatus dataStatus,
+      List<ImagesFromLink>? recents,
+      ImagesFromLink? imagesFromLink,
+      List<Images>? currentFolder,
+      List<Images>? prevFolder});
 }
 
 /// @nodoc
@@ -469,13 +104,33 @@ class __$$_LoadedCopyWithImpl<$Res> extends _$HomeStateCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? dataStatus = freezed,
+    Object? recents = freezed,
     Object? imagesFromLink = freezed,
+    Object? currentFolder = freezed,
+    Object? prevFolder = freezed,
   }) {
     return _then(_$_Loaded(
+      dataStatus: dataStatus == freezed
+          ? _value.dataStatus
+          : dataStatus // ignore: cast_nullable_to_non_nullable
+              as DataStatus,
+      recents: recents == freezed
+          ? _value._recents
+          : recents // ignore: cast_nullable_to_non_nullable
+              as List<ImagesFromLink>?,
       imagesFromLink: imagesFromLink == freezed
           ? _value.imagesFromLink
           : imagesFromLink // ignore: cast_nullable_to_non_nullable
               as ImagesFromLink?,
+      currentFolder: currentFolder == freezed
+          ? _value._currentFolder
+          : currentFolder // ignore: cast_nullable_to_non_nullable
+              as List<Images>?,
+      prevFolder: prevFolder == freezed
+          ? _value._prevFolder
+          : prevFolder // ignore: cast_nullable_to_non_nullable
+              as List<Images>?,
     ));
   }
 }
@@ -483,14 +138,51 @@ class __$$_LoadedCopyWithImpl<$Res> extends _$HomeStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_Loaded implements _Loaded {
-  const _$_Loaded({this.imagesFromLink});
+  const _$_Loaded(
+      {this.dataStatus = DataStatus.initial,
+      final List<ImagesFromLink>? recents,
+      this.imagesFromLink,
+      final List<Images>? currentFolder,
+      final List<Images>? prevFolder})
+      : _recents = recents,
+        _currentFolder = currentFolder,
+        _prevFolder = prevFolder;
+
+  @override
+  @JsonKey()
+  final DataStatus dataStatus;
+  final List<ImagesFromLink>? _recents;
+  @override
+  List<ImagesFromLink>? get recents {
+    final value = _recents;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   final ImagesFromLink? imagesFromLink;
+  final List<Images>? _currentFolder;
+  @override
+  List<Images>? get currentFolder {
+    final value = _currentFolder;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<Images>? _prevFolder;
+  @override
+  List<Images>? get prevFolder {
+    final value = _prevFolder;
+    if (value == null) return null;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'HomeState.loaded(imagesFromLink: $imagesFromLink)';
+    return 'HomeState(dataStatus: $dataStatus, recents: $recents, imagesFromLink: $imagesFromLink, currentFolder: $currentFolder, prevFolder: $prevFolder)';
   }
 
   @override
@@ -499,253 +191,51 @@ class _$_Loaded implements _Loaded {
         (other.runtimeType == runtimeType &&
             other is _$_Loaded &&
             const DeepCollectionEquality()
-                .equals(other.imagesFromLink, imagesFromLink));
+                .equals(other.dataStatus, dataStatus) &&
+            const DeepCollectionEquality().equals(other._recents, _recents) &&
+            const DeepCollectionEquality()
+                .equals(other.imagesFromLink, imagesFromLink) &&
+            const DeepCollectionEquality()
+                .equals(other._currentFolder, _currentFolder) &&
+            const DeepCollectionEquality()
+                .equals(other._prevFolder, _prevFolder));
   }
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(imagesFromLink));
+      runtimeType,
+      const DeepCollectionEquality().hash(dataStatus),
+      const DeepCollectionEquality().hash(_recents),
+      const DeepCollectionEquality().hash(imagesFromLink),
+      const DeepCollectionEquality().hash(_currentFolder),
+      const DeepCollectionEquality().hash(_prevFolder));
 
   @JsonKey(ignore: true)
   @override
   _$$_LoadedCopyWith<_$_Loaded> get copyWith =>
       __$$_LoadedCopyWithImpl<_$_Loaded>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() start,
-    required TResult Function() loading,
-    required TResult Function(ImagesFromLink? imagesFromLink) loaded,
-    required TResult Function(String message) error,
-  }) {
-    return loaded(imagesFromLink);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-  }) {
-    return loaded?.call(imagesFromLink);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(imagesFromLink);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Start value) start,
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Loaded value) loaded,
-    required TResult Function(_Error value) error,
-  }) {
-    return loaded(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-  }) {
-    return loaded?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (loaded != null) {
-      return loaded(this);
-    }
-    return orElse();
-  }
 }
 
 abstract class _Loaded implements HomeState {
-  const factory _Loaded({final ImagesFromLink? imagesFromLink}) = _$_Loaded;
+  const factory _Loaded(
+      {final DataStatus dataStatus,
+      final List<ImagesFromLink>? recents,
+      final ImagesFromLink? imagesFromLink,
+      final List<Images>? currentFolder,
+      final List<Images>? prevFolder}) = _$_Loaded;
 
+  @override
+  DataStatus get dataStatus;
+  @override
+  List<ImagesFromLink>? get recents;
+  @override
   ImagesFromLink? get imagesFromLink;
+  @override
+  List<Images>? get currentFolder;
+  @override
+  List<Images>? get prevFolder;
+  @override
   @JsonKey(ignore: true)
   _$$_LoadedCopyWith<_$_Loaded> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$_ErrorCopyWith<$Res> {
-  factory _$$_ErrorCopyWith(_$_Error value, $Res Function(_$_Error) then) =
-      __$$_ErrorCopyWithImpl<$Res>;
-  $Res call({String message});
-}
-
-/// @nodoc
-class __$$_ErrorCopyWithImpl<$Res> extends _$HomeStateCopyWithImpl<$Res>
-    implements _$$_ErrorCopyWith<$Res> {
-  __$$_ErrorCopyWithImpl(_$_Error _value, $Res Function(_$_Error) _then)
-      : super(_value, (v) => _then(v as _$_Error));
-
-  @override
-  _$_Error get _value => super._value as _$_Error;
-
-  @override
-  $Res call({
-    Object? message = freezed,
-  }) {
-    return _then(_$_Error(
-      message == freezed
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$_Error implements _Error {
-  const _$_Error(this.message);
-
-  @override
-  final String message;
-
-  @override
-  String toString() {
-    return 'HomeState.error(message: $message)';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$_Error &&
-            const DeepCollectionEquality().equals(other.message, message));
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(message));
-
-  @JsonKey(ignore: true)
-  @override
-  _$$_ErrorCopyWith<_$_Error> get copyWith =>
-      __$$_ErrorCopyWithImpl<_$_Error>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function() start,
-    required TResult Function() loading,
-    required TResult Function(ImagesFromLink? imagesFromLink) loaded,
-    required TResult Function(String message) error,
-  }) {
-    return error(message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-  }) {
-    return error?.call(message);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? start,
-    TResult Function()? loading,
-    TResult Function(ImagesFromLink? imagesFromLink)? loaded,
-    TResult Function(String message)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(message);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Start value) start,
-    required TResult Function(_Loading value) loading,
-    required TResult Function(_Loaded value) loaded,
-    required TResult Function(_Error value) error,
-  }) {
-    return error(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-  }) {
-    return error?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Start value)? start,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? loaded,
-    TResult Function(_Error value)? error,
-    required TResult orElse(),
-  }) {
-    if (error != null) {
-      return error(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class _Error implements HomeState {
-  const factory _Error(final String message) = _$_Error;
-
-  String get message;
-  @JsonKey(ignore: true)
-  _$$_ErrorCopyWith<_$_Error> get copyWith =>
       throw _privateConstructorUsedError;
 }

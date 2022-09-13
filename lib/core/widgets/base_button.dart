@@ -5,17 +5,16 @@ import '../constants/colors.dart';
 class BaseButton extends StatelessWidget {
   const BaseButton(
       {super.key,
-       this.text,
+      this.text,
       this.backgroundColor,
-       this.buttonHeight = 32,
+      this.buttonHeight = 32,
       this.buttonWidth = 116,
       this.borderRadius = 28,
       this.onTap,
       this.borderColor,
       this.horizontalPadding = 12,
       this.verticalPadding = 5,
-      this.isDisabled = false
-      });
+      this.isDisabled = false});
   final String? text;
   final Color? backgroundColor;
   final double buttonHeight;
@@ -31,12 +30,12 @@ class BaseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(borderRadius),
-      color: isDisabled?Colors.grey:backgroundColor,
+      color: isDisabled ? Colors.grey : backgroundColor,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        onTap: isDisabled?null:onTap,
+        onTap: isDisabled ? null : onTap,
         child: Container(
           decoration: (borderColor != null)
               ? BoxDecoration(
@@ -46,12 +45,19 @@ class BaseButton extends StatelessWidget {
               : null,
           height: buttonHeight,
           width: buttonWidth,
-          child:(text != null)? Center(
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: horizontalPadding,vertical: verticalPadding),
-              child: Text(text!, style: const TextStyle(color: AppColors.fontColor),),
-            ),
-          ) : null,
+          child: (text != null)
+              ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: verticalPadding),
+                    child: Text(
+                      text!,
+                      style: const TextStyle(color: AppColors.fontColor),
+                    ),
+                  ),
+                )
+              : null,
         ),
       ),
     );
