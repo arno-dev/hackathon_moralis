@@ -3,12 +3,12 @@ import 'package:equatable/equatable.dart';
 import 'images.dart';
 
 class ImagesFromLink extends Equatable {
-  final String ipfsKey;
-  final String cid;
-  final Images? filetree;
+  final String ipfsKeyEntity;
+  final String cidEntity;
+  final Images? filetreeEntity;
 
-  const ImagesFromLink(this.cid, this.filetree, this.ipfsKey);
+  const ImagesFromLink(this.cidEntity, this.filetreeEntity, this.ipfsKeyEntity);
 
   @override
-  List<Object?> get props => [cid, filetree];
+  List<Object?> get props => [cidEntity, filetreeEntity, ipfsKeyEntity];
 }

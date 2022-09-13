@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -18,22 +17,16 @@ class HomeCubit extends Cubit<HomeState> {
   TextEditingController searchController = TextEditingController();
 
   Future<void> getUserFromLink(String link) async {
-    try {
-      emit(const HomeState.loading());
-      final request =
-          await getImagesFromLinkUsecase(GetImagesFromLinkParams(link));
-      request.fold(
-        (error) => emit(
-          HomeState.error(error.message),
-        ),
-        (imagesFromLink) => emit(
-          HomeState.loaded(imagesFromLink: imagesFromLink),
-        ),
-      );
-    } on PlatformException catch (e) {
-      // emit(
-      //   HomeState.error(e.message),
-      // );
-    }
+    emit(const HomeState.loading());
+    final request =
+        await getImagesFromLinkUsecase(GetImagesFromLinkParams(link));
+    request.fold(
+      (error) => emit(
+        HomeState.error(error.message),
+      ),
+      (imagesFromLink) => emit(
+        HomeState.loaded(imagesFromLink: imagesFromLink),
+      ),
+    );
   }
 }
