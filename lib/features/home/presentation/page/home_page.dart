@@ -1,9 +1,13 @@
+import 'package:d_box/core/constants/data_status.dart';
+import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
+import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/d_appbar.dart';
+import '../../../../core/widgets/d_box_textfield.dart';
 import '../../../../generated/assets.gen.dart';
-import '../../../../widgets/d_box_textfield.dart';
+import '../../domain/entities/images.dart';
 import '../cubit/Home/home_cubit.dart';
 
 class HomePage extends StatelessWidget {
@@ -33,13 +37,12 @@ class HomePage extends StatelessWidget {
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
-          return state.when(initial: () {
+          if (state.dataStatus == DataStatus.initial) {
             return const SizedBox();
-          }, start: () {
-            return const SizedBox();
-          }, loading: () {
+          } else if (state.dataStatus == DataStatus.loading) {
             return const Center(child: CircularProgressIndicator());
-          }, loaded: (imagesFromLink) {
+          } else if (state.dataStatus == DataStatus.loaded) {
+            List<Images>? folders = state.currentFolder ?? [];
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -51,66 +54,62 @@ class HomePage extends StatelessWidget {
                       isSearch: true,
                       controller: context.read<HomeCubit>().searchController,
                     ),
-                    TextButton(
+                    CustomButtonRecent(
                       onPressed: () {},
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            "Recent ",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                    ),
+                    folders.length > 0
+                        ? Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                              ),
+                              itemCount: folders.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {},
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        folders[index].isFolderEntity
+                                            ? const Icon(
+                                                Icons.folder,
+                                                size: 100,
+                                              )
+                                            : const Icon(Icons.image),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          folders[index].nameEntity,
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 16,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          const SizedBox(width: 5),
-                          Assets.icons.down.svg(
-                            width: 6.0,
-                            height: 6.0,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Assets.icons.recent.svg(),
-                    const SizedBox(height: 40),
-                    const Center(
-                      child: SizedBox(
-                        width: 250,
-                        child: Text(
-                          "Easy to send files to family, friends, and co-workers",
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            height: 1.8,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Center(
-                      child: Text(
-                        "After you send a file, it'll show up here.",
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    )
+                          )
+                        : const EmtryFileWidget(),
+                    Text("End")
                   ],
                 ),
               ),
             );
-          }, error: (String message) {
+          } else if (state.dataStatus == DataStatus.error) {
             return Center(
               child: Text(
-                message,
+                "ERROR",
                 style: Theme.of(context).textTheme.displaySmall,
               ),
             );
-          });
+          }
+          return SizedBox.shrink();
         },
       ),
     );

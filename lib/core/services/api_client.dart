@@ -25,4 +25,9 @@ abstract class ApiClient {
   Future<ImagesFromLinkModel> getImagesFromLink(
     @Path('link') String link,
   );
+
+  @GET(ApiPaht.imagesFromLink)
+  Future<List<ImagesFromLinkModel>> getRecents(
+    @Path('recnets') String link,
+  );
 }

@@ -7,15 +7,26 @@ part 'images_from_link_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ImagesFromLinkModel extends ImagesFromLink {
-  // final String ipfsKey;
-  // final String cid;
+  final String ipfsKey;
+  final String origin;
+  final String dest;
+  final String cid;
+  final DateTime createdAt;
   final ImagesModel? filetree;
   const ImagesFromLinkModel(
-      {required String cid, required String ipfsKey, this.filetree})
-      : super(
-          cid,
-          filetree,
+    this.ipfsKey,
+    this.origin,
+    this.dest,
+    this.cid,
+    this.createdAt,
+    this.filetree,
+  ) : super(
           ipfsKey,
+          origin,
+          dest,
+          cid,
+          createdAt,
+          filetree,
         );
 
   factory ImagesFromLinkModel.fromJson(Map<String, dynamic> json) =>

@@ -17,7 +17,8 @@ class AppRoute {
             // hard code link for test
             builder: (_) => BlocProvider(
                   create: (context) => getIt<HomeCubit>()
-                    ..getUserFromLink('hkF9RMhB4yEICzd2B383v'),
+                  // ..getUserFromLink('_8Plp_fn71Rf70cp8b65-'),
+                  ,
                   child: const HomePage(),
                 ));
       case todosRoute:

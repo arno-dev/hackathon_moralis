@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:injectable/injectable.dart';
@@ -10,6 +11,7 @@ import '../models/images_from_link_model.dart';
 
 abstract class DboxRemoteDataSource {
   Future<ImagesFromLinkModel> getImageFromLink(String link);
+  Future<List<ImagesFromLinkModel>> getRecents(String recents);
 }
 
 @LazySingleton(as: DboxRemoteDataSource)
@@ -22,6 +24,17 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   Future<ImagesFromLinkModel> getImageFromLink(String link) async {
     try {
       return await apiClient.getImagesFromLink(link);
+    } on DioError catch (e) {
+      throw ResponseHelper.returnResponse(e);
+    } catch (e) {
+      throw ServerException(LocaleKeys.somethingWrong.tr());
+    }
+  }
+
+  @override
+  Future<List<ImagesFromLinkModel>> getRecents(String recents) async {
+    try {
+      return await apiClient.getRecents(recents);
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
     } catch (e) {
