@@ -5,47 +5,14 @@ const { getIPFSCid } = require('../utils/utils');
 const merge = require('deepmerge');
 const { nanoid } = require('nanoid');
 const e = require("express");
-const { admin, notification_options } = require("../utils/firebase-config")
 
 var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
 
-// save firebase token
-exports.saveRegistrationToken = async (request, response) => {
-    const { address, token } = request.body;
-    if (!address || !token) {
-        return response.sendStatus(400);
-    }
-    try {
-        await db.push("/token/" + address, token);
-        return response.sendStatus(200)
-    } catch (error) {
-        return response.sendStatus(500)
-    }
-}
-// get firebase token from address
-exports.getRegistrationTokenFromAddress = async (request, response) => {
-    const { address } = request.params;
-    if (!address) {
-        return response.status(400);
-    }
-    const firebaesToken = await db.getData("/token/" + address);
-    return response.send({ "token": firebaesToken });
-}
-// send invite link via firebase cloud messaging
-exports.sendNotifications = async (request, response) => {
-    const { registrationToken, message } = request.body
-    const options = notification_options
-    if (!registrationToken || !message) {
-        return response.status(400)
-    }
-    admin.messaging().sendToDevice(registrationToken, message, options)
-        .then(_ => {
-            return response.status(200).send("Notification sent successfully")
-        })
-        .catch(error => {
-            return response.status(500).send(error)
-        });
-}
+// Controllers
+const alertsController = require('./alertsController');
+
+// Ty[e]
+const ALERT = require('../utils/alertType.js');
 
 exports.uploadImagesToIpfs = async (request, res, next) => {
     const { images, origin, dest, encryptIpfsKey } = request.body;
@@ -80,26 +47,8 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "paths": imagePath["data"],
         "ipfsKey": ipfsKey
     };
-    // TODO: remove below
-    console.log(ipfsData);
     await db.push("/ipfs/" + cid + "/paths", ipfsData)
 
-    // TODO: change with that 
-    /*
-        "ipfs": {
-        "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP": {
-            "paths": [
-                {
-                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo5.jpg"
-                },
-                {
-                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo4.jpg"
-                }
-            ],
-            "ipfsKey": "test+ananothertest"
-        }
-    },
-    */
     request.body = {
         "cid": cid,
         "ipfsKey": ipfsKey,
@@ -107,7 +56,6 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "dest": dest
     }
     next();
-    // return response.send(request.body)
 }
 
 exports.getSharedUsers = async (request, response) => {
@@ -141,15 +89,23 @@ exports.createShareableLink = async (request, response) => {
         if (sharedUserAddresses.indexOf(dest) < 0) {
             // Doesn't exist so we can push it
             await db.push("/sharing/" + origin + "/users[]/user", dest);
+
+            // We should save the alert
+            await alertsController.saveAlert(AlertType.AddedInContact, dest, { "origin": origin });
         }
     }
     catch (e) {
         // Doesn't exist so we can push it
         await db.push("/sharing/" + origin + "/users[]/user", dest);
+
+        // We should save the alert
+        await alertsController.saveAlert(ALERT.AddedInContact, dest, { "origin": origin, "ipfsKey": ipfsKey });
     }
 
     try {
         const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
+        const { cid, link } = shareLink;
+        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link });
         return response.send(shareLink);
     }
     catch (e) {
@@ -157,6 +113,13 @@ exports.createShareableLink = async (request, response) => {
         await db.push("/links/" + ID, shareData, true);
         await db.push("/cid/links/" + cid, shareData, true);
         await db.push("/sharing/" + origin + "/" + dest + "/" + cid, shareData, true);
+
+
+        // const emitterAddress = payload["origin"];
+        // const cid = payload["cid"];
+        // const link = payload["link"];
+        // We should save the alert
+        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID });
 
         return response.send(shareData);
     }
