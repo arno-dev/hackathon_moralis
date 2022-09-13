@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 class DAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const DAppBar(
-      {super.key,
-      this.title,
-      this.backgroundColor = Colors.transparent,
-      this.appBarHeight = 65,
-      this.elevation = 0,
-      this.listOfAction,
-      this.leading,
-      this.centerTitle = true,
-      this.automaticallyImplyLeading = false});
+  const DAppBar({
+    super.key,
+    this.title,
+    this.backgroundColor = Colors.transparent,
+    this.appBarHeight = 65,
+    this.elevation = 0,
+    this.listOfAction,
+    this.leading,
+    this.centerTitle = true,
+    this.automaticallyImplyLeading = false,
+    this.titleColor = Colors.red,
+    this.titleFontSize = 18.0,
+  });
   final String? title;
   final Color backgroundColor;
   final double appBarHeight;
@@ -19,7 +22,8 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final bool centerTitle;
   final bool automaticallyImplyLeading;
-
+  final Color titleColor;
+  final double titleFontSize;
   @override
   Size get preferredSize => Size.fromHeight(appBarHeight);
   @override
@@ -31,7 +35,10 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: (title != null)
           ? Text(
               title!,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(
+                color: titleColor,
+                fontSize: titleFontSize,
+              ),
             )
           : Container(),
       centerTitle: centerTitle,
