@@ -28,6 +28,7 @@ app.get('/v2/images/address/:address', imagesController.getImagesFromAddress);
 app.post('/v2/share', imagesController.createShareableLink);
 
 app.get('/v2/share/address', imagesController.getShareableLinkByAddresses);
+app.get('/v2/share/recents/:address', imagesController.getRecentImagesSharedWithMyself);
 
 // We want to have a list of users we shared links in the past
 app.get('/v2/share/users/:address', imagesController.getSharedUsers);
@@ -41,12 +42,6 @@ app.get('/v2/getRegistrationTokenFromAddress/:address', alertsController.getRegi
 
 // Alerts 
 app.get('/v2/alerts/:address', alertsController.getAlerts);
-
-// TODO: Get the "Recent" which will {cid, path, ipfsKey, }
-// The Get Recent will be all the shared links to myself as i'm the only one to be able to decrypt it
-
-// TODO: put the origin addres along the ipfsKey so the receiver can decypher it
-
 
 
 app.listen(PORT || 3000, async () => {
