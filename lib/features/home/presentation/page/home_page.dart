@@ -1,6 +1,8 @@
 import 'package:d_box/core/constants/data_status.dart';
+import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
 import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -42,7 +44,7 @@ class HomePage extends StatelessWidget {
           } else if (state.dataStatus == DataStatus.loading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state.dataStatus == DataStatus.loaded) {
-            List<Images>? folders = state.currentFolder ?? [];
+            List<ImagesFromLink>? recents = state.recents ?? [];
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -57,40 +59,61 @@ class HomePage extends StatelessWidget {
                     CustomButtonRecent(
                       onPressed: () {},
                     ),
-                    folders.length > 0
+                    recents.length > 0
                         ? Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                              ),
-                              itemCount: folders.length,
+                            child: ListView.builder(
+                              itemCount: recents.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
-                                  onTap: () {},
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        folders[index].isFolderEntity
-                                            ? const Icon(
-                                                Icons.folder,
-                                                size: 100,
-                                              )
-                                            : const Icon(Icons.image),
-                                        const SizedBox(
-                                          height: 10,
+                                DateTime modified = recents[index].createdAt;
+                                List<Images>? folders = recents[index]
+                                        .filetreeEntity
+                                        ?.childrenEntity ??
+                                    [];
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ...List.generate(
+                                      folders.length,
+                                      (index) => GestureDetector(
+                                        onTap: () {},
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            folders[index].isFolderEntity
+                                                ? const Icon(
+                                                    Icons.folder,
+                                                    size: 100,
+                                                  )
+                                                : const Icon(Icons.image),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  folders[index].nameEntity,
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  'Modified ' +
+                                                      DateFormat.yMMMd()
+                                                          .format(modified),
+                                                )
+                                              ],
+                                            )
+                                          ],
                                         ),
-                                        Text(
-                                          folders[index].nameEntity,
-                                          style: const TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 16,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                      ),
+                                    )
+                                  ],
                                 );
                               },
                             ),

@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/domain/usecases/recenst_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -14,7 +15,9 @@ part 'home_cubit.freezed.dart';
 @injectable
 class HomeCubit extends Cubit<HomeState> {
   final GetImagesFromLinkUsecase getImagesFromLinkUsecase;
-  HomeCubit(this.getImagesFromLinkUsecase) : super(const HomeState());
+  final GetRecentsUsecase getRecentsUsecase;
+  HomeCubit(this.getImagesFromLinkUsecase, this.getRecentsUsecase)
+      : super(const HomeState());
 
   TextEditingController searchController = TextEditingController();
 
@@ -29,6 +32,20 @@ class HomeCubit extends Cubit<HomeState> {
           dataStatus: DataStatus.loaded,
           imagesFromLink: imagesFromLink,
           currentFolder: imagesFromLink.filetreeEntity?.childrenEntity,
+        ));
+      },
+    );
+  }
+
+  Future<void> getRecents(String recents) async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+    final request = await getRecentsUsecase(GetRecentsParams(recents));
+    request.fold(
+      (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+      (data) {
+        emit(state.copyWith(
+          dataStatus: DataStatus.loaded,
+          recents: data,
         ));
       },
     );
