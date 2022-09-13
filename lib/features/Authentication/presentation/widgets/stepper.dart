@@ -185,25 +185,22 @@ class Stepper extends StatefulWidget {
   /// new one.
   ///
   /// The [steps], [type], and [currentStep] arguments must not be null.
-  const Stepper({
-    super.key,
-    required this.steps,
-    this.physics,
-    this.type = StepperType.vertical,
-    this.currentStep = 0,
-    this.onStepTapped,
-    this.onStepContinue,
-    this.onStepCancel,
-    this.controlsBuilder,
-    this.elevation,
-    this.margin,
-    this.lineColor,
-    this.stepSize,
-    this.stepperhorizontal =40
-  })  : assert(steps != null),
-        assert(type != null),
-        assert(currentStep != null),
-        assert(0 <= currentStep && currentStep < steps.length);
+  const Stepper(
+      {super.key,
+      required this.steps,
+      this.physics,
+      this.type = StepperType.vertical,
+      this.currentStep = 0,
+      this.onStepTapped,
+      this.onStepContinue,
+      this.onStepCancel,
+      this.controlsBuilder,
+      this.elevation,
+      this.margin,
+      this.lineColor,
+      this.stepSize,
+      this.stepperhorizontal = 40})
+      : assert(0 <= currentStep && currentStep < steps.length);
 
   /// Modify Stepper
   final double? stepSize;
@@ -375,7 +372,6 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final StepState state =
         oldState ? _oldStates[index]! : widget.steps[index].state;
     final bool isDarkActive = _isDark() && widget.steps[index].isActive;
-    assert(state != null);
     switch (state) {
       case StepState.indexed:
       case StepState.disabled:
@@ -527,25 +523,22 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
             TextButton(
               onPressed: widget.onStepContinue,
               style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                  return states.contains(MaterialState.disabled)
-                      ? null
-                      : (_isDark()
-                          ? colorScheme.onSurface
-                          : colorScheme.onPrimary);
-                }),
-                backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                  return _isDark() || states.contains(MaterialState.disabled)
-                      ? null
-                      : colorScheme.primary;
-                }),
-                padding: const MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                    buttonPadding),
-                shape:
-                    const MaterialStatePropertyAll<OutlinedBorder>(buttonShape),
-              ),
+                  foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                    return states.contains(MaterialState.disabled)
+                        ? null
+                        : (_isDark()
+                            ? colorScheme.onSurface
+                            : colorScheme.onPrimary);
+                  }),
+                  backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                    return _isDark() || states.contains(MaterialState.disabled)
+                        ? null
+                        : colorScheme.primary;
+                  }),
+                  padding: MaterialStateProperty.all(buttonPadding),
+                  shape: MaterialStateProperty.all(buttonShape)),
               child: Text(localizations.continueButtonLabel),
             ),
             Container(
@@ -570,7 +563,6 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final ThemeData themeData = Theme.of(context);
     final TextTheme textTheme = themeData.textTheme;
 
-    assert(widget.steps[index].state != null);
     switch (widget.steps[index].state) {
       case StepState.indexed:
       case StepState.editing:
@@ -591,7 +583,6 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final ThemeData themeData = Theme.of(context);
     final TextTheme textTheme = themeData.textTheme;
 
-    assert(widget.steps[index].state != null);
     switch (widget.steps[index].state) {
       case StepState.indexed:
       case StepState.editing:
@@ -612,7 +603,6 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final ThemeData themeData = Theme.of(context);
     final TextTheme textTheme = themeData.textTheme;
 
-    assert(widget.steps[index].state != null);
     switch (widget.steps[index].state) {
       case StepState.indexed:
       case StepState.editing:
@@ -775,10 +765,8 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final List<Widget> listTitle = [
       for (int i = 0; i < widget.steps.length; i += 1) ...<Widget>[
         _buildLabelText(i),
-        if(!_isLast(i))
-        const Spacer(),
+        if (!_isLast(i)) const Spacer(),
       ]
-
     ];
     final List<Widget> children = <Widget>[
       for (int i = 0; i < widget.steps.length; i += 1) ...<Widget>[
@@ -801,7 +789,9 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
                         height: 24.0,
                       ),
                     Center(child: _buildIcon(i)),
-                    const SizedBox(height: 24.0,),
+                    const SizedBox(
+                      height: 24.0,
+                    ),
                     // if (widget.steps[i].label != null) SizedBox(height : 24.0, child: _buildLabelText(i),),
                   ],
                 ),
@@ -843,14 +833,13 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: widget.stepperhorizontal),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: widget.stepperhorizontal),
                   child: Row(
                     children: children,
                   ),
                 ),
-                Row(
-                  children: listTitle
-                )
+                Row(children: listTitle)
               ],
             ),
           ),
@@ -890,7 +879,6 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
       }
       return true;
     }());
-    assert(widget.type != null);
     switch (widget.type) {
       case StepperType.vertical:
         return _buildVertical();

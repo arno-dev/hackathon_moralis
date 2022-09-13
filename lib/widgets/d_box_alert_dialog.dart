@@ -5,9 +5,9 @@ class DboxAlertDialog extends StatelessWidget {
   final String? textContent;
   final Color titleColor;
   final double borderRadius;
-  List<Widget> content;
+  final List<Widget> content;
 
-  DboxAlertDialog({
+  const DboxAlertDialog({
     super.key,
     required this.title,
     this.textContent,
