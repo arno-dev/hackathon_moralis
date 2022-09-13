@@ -5,47 +5,14 @@ const { getIPFSCid } = require('../utils/utils');
 const merge = require('deepmerge');
 const { nanoid } = require('nanoid');
 const e = require("express");
-const { admin, notification_options } = require("../utils/firebase-config")
 
 var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
 
-// save firebase token
-exports.saveRegistrationToken = async (request, response) => {
-    const { address, token } = request.body;
-    if (!address || !token) {
-        return response.sendStatus(400);
-    }
-    try {
-        await db.push("/token/" + address, token);
-        return response.sendStatus(200)
-    } catch (error) {
-        return response.sendStatus(500)
-    }
-}
-// get firebase token from address
-exports.getRegistrationTokenFromAddress = async (request, response) => {
-    const { address } = request.params;
-    if (!address) {
-        return response.status(400);
-    }
-    const firebaesToken = await db.getData("/token/" + address);
-    return response.send({ "token": firebaesToken });
-}
-// send invite link via firebase cloud messaging
-exports.sendNotifications = async (request, response) => {
-    const { registrationToken, message } = request.body
-    const options = notification_options
-    if (!registrationToken || !message) {
-        return response.status(400)
-    }
-    admin.messaging().sendToDevice(registrationToken, message, options)
-        .then(_ => {
-            return response.status(200).send("Notification sent successfully")
-        })
-        .catch(error => {
-            return response.status(500).send(error)
-        });
-}
+// Controllers
+const alertsController = require('./alertsController');
+
+// Ty[e]
+const ALERT = require('../utils/alertType.js');
 
 exports.uploadImagesToIpfs = async (request, res, next) => {
     const { images, origin, dest, encryptIpfsKey } = request.body;
@@ -80,26 +47,8 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "paths": imagePath["data"],
         "ipfsKey": ipfsKey
     };
-    // TODO: remove below
-    console.log(ipfsData);
     await db.push("/ipfs/" + cid + "/paths", ipfsData)
 
-    // TODO: change with that 
-    /*
-        "ipfs": {
-        "QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP": {
-            "paths": [
-                {
-                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo5.jpg"
-                },
-                {
-                    "path": "https://ipfs.moralis.io:2053/ipfs/QmdeFdCNVYHiTsYf2Wg1xoz9CbQvBckZCAuHi1yGGxvsFP/moralis/logo4.jpg"
-                }
-            ],
-            "ipfsKey": "test+ananothertest"
-        }
-    },
-    */
     request.body = {
         "cid": cid,
         "ipfsKey": ipfsKey,
@@ -107,7 +56,6 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "dest": dest
     }
     next();
-    // return response.send(request.body)
 }
 
 exports.getSharedUsers = async (request, response) => {
@@ -141,22 +89,39 @@ exports.createShareableLink = async (request, response) => {
         if (sharedUserAddresses.indexOf(dest) < 0) {
             // Doesn't exist so we can push it
             await db.push("/sharing/" + origin + "/users[]/user", dest);
+
+            // We should save the alert
+            await alertsController.saveAlert(AlertType.AddedInContact, dest, { "origin": origin });
         }
     }
     catch (e) {
         // Doesn't exist so we can push it
         await db.push("/sharing/" + origin + "/users[]/user", dest);
+
+        // We should save the alert
+        await alertsController.saveAlert(ALERT.AddedInContact, dest, { "origin": origin, "ipfsKey": ipfsKey });
     }
 
+
+
+    // We will create our share links
+    const createdAt = new Date().toISOString();
     try {
         const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
+        const { cid, link } = shareLink;
+        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link, "createdAt": createdAt });
         return response.send(shareLink);
     }
     catch (e) {
-        var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID };
+        var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "link": ID, "createdAt": createdAt };
         await db.push("/links/" + ID, shareData, true);
         await db.push("/cid/links/" + cid, shareData, true);
         await db.push("/sharing/" + origin + "/" + dest + "/" + cid, shareData, true);
+
+        // We want to store the receivers so they can retrieve all the links shared to themselves
+        await db.push("/receivers/" + dest + "/links[]", shareData, true);
+
+        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "createdAt": createdAt });
 
         return response.send(shareData);
     }
@@ -202,14 +167,15 @@ exports.getImagesFromLink = async (request, response) => {
 
     try {
         const imagesFromLink = await db.getData("/links/" + link);
-        const cid = imagesFromLink["cid"];
+        const { cid, ipfsKey, origin, dest } = imagesFromLink;
         const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
-        const ipfsKey = imagesFromLink["ipfsKey"];
         const ipfsImages = ipfsInfo[cid]["paths"];
         paths = await this.getImages(ipfsImages, cid);
 
-        response.send({
+        return response.send({
             "ipfsKey": ipfsKey,
+            "origin": origin,
+            "dest": dest,
             "cid": cid,
             "filetree": paths
         });
@@ -219,7 +185,42 @@ exports.getImagesFromLink = async (request, response) => {
     }
 }
 
-// !Important : this one is the main method to retrieve a formatted filetree images
+exports.getRecentImagesSharedWithMyself = async (request, response) => {
+    const { address } = request.params;
+    if (!address) {
+        return response.sendStatus(400);
+    }
+
+    try {
+        const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
+        // Now we want to grab all the files from those links
+        const linksUniqueAddressedToMyself = [...new Set(linksAddressedToMyself)];
+        var files = [];
+        for (var i = 0; i < linksUniqueAddressedToMyself.length; i++) {
+            const { link } = linksUniqueAddressedToMyself[i];
+
+            const imagesFromLink = await db.getData("/links/" + link);
+            const { cid, ipfsKey, origin, dest } = imagesFromLink;
+            const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
+            const ipfsImages = ipfsInfo[cid]["paths"];
+            paths = await this.getImages(ipfsImages, cid);
+            files.push({
+                "ipfsKey": ipfsKey,
+                "origin": origin,
+                "dest": dest,
+                "cid": cid,
+                "createdAt": createdAt,
+                "filetree": paths
+            });
+        }
+        return response.send(files);
+    }
+    catch (e) {
+        return response.sendStatus(204);
+    }
+}
+
+// !Important : this is used before to get all the filestree related to the owner address (not receievers)
 exports.getImagesFromAddress = async (request, response) => {
     const { address } = request.params;
     if (!address) {

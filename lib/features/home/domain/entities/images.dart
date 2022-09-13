@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 
 class Images extends Equatable {
-  final String name;
-  final bool isFolder;
-  final List<Images>? children;
+  final String nameEntity;
+  final bool isFolderEntity;
+  final List<Images>? childrenEntity;
 
-  const Images(this.name, this.isFolder, this.children);
+  const Images(this.nameEntity, this.isFolderEntity, this.childrenEntity);
 
   @override
-  List<Object?> get props => [name, isFolder, children];
+  List<Object?> get props => [nameEntity, isFolderEntity, childrenEntity];
 }

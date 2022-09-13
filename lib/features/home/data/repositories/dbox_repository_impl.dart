@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
@@ -18,6 +16,17 @@ class DboxRepositoryImpl implements DboxRepository {
   Future<Either<Failure, ImagesFromLink>> getImagesFromLink(String link) async {
     try {
       final data = await dboxRemoteDataSource.getImageFromLink(link);
+      return Right(data);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ImagesFromLink>>> getRecents(
+      String recents) async {
+    try {
+      final data = await dboxRemoteDataSource.getRecents(recents);
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));

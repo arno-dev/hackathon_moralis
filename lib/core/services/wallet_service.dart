@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bip32/bip32.dart';
-import 'package:hackathon_moralis/core/models/wallet_credential.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pointycastle/export.dart'
     show ECCurve_secp256k1, ECPoint, KeccakDigest;
@@ -10,6 +9,8 @@ import 'package:convert/convert.dart' show hex;
 
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:web3dart/web3dart.dart';
+
+import '../models/wallet_credential.dart';
 
 @lazySingleton
 class WalletService {

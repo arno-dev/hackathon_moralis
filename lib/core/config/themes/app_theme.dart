@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hackathon_moralis/core/constants/colors.dart';
+
+import '../../constants/colors.dart';
 
 class AppTheme {
   static ThemeData get mainTheme {

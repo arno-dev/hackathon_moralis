@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hackathon_moralis/core/constants/colors.dart';
+import '../../constants/colors.dart';
 
 extension CustomTextTheme on TextTheme {
   TextStyle get caption1 => const TextStyle(

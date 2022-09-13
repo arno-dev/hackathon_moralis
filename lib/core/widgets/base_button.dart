@@ -13,7 +13,9 @@ class BaseButton extends StatelessWidget {
       this.onTap,
       this.borderColor,
       this.horizontalPadding = 12,
-      this.verticalPadding = 5});
+      this.verticalPadding = 5,
+      this.isDisabled = false
+      });
   final String? text;
   final Color? backgroundColor;
   final double buttonHeight;
@@ -22,18 +24,19 @@ class BaseButton extends StatelessWidget {
   final Color? borderColor;
   final double horizontalPadding;
   final double verticalPadding;
+  final bool isDisabled;
   final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(borderRadius),
-      color: backgroundColor,
+      color: isDisabled?Colors.grey:backgroundColor,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        onTap: onTap,
+        onTap: isDisabled?null:onTap,
         child: Container(
           decoration: (borderColor != null)
               ? BoxDecoration(
@@ -46,7 +49,7 @@ class BaseButton extends StatelessWidget {
           child:(text != null)? Center(
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: horizontalPadding,vertical: verticalPadding),
-              child: Text(text!, style: const TextStyle(color: AppColors.accentColor),),
+              child: Text(text!, style: const TextStyle(color: AppColors.fontColor),),
             ),
           ) : null,
         ),
