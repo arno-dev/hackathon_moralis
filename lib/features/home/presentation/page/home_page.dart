@@ -1,5 +1,6 @@
 import 'package:d_box/core/constants/data_status.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
+import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
 import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
 import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:flutter/material.dart';
@@ -37,57 +38,62 @@ class HomePage extends StatelessWidget {
           size: 30,
         ),
       ),
-      body: BlocBuilder<HomeCubit, HomeState>(
+      body: BlocBuilder<PushNotificationCubit, PushNotificationState>(
         builder: (context, state) {
-          if (state.dataStatus == DataStatus.initial) {
-            return const SizedBox();
-          } else if (state.dataStatus == DataStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state.dataStatus == DataStatus.loaded) {
-            List<ImagesFromLink>? recents = state.recents ?? [];
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DboxTextField(
-                      hintText: 'Search your files',
-                      isSearch: true,
-                      controller: context.read<HomeCubit>().searchController,
+          return BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              if (state.dataStatus == DataStatus.initial) {
+                return const SizedBox();
+              } else if (state.dataStatus == DataStatus.loading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state.dataStatus == DataStatus.loaded) {
+                List<ImagesFromLink>? recents = state.recents ?? [];
+                return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DboxTextField(
+                          hintText: 'Search your files',
+                          isSearch: true,
+                          controller:
+                              context.read<HomeCubit>().searchController,
+                        ),
+                        CustomButtonRecent(
+                          onPressed: () {},
+                        ),
+                        state.stack.isNotEmpty
+                            ? TextButton(
+                                onPressed: () {
+                                  context.read<HomeCubit>().onBackFolder();
+                                },
+                                child: const Text("..."))
+                            : const SizedBox.shrink(),
+                        recents.isNotEmpty
+                            ? state.stack.isEmpty
+                                ? RootFolderView(recents: recents)
+                                : ChildFolderView(
+                                    folders: state.currentFolder,
+                                    modified: state.recents![state.stack[0]]
+                                        .createdAtEntity,
+                                    rootIndex: state.stack[0])
+                            : const EmtryFileWidget(),
+                      ],
                     ),
-                    CustomButtonRecent(
-                      onPressed: () {},
-                    ),
-                    state.stack.isNotEmpty
-                        ? TextButton(
-                            onPressed: () {
-                              context.read<HomeCubit>().onBackFolder();
-                            },
-                            child: const Text("..."))
-                        : const SizedBox.shrink(),
-                    recents.isNotEmpty
-                        ? state.stack.isEmpty
-                            ? RootFolderView(recents: recents)
-                            : ChildFolderView(
-                                folders: state.currentFolder,
-                                modified:
-                                    state.recents![state.stack[0]].createdAtEntity,
-                                rootIndex: state.stack[0])
-                        : const EmtryFileWidget(),
-                  ],
-                ),
-              ),
-            );
-          } else if (state.dataStatus == DataStatus.error) {
-            return Center(
-              child: Text(
-                "ERROR",
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-            );
-          }
-          return const SizedBox.shrink();
+                  ),
+                );
+              } else if (state.dataStatus == DataStatus.error) {
+                return Center(
+                  child: Text(
+                    "ERROR",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          );
         },
       ),
     );

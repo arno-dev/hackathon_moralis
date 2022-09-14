@@ -1,0 +1,3 @@
+enum PushNotificationPath {
+  detail
+}

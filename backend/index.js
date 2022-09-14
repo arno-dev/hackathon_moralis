@@ -37,7 +37,7 @@ app.post('/v2/share/images', imagesController.uploadImagesToIpfs, imagesControll
 
 // Push notification
 app.post('/v2/saveRegistrationToken', alertsController.saveRegistrationToken)
-// app.post('/v2/sendNotifications', alertsController.sendNotifications) // Note : it shouldn't be available in UAT
+app.post('/v2/sendNotifications', alertsController.sendNotifications) // Note : it shouldn't be available in UAT
 app.get('/v2/getRegistrationTokenFromAddress/:address', alertsController.getRegistrationTokenFromAddress)
 
 // Alerts 
