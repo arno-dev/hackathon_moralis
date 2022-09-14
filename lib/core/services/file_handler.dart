@@ -4,10 +4,12 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../features/home/data/models/params/upload_image_param/image_param.dart';
 
@@ -15,8 +17,9 @@ import '../../features/home/data/models/params/upload_image_param/image_param.da
 class FileHandler {
   final FilePicker filePicker;
   final http.Client client;
+  final ImagePicker imagePicker;
 
-  FileHandler(this.filePicker, this.client);
+  FileHandler(this.filePicker, this.client, this.imagePicker);
 
   Future<void> getPreviewFile(String base64String, String filename) async {
     Directory dir = await getTemporaryDirectory();
@@ -40,9 +43,13 @@ class FileHandler {
     }
   }
 
-  Future<List<ImageParam>> getMultiFiles() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
+  Future<List<ImageParam>> getMultiFiles(
+      List<String>? allowedExtensions) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: allowedExtensions == null ? FileType.any : FileType.custom,
+      allowedExtensions: allowedExtensions,
+    );
     List<ImageParam> files = [];
     if (result != null) {
       for (var path in result.paths) {
@@ -51,13 +58,34 @@ class FileHandler {
           files.add(
             ImageParam(
               content: imageBase64,
-              path: path,
+              path: path.split("/").last,
             ),
           );
         }
       }
     }
     return files;
+  }
+
+  Future<List<ImageParam>> takePhoto() async {
+    List<ImageParam> response = [];
+    final XFile? pickedFile = await imagePicker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 100.w,
+      maxHeight: 100.h,
+      imageQuality: 50,
+    );
+
+    String? path = pickedFile?.path;
+    if (path != null) {
+      File file = File(path);
+      List<int> imageBytes = await file.readAsBytes();
+      String imageBase64 = base64Encode(imageBytes);
+      ImageParam imageParam = ImageParam(path: path.split("/").last, content: imageBase64);
+      response.add(imageParam);
+      return response;
+    }
+    return response;
   }
 
   Future<String> _convertFileToBase64(File file) async {

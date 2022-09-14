@@ -1,6 +1,7 @@
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:dartz/dartz.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/exceptions.dart';
@@ -51,6 +52,21 @@ class DboxRepositoryImpl implements DboxRepository {
       UploadImageParam uploadImageParam) async {
     try {
       final data = await dboxRemoteDataSource.postSaveImages(uploadImageParam);
+      return Right(data);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> initializeFirebaseMessaging(
+      {void Function(RemoteMessage message)? onMessageOpenedApp,
+      void Function(String? payload)? onSelectNotification}) async {
+    try {
+      final data = await dboxRemoteDataSource.initializeFirebaseMessaging(
+        onMessageOpenedApp: onMessageOpenedApp,
+        onSelectNotification: onSelectNotification,
+      );
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));

@@ -3,10 +3,12 @@ import 'package:d_box/features/home/data/models/params/upload_image_param/image_
 import 'package:d_box/features/home/data/models/save_images_model.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/services/api_client.dart';
+import '../../../../core/services/push_notification_service.dart';
 import '../../../../core/util/response_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../models/images_from_link_model.dart';
@@ -17,14 +19,19 @@ abstract class DboxRemoteDataSource {
   Future<List<ImagesFromLinkModel>> getRecents(String recents);
   Future<SaveImagesModel> postSaveImages(UploadImageParam uploadImageParam);
   Future<List<ImageParam>> pickImages();
+  Future<bool> initializeFirebaseMessaging(
+      {void Function(RemoteMessage)? onMessageOpenedApp,
+      void Function(String?)? onSelectNotification});
 }
 
 @LazySingleton(as: DboxRemoteDataSource)
 class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   final ApiClient apiClient;
   final FileHandler fileHandler;
+  final PushNotificationService notificationService;
 
-  DboxRemoteDataSourceImpl(this.apiClient, this.fileHandler);
+  DboxRemoteDataSourceImpl(
+      this.apiClient, this.fileHandler, this.notificationService);
 
   @override
   Future<ImagesFromLinkModel> getImageFromLink(String link) async {
@@ -64,9 +71,22 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   @override
   Future<List<ImageParam>> pickImages() async {
     try {
-      return await fileHandler.getMultiFiles();
+      return await fileHandler.getMultiFiles(allowedExtensions: ["jpg", "png"]);
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
+    }
+  }
+
+  @override
+  Future<bool> initializeFirebaseMessaging(
+      {void Function(RemoteMessage)? onMessageOpenedApp,
+      void Function(String?)? onSelectNotification}) async {
+    try {
+      await notificationService.initializePlatformNotifications(
+        onMessageOpenedApp: onMessageOpenedApp,
+        onSelectNotification: onSelectNotification,
+      );
+      return true;
     } catch (e) {
       throw ServerException(LocaleKeys.somethingWrong.tr());
     }
