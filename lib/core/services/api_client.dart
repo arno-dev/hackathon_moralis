@@ -10,23 +10,23 @@ import '../constants/api_path.dart';
 part 'api_client.g.dart';
 
 @lazySingleton
-@RestApi(baseUrl: ApiPaht.baseUrl)
+@RestApi(baseUrl: ApiPath.baseUrl)
 abstract class ApiClient {
   @factoryMethod
   factory ApiClient(Dio dio) = _ApiClient;
 
-  @GET(ApiPaht.todos)
+  @GET(ApiPath.todos)
   Future<List<TodosModel>> getTodos();
 
-  @GET(ApiPaht.users)
+  @GET(ApiPath.users)
   Future<List<UserModel>> getUsers();
 
-  @GET(ApiPaht.imagesFromLink)
+  @GET(ApiPath.imagesFromLink)
   Future<ImagesFromLinkModel> getImagesFromLink(
     @Path('link') String link,
   );
 
-  @GET(ApiPaht.recent)
+  @GET(ApiPath.recent)
   Future<List<ImagesFromLinkModel>> getRecents(
     @Path('recents') String recents,
   );

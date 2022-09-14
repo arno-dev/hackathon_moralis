@@ -4,7 +4,7 @@ import '../../../../generated/assets.gen.dart';
 
 class CustomButtonRecent extends StatelessWidget {
   final Function onPressed;
-  CustomButtonRecent({Key? key, required this.onPressed}) : super(key: key);
+  const CustomButtonRecent({Key? key, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

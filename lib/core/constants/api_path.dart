@@ -1,4 +1,4 @@
-class ApiPaht {
+class ApiPath {
   //base url
   // static const String baseUrl = "https://jsonplaceholder.typicode.com";
   static const String baseUrl = "http://localhost:3000";
