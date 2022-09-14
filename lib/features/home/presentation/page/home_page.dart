@@ -2,15 +2,15 @@ import 'package:d_box/core/constants/data_status.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
 import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/d_appbar.dart';
 import '../../../../core/widgets/d_box_textfield.dart';
 import '../../../../generated/assets.gen.dart';
-import '../../domain/entities/images.dart';
 import '../cubit/Home/home_cubit.dart';
+import '../widgets/child_folder_view.dart';
+import '../widgets/root_folder.view.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -59,66 +59,22 @@ class HomePage extends StatelessWidget {
                     CustomButtonRecent(
                       onPressed: () {},
                     ),
+                    state.stack.isNotEmpty
+                        ? TextButton(
+                            onPressed: () {
+                              context.read<HomeCubit>().onBackFolder();
+                            },
+                            child: const Text("..."))
+                        : const SizedBox.shrink(),
                     recents.isNotEmpty
-                        ? Expanded(
-                            child: ListView.builder(
-                              itemCount: recents.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                DateTime modified = recents[index].createdAtEntity;
-                                List<Images>? folders = recents[index]
-                                        .filetreeEntity
-                                        ?.childrenEntity ??
-                                    [];
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ...List.generate(
-                                      folders.length,
-                                      (index) => GestureDetector(
-                                        onTap: () {},
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            folders[index].isFolderEntity
-                                                ? const Icon(
-                                                    Icons.folder,
-                                                    size: 100,
-                                                  )
-                                                : const Icon(Icons.image),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  folders[index].nameEntity,
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 10),
-                                                Text(
-                                                  'Modified ${DateFormat.yMMMd()
-                                                          .format(modified)}',
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                );
-                              },
-                            ),
-                          )
+                        ? state.stack.isEmpty
+                            ? RootFolderView(recents: recents)
+                            : ChildFolderView(
+                                folders: state.currentFolder,
+                                modified:
+                                    state.recents![state.stack[0]].createdAt,
+                                rootIndex: state.stack[0])
                         : const EmtryFileWidget(),
-                    const Text("End")
                   ],
                 ),
               ),
