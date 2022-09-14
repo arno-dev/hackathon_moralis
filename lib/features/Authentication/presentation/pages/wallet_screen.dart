@@ -40,7 +40,7 @@ class WalletPage extends StatelessWidget {
                             text: tr('importWallet'),
                             buttonWidth: 100.w,
                             backgroundColor: AppColors.primaryPurpleColor,
-                            color: Colors.white,
+                            textColor: Colors.white,
                             buttonHeight: 13.w),
                         SizedBox(height: 3.w),
                         BaseButton(
@@ -48,7 +48,7 @@ class WalletPage extends StatelessWidget {
                           buttonWidth: 100.w,
                           buttonHeight: 13.w,
                           borderColor: AppColors.primaryPurpleColor,
-                          color: AppColors.primaryPurpleColor,
+                          textColor: AppColors.primaryPurpleColor,
                         ),
                       ],
                     )

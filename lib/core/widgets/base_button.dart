@@ -15,11 +15,11 @@ class BaseButton extends StatelessWidget {
       this.horizontalPadding = 12,
       this.verticalPadding = 5,
       this.isDisabled = false,
-      this.color = AppColors.primaryColor
+      this.textColor = AppColors.primaryFontColor,
+      this.isDisabledColor = AppColors.secondaryFontColor
       });
   final String? text;
   final Color? backgroundColor;
-  final Color color;
   final double buttonHeight;
   final double? buttonWidth;
   final double borderRadius;
@@ -27,32 +27,31 @@ class BaseButton extends StatelessWidget {
   final double horizontalPadding;
   final double verticalPadding;
   final bool isDisabled;
+  final Color isDisabledColor;
+  final Color textColor;
   final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(borderRadius),
-      color: isDisabled ? Colors.grey : backgroundColor,
+      color: isDisabled?AppColors.shadowColor:backgroundColor,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        onTap: isDisabled ? null : onTap,
+        onTap:onTap,
         child: Container(
           decoration: (borderColor != null)
               ? BoxDecoration(
-                  border: Border.all(color: borderColor!),
+                  border:isDisabled? null:  Border.all(color: borderColor!),
                   borderRadius: BorderRadius.circular(borderRadius),
                 )
               : null,
           height: buttonHeight,
           width: buttonWidth,
           child:(text != null)? Center(
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: horizontalPadding,vertical: verticalPadding),
-              child: Text(text!, style:  TextStyle(color: color,fontWeight: FontWeight.bold),),
-            ),
+            child: Text(text!, style:  TextStyle(color:isDisabled? isDisabledColor : textColor),),
           ) : null,
         ),
       ),
