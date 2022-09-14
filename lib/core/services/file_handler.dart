@@ -40,9 +40,13 @@ class FileHandler {
     }
   }
 
-  Future<List<ImageParam>> getMultiFiles() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
+  Future<List<ImageParam>> getMultiFiles(
+      List<String>? allowedExtensions) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: allowedExtensions == null ? FileType.any : FileType.custom,
+      allowedExtensions: allowedExtensions,
+    );
     List<ImageParam> files = [];
     if (result != null) {
       for (var path in result.paths) {
