@@ -1,3 +1,6 @@
+import 'package:d_box/core/usecases/usecase.dart';
+import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
+import 'package:d_box/features/home/domain/usecases/pick_images_usecase.dart';
 import 'package:d_box/features/home/domain/usecases/recenst_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,10 +19,14 @@ part 'home_cubit.freezed.dart';
 class HomeCubit extends Cubit<HomeState> {
   final GetImagesFromLinkUsecase getImagesFromLinkUsecase;
   final GetRecentsUsecase getRecentsUsecase;
-  HomeCubit(this.getImagesFromLinkUsecase, this.getRecentsUsecase)
+  final PickImagesUsecase pickImagesUsecase;
+  HomeCubit(this.getImagesFromLinkUsecase, this.getRecentsUsecase,
+      this.pickImagesUsecase)
       : super(const HomeState());
 
   TextEditingController searchController = TextEditingController();
+  TextEditingController addPeopleController = TextEditingController(text: "");
+  TextEditingController addFolderController = TextEditingController(text: "");
 
   Future<void> getUserFromLink(String link) async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
@@ -101,5 +108,21 @@ class HomeCubit extends Cubit<HomeState> {
       stack: newStack,
       currentFolder: current,
     ));
+  }
+
+  Future<void> onPickImages() async {
+    final request = await pickImagesUsecase(NoParams());
+    request.fold((error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+        (data) {
+      List<ImageParam> listImage = data;
+    });
+  }
+
+  void onAddPeopleChange(String text) {
+    emit(state.copyWith(addPeople: text));
+  }
+
+  void onAddFolderChange(String text) {
+    emit(state.copyWith(addFolder: text));
   }
 }

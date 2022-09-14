@@ -67,8 +67,8 @@ exports.sendNotifications = async (request, response) => {
         return response.status(400)
     }
     admin.messaging().sendToDevice(registrationToken, message, options)
-        .then(_ => {
-            return response.status(200).send("Notification sent successfully")
+        .then(data => {
+            return response.status(200).send(data)
         })
         .catch(error => {
             return response.status(500).send(error)
