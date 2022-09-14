@@ -1,6 +1,7 @@
 import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
+import 'package:d_box/core/constants/data_status.dart';
 import 'package:d_box/core/widgets/base_button.dart';
 import 'package:d_box/core/widgets/d_appbar.dart';
 import 'package:d_box/core/widgets/d_box_check_box.dart';
@@ -19,7 +20,10 @@ class ImportWalletPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationCubit, AuthenticationState>(
+    return BlocConsumer<AuthenticationCubit, AuthenticationState>(
+      listener: (context, state){
+        if(state.dataStatus == DataStatus.isVerify) navService.pushNamedAndRemoveUntil(AppRoute.homeRoute);
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
@@ -56,7 +60,7 @@ class ImportWalletPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10.w),
                     BaseButton(
-                    onTap:  () => navService.pushNamed(AppRoute.homeRoute),
+                    onTap:  () async  =>  await context.read<AuthenticationCubit>().saveCredentialFromPrivateKey(),
                     text: tr('import'),
                     buttonWidth: 100.w,
                     buttonHeight: 13.w,

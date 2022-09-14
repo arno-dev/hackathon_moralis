@@ -20,7 +20,12 @@ class AuthenticationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationCubit, AuthenticationState>(
+    return BlocConsumer<AuthenticationCubit, AuthenticationState>(
+      listener: (context, state) {
+        if(state.dataStatus == DataStatus.isVerify){
+          navService.pushNamedAndRemoveUntil(AppRoute.congratulations);
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
@@ -44,7 +49,6 @@ class AuthenticationScreen extends StatelessWidget {
                     await context
                           .read<AuthenticationCubit>()
                           .saveCredential();
-                     if(state.mnemonic.toString() == state.newMnemonic.toString()) navService.pushNamedAndRemoveUntil(AppRoute.congratulations);
                     }
                   }
                 : null,

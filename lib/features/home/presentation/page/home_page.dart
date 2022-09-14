@@ -92,25 +92,6 @@ class HomePage extends StatelessWidget {
                           controller:
                               context.read<HomeCubit>().searchController,
                         ),
-                        CustomButtonRecent(
-                          onPressed: () {},
-                        ),
-                        state.stack.isNotEmpty
-                            ? TextButton(
-                                onPressed: () {
-                                  context.read<HomeCubit>().onBackFolder();
-                                },
-                                child: const Text("..."))
-                            : const SizedBox.shrink(),
-                        recents.isNotEmpty
-                            ? state.stack.isEmpty
-                                ? RootFolderView(recents: recents)
-                                : ChildFolderView(
-                                    folders: state.currentFolder,
-                                    modified: state.recents![state.stack[0]]
-                                        .createdAtEntity,
-                                    rootIndex: state.stack[0])
-                            : const EmtryFileWidget(),
                         state.stack.isNotEmpty
                             ? TextButton(
                                 onPressed: () {
