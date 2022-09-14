@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
-import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:injectable/injectable.dart';
