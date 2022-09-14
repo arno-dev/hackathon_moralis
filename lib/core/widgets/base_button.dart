@@ -14,10 +14,12 @@ class BaseButton extends StatelessWidget {
       this.borderColor,
       this.horizontalPadding = 12,
       this.verticalPadding = 5,
-      this.isDisabled = false
+      this.isDisabled = false,
+      this.color = AppColors.primaryColor
       });
   final String? text;
   final Color? backgroundColor;
+  final Color color;
   final double buttonHeight;
   final double? buttonWidth;
   final double borderRadius;
@@ -49,7 +51,7 @@ class BaseButton extends StatelessWidget {
           child:(text != null)? Center(
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: horizontalPadding,vertical: verticalPadding),
-              child: Text(text!, style: const TextStyle(color: AppColors.fontColor),),
+              child: Text(text!, style:  TextStyle(color: color,fontWeight: FontWeight.bold),),
             ),
           ) : null,
         ),
