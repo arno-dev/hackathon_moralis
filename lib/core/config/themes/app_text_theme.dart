@@ -85,7 +85,23 @@ extension CustomTextTheme on TextTheme {
         color: AppColors.primaryPurpleColor,
         letterSpacing: -.3,
         height: 1.5,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w400,
+      );
+
+  TextStyle get customText5 => const TextStyle(
+        fontSize: 16.0,
+        color: AppColors.primaryFontColor,
+        letterSpacing: -.3,
+        height: 1.5,
+        fontWeight: FontWeight.w400,
+      );
+
+   TextStyle get customText6 => const TextStyle(
+        fontSize: 12.0,
+        color: AppColors.disAbleColor,
+        letterSpacing: -.3,
+        height: 1.5,
+        fontWeight: FontWeight.w400,
       );
 
   TextStyle get subtitle3 => const TextStyle(

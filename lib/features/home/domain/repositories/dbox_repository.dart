@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/domain/entities/alerts.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:dartz/dartz.dart';
@@ -20,4 +21,5 @@ abstract class DboxRepository {
   Future<Either<Failure, bool>> initializeFirebaseMessaging(
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});
+  Future<Either<Failure, List<Alerts>>> getAlerts(String address);
 }

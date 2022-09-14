@@ -54,6 +54,7 @@ dependencies:
   url_launcher: ^6.1.5
   web3dart: 2.3.5
   dotted_border: ^2.0.0+2
+  timeago: ^3.3.0
 
   # Encryption
   bip32: ^2.0.0

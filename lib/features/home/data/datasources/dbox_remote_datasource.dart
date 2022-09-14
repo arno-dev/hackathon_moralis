@@ -13,6 +13,7 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/util/response_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../models/alerts_model.dart';
 import '../models/images_from_link_model.dart';
 import '../models/params/upload_image_param/upload_image_param.dart';
 
@@ -24,6 +25,7 @@ abstract class DboxRemoteDataSource {
   Future<bool> initializeFirebaseMessaging(
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});
+  Future<List<AlertsModel>> getAlerts(String address);
 }
 
 @LazySingleton(as: DboxRemoteDataSource)
@@ -83,6 +85,17 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
         onSelectNotification: onSelectNotification,
       );
       return true;
+    } catch (e) {
+      throw ServerException(LocaleKeys.somethingWrong.tr());
+    }
+  }
+
+  @override
+  Future<List<AlertsModel>> getAlerts(String address) async {
+    try {
+      return await apiClient.getAlerts(address);
+    } on DioError catch (e) {
+      throw ResponseHelper.returnResponse(e);
     } catch (e) {
       throw ServerException(LocaleKeys.somethingWrong.tr());
     }

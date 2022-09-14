@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/data/models/alerts_model.dart';
 import 'package:d_box/features/home/data/datasources/dbox_local_datasource.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
@@ -102,6 +103,16 @@ class DboxRepositoryImpl implements DboxRepository {
         onMessageOpenedApp: onMessageOpenedApp,
         onSelectNotification: onSelectNotification,
       );
+      return Right(data);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AlertsModel>>> getAlerts(String address)async {
+    try {
+      final data = await dboxRemoteDataSource.getAlerts(address);
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));

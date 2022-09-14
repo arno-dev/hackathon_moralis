@@ -7,5 +7,6 @@ class ApiPath {
   static const String users = "/users";
   static const String imagesFromLink = "/v2/images/link/{link}";
   static const String recent = "/v2/share/recents/{recents}";
+  static const String alertAddress = "/v2/alerts/{address}";
   static const String saveImages = "/v2/share/images";
 }
