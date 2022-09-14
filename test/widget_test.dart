@@ -5,12 +5,13 @@ import 'package:d_box/core/services/wallet_service.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 import 'package:http/http.dart' as http;
 import 'widget_test.mocks.dart';
 
-@GenerateMocks([http.Client, FilePicker])
+@GenerateMocks([http.Client, FilePicker, ImagePicker])
 void main() {
   group("flow of authentication", () {
     const actual = "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8";
@@ -62,6 +63,7 @@ void main() {
     late FileHandler fileHandler;
     late MockFilePicker mockFilePicker;
     late MockClient mockClient;
+    late MockImagePicker mockImagePicker;
 
     setUpAll(() {
       asymmetricEncryption = AsymmetricEncryption();
@@ -91,13 +93,15 @@ void main() {
       // mock injection
       mockFilePicker = MockFilePicker();
       mockClient = MockClient();
+      mockImagePicker = MockImagePicker();
       // For handling file
-      fileHandler = FileHandler(mockFilePicker, mockClient);
+      fileHandler = FileHandler(mockFilePicker, mockClient, mockImagePicker);
     });
 
     group("Test integrity of the keys", () {
       late MockFilePicker mockFilePicker;
       late MockClient mockClient;
+      late MockImagePicker mockImagePicker;
       setUpAll(() {});
       test("if address are expected from mneumonics", () {
         expect("0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8",
@@ -186,8 +190,9 @@ void main() {
         // mock injection
         mockFilePicker = MockFilePicker();
         mockClient = MockClient();
+        mockImagePicker = MockImagePicker();
 
-        fileHandler = FileHandler(mockFilePicker, mockClient);
+        fileHandler = FileHandler(mockFilePicker, mockClient, mockImagePicker);
         final encryptImage =
             fileHandler.encryption(actual, secretMessageFromOnetoTwo);
 
