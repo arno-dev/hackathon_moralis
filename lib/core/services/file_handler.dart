@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../features/home/data/models/params/upload_image_param/image_param.dart';
 
 @lazySingleton
 class FileHandler {
@@ -38,15 +41,20 @@ class FileHandler {
     }
   }
 
-  Future<List<String>> getMultiFiles() async {
+  Future<List<ImageParam>> getMultiFiles() async {
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
-    List<String> files = [];
+    List<ImageParam> files = [];
     if (result != null) {
       for (var path in result.paths) {
         if (path != null) {
           final imageBase64 = await _convertFileToBase64(File(path));
-          files.add(imageBase64);
+          files.add(
+            ImageParam(
+              content: imageBase64,
+              path: path,
+            ),
+          );
         }
       }
     }
