@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/exceptions.dart';
@@ -27,6 +28,21 @@ class DboxRepositoryImpl implements DboxRepository {
       String recents) async {
     try {
       final data = await dboxRemoteDataSource.getRecents(recents);
+      return Right(data);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> initializeFirebaseMessaging(
+      {void Function(RemoteMessage message)? onMessageOpenedApp,
+      void Function(String? payload)? onSelectNotification}) async {
+    try {
+      final data = await dboxRemoteDataSource.initializeFirebaseMessaging(
+        onMessageOpenedApp: onMessageOpenedApp,
+        onSelectNotification: onSelectNotification,
+      );
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));

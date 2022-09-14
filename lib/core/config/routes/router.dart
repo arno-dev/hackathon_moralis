@@ -1,4 +1,5 @@
 import 'package:d_box/features/Authentication/presentation/pages/wallet_screen.dart';
+import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../features/Authentication/presentation/cubit/authentication_cubit_cubit.dart';
@@ -23,7 +24,7 @@ class AppRoute {
     switch (settings.name) {
       case initialRoute:
         return MaterialPageRoute(
-            builder: (_) =>  BlocProvider(
+            builder: (_) => BlocProvider(
                   create: (context) => getIt<AuthenticationCubit>(),
                   child: const WalletPage(),
                 ));
@@ -43,16 +44,23 @@ class AppRoute {
       case congratulations:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                  create: (context) =>
-                      getIt<AuthenticationCubit>(),
+                  create: (context) => getIt<AuthenticationCubit>(),
                   child: const CongratulationsPage(),
                 ));
       case homeRoute:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                  create: (context) => getIt<HomeCubit>()
-                    ..getRecents(
-                        '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'), // hard code link for test
+            builder: (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => getIt<HomeCubit>()
+                        ..getRecents(
+                            '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'), // hard code link for test
+                    ),
+                    BlocProvider(
+                      create: (context) => getIt<PushNotificationCubit>()
+                        ..initializeFirebaseMessaging(),
+                    ),
+                  ],
                   child: const HomePage(),
                 ));
       case todosRoute:

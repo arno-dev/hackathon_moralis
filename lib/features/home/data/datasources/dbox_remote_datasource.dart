@@ -1,5 +1,7 @@
+import 'package:d_box/core/services/push_notification_service.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/exceptions.dart';
@@ -11,13 +13,17 @@ import '../models/images_from_link_model.dart';
 abstract class DboxRemoteDataSource {
   Future<ImagesFromLinkModel> getImageFromLink(String link);
   Future<List<ImagesFromLinkModel>> getRecents(String recents);
+  Future<bool> initializeFirebaseMessaging(
+      {void Function(RemoteMessage)? onMessageOpenedApp,
+      void Function(String?)? onSelectNotification});
 }
 
 @LazySingleton(as: DboxRemoteDataSource)
 class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   final ApiClient apiClient;
+  final PushNotificationService notificationService;
 
-  DboxRemoteDataSourceImpl(this.apiClient);
+  DboxRemoteDataSourceImpl(this.apiClient, this.notificationService);
 
   @override
   Future<ImagesFromLinkModel> getImageFromLink(String link) async {
@@ -36,6 +42,21 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
       return await apiClient.getRecents(recents);
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
+    } catch (e) {
+      throw ServerException(LocaleKeys.somethingWrong.tr());
+    }
+  }
+
+  @override
+  Future<bool> initializeFirebaseMessaging(
+      {void Function(RemoteMessage)? onMessageOpenedApp,
+      void Function(String?)? onSelectNotification}) async {
+    try {
+      await notificationService.initializePlatformNotifications(
+        onMessageOpenedApp: onMessageOpenedApp,
+        onSelectNotification: onSelectNotification,
+      );
+      return true;
     } catch (e) {
       throw ServerException(LocaleKeys.somethingWrong.tr());
     }
