@@ -63,8 +63,6 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     Map<String, dynamic> body = uploadImageParam.toMap();
     try {
       return await apiClient.postSaveImages(body);
-    } on DioError catch (e) {
-      throw ResponseHelper.returnResponse(e);
     } catch (e) {
       throw ServerException(LocaleKeys.somethingWrong.tr());
     }
@@ -72,11 +70,7 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
 
   @override
   Future<List<ImageParam>> pickImages() async {
-    try {
-      return await fileHandler.getMultiFiles(allowedExtensions: ["jpg", "png"]);
-    } on DioError catch (e) {
-      throw ResponseHelper.returnResponse(e);
-    }
+    return await fileHandler.getMultiFiles(allowedExtensions: ["jpg", "png"]);
   }
 
   @override
