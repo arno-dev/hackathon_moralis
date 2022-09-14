@@ -209,7 +209,7 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
                 "origin": origin,
                 "dest": dest,
                 "cid": cid,
-                "createdAt": createdAt,
+                "createdAt": new Date().toISOString(),
                 "filetree": paths
             });
         }

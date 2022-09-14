@@ -28,5 +28,7 @@
     "start":"Start",
     "done":"Done",
     "congretulations":"Congretutations!",
-    "congretulationsContentText":"You’ve successfully protected your wallet. Remember to keep your Secret Recovery Phrase safe, it’s your responsibility!"
+    "congretulationsContentText":"You’ve successfully protected your wallet. Remember to keep your Secret Recovery Phrase safe, it’s your responsibility!",
+    "send": "Send",
+    "cancel": "Cancel"
 }
