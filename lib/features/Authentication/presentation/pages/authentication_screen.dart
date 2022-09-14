@@ -1,9 +1,14 @@
+import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/constants/data_status.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../core/constants/colors.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/widgets/d_appbar.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../../../core/config/themes/app_text_theme.dart';
@@ -20,6 +25,15 @@ class AuthenticationScreen extends StatefulWidget {
 }
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
+  late NotificationService notificationService;
+
+  @override
+  void initState() {
+    super.initState();
+    notificationService = NotificationService(
+        FlutterLocalNotificationsPlugin(), FirebaseMessaging.instance);
+    notificationService.initializePlatformNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +42,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         return Scaffold(
           appBar: DAppBar(
             onTap: () => (state.firstStep)
-                ? null
+                ? navService.goBack()
                 : context.read<AuthenticationCubit>().firstStep(true),
             centerTitle: false,
             title: (state.firstStep)
@@ -44,18 +58,17 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     if (index == 0) {
                       context.read<AuthenticationCubit>().firstStep(false);
                     } else {
-                      await context
+                    await context
                           .read<AuthenticationCubit>()
                           .saveCredential();
+                     if(state.mnemonic.toString() == state.newMnemonic.toString()) navService.pushNamedAndRemoveUntil(AppRoute.congratulations);
                     }
                   }
                 : null,
-            physics:
-                (state.firstStep) ? const NeverScrollableScrollPhysics() : null,
             lineColor: AppColors.primaryPurpleColor,
             currentIndex: (state.firstStep) ? 0 : 1,
             stepSize: 30,
-            textWidth: 30.w,
+            textWidth: 30.w, 
             stepperhorizontal: 10.w,
             listOfContentText: [
               LocaleKeys.secureWallet.tr(),

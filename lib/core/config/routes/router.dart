@@ -1,7 +1,10 @@
+import 'package:d_box/features/Authentication/presentation/pages/wallet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../features/Authentication/presentation/cubit/authentication_cubit_cubit.dart';
 import '../../../features/Authentication/presentation/pages/authentication_screen.dart';
+import '../../../features/Authentication/presentation/pages/congratulations_screen.dart';
+import '../../../features/Authentication/presentation/pages/import_wallet_screen.dart';
 import '../../../features/home/presentation/cubit/Home/home_cubit.dart';
 import '../../../features/home/presentation/page/home_page.dart';
 import '../../../features/todo/presentation/cubit/todo_cubit.dart';
@@ -10,6 +13,9 @@ import '../DI/configure_dependencies.dart';
 
 class AppRoute {
   static const String initialRoute = "/";
+  static const String importWallet = "/importWallet";
+  static const String createWallet = "/createWallet";
+  static const String congratulations = "/congratulations";
   static const String todosRoute = "/todos";
   static const String homeRoute = "/home";
   static Route<dynamic>? routeGenerate(
@@ -17,18 +23,38 @@ class AppRoute {
     switch (settings.name) {
       case initialRoute:
         return MaterialPageRoute(
+            builder: (_) =>  BlocProvider(
+                  create: (context) => getIt<AuthenticationCubit>(),
+                  child: const WalletPage(),
+                ));
+      case importWallet:
+        return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                  create: (context) => getIt<AuthenticationCubit>()..getMnemonicData(), 
+                  create: (context) => getIt<AuthenticationCubit>(),
+                  child: const ImportWalletPage(),
+                ));
+      case createWallet:
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) =>
+                      getIt<AuthenticationCubit>()..getMnemonicData(),
                   child: const AuthenticationScreen(),
-                ));          
-
+                ));
+      case congratulations:
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) =>
+                      getIt<AuthenticationCubit>(),
+                  child: const CongratulationsPage(),
+                ));
       case homeRoute:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                   create: (context) => getIt<HomeCubit>()
-                    ..getUserFromLink('_8Plp_fn71Rf70cp8b65-'), // hard code link for test
+                    ..getRecents(
+                        '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'), // hard code link for test
                   child: const HomePage(),
-                ));          
+                ));
       case todosRoute:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(

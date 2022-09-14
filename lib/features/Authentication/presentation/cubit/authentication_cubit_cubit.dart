@@ -39,7 +39,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r,newMnemonic: List.generate(r.length, (index) => "").toList()));
     randomData = [...?state.mnemonic];
     randomData.shuffle();
-      emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r));
+      
     });
   }
 
@@ -66,7 +66,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     }
     emit(state.copyWith(newMnemonic: store));
   }
-
+  
   Future<void> saveCredential() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     if (state.mnemonic.toString() == state.newMnemonic.toString()) {

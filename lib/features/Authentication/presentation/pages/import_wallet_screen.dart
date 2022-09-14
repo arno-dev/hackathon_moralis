@@ -1,3 +1,4 @@
+import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
 import 'package:d_box/core/widgets/base_button.dart';
@@ -10,6 +11,7 @@ import 'package:d_box/generated/assets.gen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 
 import '../cubit/authentication_cubit_cubit.dart';
@@ -23,6 +25,7 @@ class ImportWalletPage extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
+            onTap: ()=> navService.goBack(),
             title: tr('importWallet'),
             titleStyle: Theme.of(context).textTheme.caption2,
             centerTitle: false,
@@ -54,8 +57,8 @@ class ImportWalletPage extends StatelessWidget {
                     onTab: (value) {},
                   ),
                   SizedBox(height: 10.w),
-                  BaseButton(
-                    onTap: () => _dialogBuilder(context),
+                    BaseButton(
+                    onTap:  () => navService.pushNamed(AppRoute.homeRoute),
                     text: tr('import'),
                     buttonWidth: 100.w,
                     buttonHeight: 13.w,
@@ -63,6 +66,7 @@ class ImportWalletPage extends StatelessWidget {
                     textColor: Colors.white,
                     isDisabled: !state.isInputValidated,
                   ),
+            
                 ],
               ),
             ),
@@ -105,6 +109,10 @@ Future<void> _dialogBuilder(BuildContext context) {
                 },
                 builder: (context, isChecked) {
                   return BaseButton(
+                      onTap: () async {
+                         Navigator.pop(context);
+                        await navService.pushNamed(AppRoute.createWallet);
+                      },
                       isDisabled: !isChecked,
                       text: tr('start'),
                       buttonWidth: 100.w,

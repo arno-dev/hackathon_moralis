@@ -27,7 +27,7 @@ class AuthenticationGrid extends StatelessWidget {
     int rightLength = ((data.length) / 2).round();
     int leftLength = (data.length) ~/ 2;
     return Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 34),
+        padding: const EdgeInsets.fromLTRB(10, 16, 20, 34),
         decoration: BoxDecoration(
             border: Border.all(width: 1, color: gridColor),
             borderRadius: BorderRadius.circular(14)),
@@ -84,7 +84,7 @@ class AuthenticationGrid extends StatelessWidget {
               )
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Column(
                       children: List.generate(
@@ -93,6 +93,7 @@ class AuthenticationGrid extends StatelessWidget {
                                 children: [
                                   const SizedBox(height: 16),
                                   GridButton(
+                                    
                                     borderColor: borderColor,
                                     isDottedButton: data[index].isEmpty,
                                     text: data[index],

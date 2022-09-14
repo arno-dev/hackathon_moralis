@@ -46,11 +46,11 @@ class AuthenticateGridView extends StatelessWidget {
             List<String> newRandomMnonic =
                 context.read<AuthenticationCubit>().randomData;
             return SizedBox(
-              height: 35.w,
+              height: 50.w,
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 1.w,
+                    childAspectRatio: 0.8.w,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                     crossAxisCount: 3),
@@ -59,7 +59,7 @@ class AuthenticateGridView extends StatelessWidget {
                   isDisabled: newMnemonic.contains(newRandomMnonic[index]),
                   borderColor: AppColors.disAbleColor,
                   text: newRandomMnonic[index],
-                  onTap: newMnemonic[index].contains(newRandomMnonic[index])
+                  onTap: newMnemonic.contains(newRandomMnonic[index])
                       ? null
                       : () => onAdd(index),
                 ),

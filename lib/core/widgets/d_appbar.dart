@@ -50,7 +50,7 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : Container(),
-      titleSpacing: -3.w,
+      titleSpacing: leading? -2.w : null,
       centerTitle: centerTitle,
       leading: (leading) ? Center(
               child: InkWell(
@@ -58,9 +58,12 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   onTap: onTap,
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.primaryColor,
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.primaryColor,
+                    ),
                   )),
             ) : null,
       elevation: elevation,
