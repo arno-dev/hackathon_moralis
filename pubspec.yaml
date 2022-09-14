@@ -52,7 +52,7 @@ dependencies:
   flutter_secure_storage: ^6.0.0
   file_picker: ^5.0.1
   url_launcher: ^6.1.5
-  web3dart: ^2.3.5
+  web3dart: 2.3.5
   dotted_border: ^2.0.0+2
 
   # Encryption
@@ -109,6 +109,7 @@ flutter:
     - assets/translations/
     - assets/icons/
     - assets/images/
+    - assets/gifs/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

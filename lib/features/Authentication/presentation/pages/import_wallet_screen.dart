@@ -1,3 +1,4 @@
+import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
 import 'package:d_box/core/widgets/base_button.dart';
 import 'package:d_box/core/widgets/d_appbar.dart';
@@ -25,6 +26,7 @@ class ImportWalletPage extends StatelessWidget {
             return Scaffold(
               appBar: DAppBar(
                 title: tr('importWallet'),
+                titleStyle: Theme.of(context).textTheme.caption2,
                 centerTitle: false,
               ),
               body: SafeArea(
@@ -38,9 +40,9 @@ class ImportWalletPage extends StatelessWidget {
                       Center(child: Assets.images.importwallet.image()),
                       SizedBox(height: 15.w),
                       Text(tr('importYourWalletWithSecret'),
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                          style: Theme.of(context).textTheme.subtitle3),
                       Text(tr('recoveryPhrase'),
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                          style: Theme.of(context).textTheme.subtitle3),
                       SizedBox(height: 5.w),
                       DboxTextField(
                           isPassword: true,
@@ -82,7 +84,7 @@ Future<void> _dialogBuilder(BuildContext context) {
     builder: (_) {
       return BlocProvider.value(
         value: context.read<AuthenticationCubit>(),
-        child: DboxAlertDialog(title: 'Secure your wallet', content: [
+        child: DboxAlertDialog(title: 'Secure your wallet',titleColor: Colors.red, content: [
           Assets.images.security.image(),
           SizedBox(height: 5.w),
           DboxUnorderedList(

@@ -87,4 +87,12 @@ extension CustomTextTheme on TextTheme {
         height: 1.5,
         fontWeight: FontWeight.w700,
       );
+
+  TextStyle get subtitle3 => const TextStyle(
+        fontSize: 18.0,
+        color: AppColors.primaryFontColor,
+        letterSpacing: -.3,
+        height: 1.5,
+        fontWeight: FontWeight.w700,
+      );
 }

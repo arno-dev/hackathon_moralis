@@ -1,3 +1,4 @@
+import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
 import 'package:d_box/core/widgets/base_button.dart';
 import 'package:d_box/core/widgets/d_appbar.dart';
@@ -14,7 +15,7 @@ class WalletPage extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return Scaffold(
           backgroundColor: Colors.white,
-          appBar: DAppBar(title: tr('titleCloudmet'), leading: false),
+          appBar: DAppBar(title: tr('titleCloudmet'),titleStyle: Theme.of(context).textTheme.caption2, leading: false),
           body: SafeArea(
               child: SingleChildScrollView(
             child: Container(
@@ -27,9 +28,7 @@ class WalletPage extends StatelessWidget {
                       children: [
                         Text(tr('welcomeToCloudmet'),
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryPurpleColor)),
+                            style:  Theme.of(context).textTheme.title2),
                         SizedBox(height: 5.w),
                         Text(tr('welcomeContent'), textAlign: TextAlign.center)
                       ],

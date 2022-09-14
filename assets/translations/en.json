@@ -25,5 +25,8 @@
     "secureYourWalletListText1":"Write down your Secret Recovery Phrase on a piece of paper and store in a safe place",
     "secureYourWalletListText2":"Make sure no one is watching your screen",
     "iGotIt":"I go it!",
-    "start":"Start"
+    "start":"Start",
+    "done":"Done",
+    "congretulations":"Congretutations!",
+    "congretulationsContentText":"You’ve successfully protected your wallet. Remember to keep your Secret Recovery Phrase safe, it’s your responsibility!"
 }
