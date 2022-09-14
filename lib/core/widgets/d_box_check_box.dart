@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 class DboxCheckBox extends StatefulWidget {
   final String title;
   final Color checkBoxColor;
+  final Function onTab;
 
   const DboxCheckBox(
-      {super.key, required this.title, this.checkBoxColor = const Color(0xffA24FFD)});
+      {super.key, required this.title, this.checkBoxColor = const Color(0xffA24FFD),required this.onTab});
 
   @override
   State<DboxCheckBox> createState() => _DboxCheckBoxState();
@@ -18,6 +19,7 @@ class _DboxCheckBoxState extends State<DboxCheckBox> {
     setState(() {
       isChecked = !isChecked;
     });
+    widget.onTab(isChecked);
   }
 
   @override

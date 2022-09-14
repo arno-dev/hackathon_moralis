@@ -3,6 +3,7 @@
     "todosTitle": "Todos",
     "rootTitle": "Root",
     "somethingWrong": "Error occured",
+    "extensionNotSupport": "The app can read this file, will be support as soon as posible!",
     "laucherError": "Could not launch {}",
     "secureWallet" :"Secure wallet",
     "confirmSecretRecoveryPhrase" : "Confirm Secret Recovery Phrase",
@@ -10,5 +11,19 @@
     "thisIsYourSecretRecoveryPhrase" : "This is your Secret Recovery Phrase. Write it down on a piece of paper and store in a safe place. You’ll be asked to re-enterthis phrase (in order) in the next step",
     "createWallet" : "Create wallet",
     "lastStep" : "Last step! Please select each phrase in order to make sure it is correct.",
-    "continueText" : "Continue"
- }
+    "continueText" : "Continue",
+    "titleCloudmet":"Cloudmet",
+    "welcomeToCloudmet":"Welcome to Cloudmet",
+    "welcomeContent":"Cloudmet helps you connect to the decenterlized web wherever you go. Get started today, easy to send files to family, friends, and co-workers by import your existing wallet or create a new one!",
+    "importWallet":"Import wallet",
+    "createYourWallet":"Create your wallet",
+    "import":"Import",
+    "rememberMe":"Remember me",
+    "enterYourSecretRecoveryPhraseHere":"Enter your Secret Recovery Phrase here!",
+    "recoveryPhrase":"Recovery Phrase",
+    "importYourWalletWithSecret":"Import your wallet with Secret",
+    "secureYourWalletListText1":"Write down your Secret Recovery Phrase on a piece of paper and store in a safe place",
+    "secureYourWalletListText2":"Make sure no one is watching your screen",
+    "iGotIt":"I go it!",
+    "start":"Start"
+}

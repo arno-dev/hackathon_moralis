@@ -8,5 +8,7 @@ class AuthenticationState with _$AuthenticationState {
      List<String>? mnemonic,
      List<String>? newMnemonic,
        String? error,
+    @Default(false) bool isChecked,
+    @Default(false) bool isInputValidated,
   }) = _Initial;
 }

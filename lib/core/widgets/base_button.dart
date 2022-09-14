@@ -5,9 +5,9 @@ import '../constants/colors.dart';
 class BaseButton extends StatelessWidget {
   const BaseButton(
       {super.key,
-       this.text,
+      this.text,
       this.backgroundColor,
-       this.buttonHeight = 32,
+      this.buttonHeight = 32,
       this.buttonWidth = 116,
       this.borderRadius = 28,
       this.onTap,
@@ -20,6 +20,7 @@ class BaseButton extends StatelessWidget {
       });
   final String? text;
   final Color? backgroundColor;
+  final Color color;
   final double buttonHeight;
   final double? buttonWidth;
   final double borderRadius;

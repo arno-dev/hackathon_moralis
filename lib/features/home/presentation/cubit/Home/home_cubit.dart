@@ -51,8 +51,55 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  // Future<void> onOpenFolder(Images images) async {
-  //   emit(const HomeState.loaded());
-  //   emit()
-  // }
+  Future<void> onOpenFolder(
+      {required int rootIndex, required int childIndex}) async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+    if (state.stack.isEmpty) {
+      List<int> newStack = [rootIndex, childIndex];
+      List<Images>? current = state.recents?[rootIndex].filetreeEntity
+          ?.childrenEntity?[childIndex].childrenEntity;
+      emit(
+        state.copyWith(
+          stack: newStack,
+          dataStatus: DataStatus.loaded,
+          currentFolder: current,
+        ),
+      );
+    } else {
+      List<int> newStack = [...state.stack, childIndex];
+      List<Images>? current = state.currentFolder?[childIndex].childrenEntity;
+      emit(
+        state.copyWith(
+          stack: newStack,
+          dataStatus: DataStatus.loaded,
+          currentFolder: current,
+        ),
+      );
+    }
+  }
+
+  Future<void> onBackFolder() async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+    if (state.stack.length <= 2) {
+      return emit(state.copyWith(
+        dataStatus: DataStatus.loaded,
+        stack: [],
+        currentFolder: null,
+      ));
+    }
+    List<int> newStack = [...state.stack];
+    newStack.removeAt(newStack.length - 1);
+    List<Images>? current =
+        state.recents?[newStack[0]].filetreeEntity?.childrenEntity;
+    for (var element in newStack.asMap().entries) {
+      if (element.key != 0) {
+        current = current?[element.value].childrenEntity;
+      }
+    }
+    emit(state.copyWith(
+      dataStatus: DataStatus.loaded,
+      stack: newStack,
+      currentFolder: current,
+    ));
+  }
 }

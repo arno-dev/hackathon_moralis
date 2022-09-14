@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/constants/data_status.dart';
@@ -17,6 +18,19 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       
 
   List<String> randomData =[];
+  late TextEditingController secretController;
+  AuthenticationCubit(this.getMnemonicUseCase)
+      : super(const AuthenticationState(dataStatus: DataStatus.initial)) {
+    secretController = TextEditingController();
+    secretController.addListener(() {
+      if (secretController.text.length > 3) {
+        emit(state.copyWith(isInputValidated: true));
+      } else {
+        emit(state.copyWith(isInputValidated: false));
+      }
+    });
+  }
+
   Future<void> getMnemonicData() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     final res = await getMnemonicUseCase(NoParams());
@@ -28,6 +42,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r,newMnemonic: List.generate(r.length, (index) => "").toList()));
     randomData = [...?state.mnemonic];
     randomData.shuffle();
+      emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r));
     });
   }
 
@@ -71,5 +86,15 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     }else{
       emit(state.copyWith(dataStatus: DataStatus.error));
     }
+  }
+
+  void changeCheckValue(value) {
+    emit(state.copyWith(isChecked: value));
+  }
+
+  @override
+  Future<void> close() {
+    secretController.dispose();
+    return super.close();
   }
 }
