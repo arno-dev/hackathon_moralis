@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:core';
 
 import 'package:d_box/core/constants/local_storage_path.dart';
@@ -15,7 +14,7 @@ abstract class DboxLocalDataSource {
       AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic);
   Future<List<ImageParam>> pickFile();
-  Future<PrivateKey?> readIpfsKey();
+  Future<String?> readIpfsKey();
   String encryptFileContent(
       String content,
       AsymmetricPrivateKey sourcePrivateKey,
@@ -63,14 +62,10 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
   }
 
   @override
-  Future<PrivateKey?> readIpfsKey() async {
+  Future<String?> readIpfsKey() async {
     String? rawData =
         await secureStorage.readSecureData(LocalStoragePath.ipfsCredential);
-    if (rawData != null) {
-      PrivateKey? ipfsKey = jsonDecode(rawData);
-      return ipfsKey;
-    }
-    return null;
+    return rawData;
   }
 
   @override

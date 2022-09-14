@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:d_box/core/services/asymmetic_encryption.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
@@ -15,7 +13,8 @@ abstract class AuthenticationLocalDataSource {
 class AuthenticationLocalDataSourceImpl extends AuthenticationLocalDataSource {
   final SecureStorage secureStorage;
   final AsymmetricEncryption asymmetricEncryption;
-  AuthenticationLocalDataSourceImpl(this.asymmetricEncryption, this.secureStorage);
+  AuthenticationLocalDataSourceImpl(
+      this.asymmetricEncryption, this.secureStorage);
   @override
   Future<bool> saveCredential({required String credential}) async {
     try {
@@ -26,14 +25,15 @@ class AuthenticationLocalDataSourceImpl extends AuthenticationLocalDataSource {
       return false;
     }
   }
-  
+
   @override
-  Future<bool> saveIpfsCredential({required String ipfsCredential})  async {
+  Future<bool> saveIpfsCredential({required String ipfsCredential}) async {
     try {
-      PrivateKey ipfsKey =  asymmetricEncryption.generatePrivateKeyFromWalletPrivate(LocalStoragePath.ipfsCredential);
-      String encodeData = jsonEncode(ipfsKey);
-       await secureStorage.writeSecureData(
-          LocalStoragePath.walletCredential, encodeData);
+      PrivateKey ipfsKey = asymmetricEncryption
+          .generatePrivateKeyFromWalletPrivate(LocalStoragePath.ipfsCredential);
+      String encodeData = ipfsKey.encode();
+      await secureStorage.writeSecureData(
+          LocalStoragePath.ipfsCredential, encodeData);
       return true;
     } catch (e) {
       return false;

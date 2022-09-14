@@ -1,7 +1,6 @@
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import 'package:pinenacl/x25519.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
@@ -25,6 +24,6 @@ class SaveImagesUsecase implements UseCase<SaveImagesModel, SaveImagesParams> {
 
 class SaveImagesParams {
   final UploadImageParam uploadImageParam;
-  final AsymmetricPublicKey destinationPublic;
+  final String destinationPublic;
   SaveImagesParams(this.uploadImageParam, this.destinationPublic);
 }

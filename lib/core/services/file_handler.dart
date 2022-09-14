@@ -81,7 +81,8 @@ class FileHandler {
       File file = File(path);
       List<int> imageBytes = await file.readAsBytes();
       String imageBase64 = base64Encode(imageBytes);
-      ImageParam imageParam = ImageParam(path: path.split("/").last, content: imageBase64);
+      ImageParam imageParam =
+          ImageParam(path: path.split("/").last, content: imageBase64);
       response.add(imageParam);
       return response;
     }

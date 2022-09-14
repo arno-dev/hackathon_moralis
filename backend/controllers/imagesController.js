@@ -216,7 +216,7 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
         return response.send(files);
     }
     catch (e) {
-        return response.sendStatus(204);
+        return response.send([]);
     }
 }
 

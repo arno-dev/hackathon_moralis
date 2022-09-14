@@ -1,7 +1,9 @@
 import 'package:d_box/core/usecases/usecase.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
+import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:d_box/features/home/domain/usecases/pick_images_usecase.dart';
 import 'package:d_box/features/home/domain/usecases/recenst_usecase.dart';
+import 'package:d_box/features/home/domain/usecases/save_images_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -20,8 +22,9 @@ class HomeCubit extends Cubit<HomeState> {
   final GetImagesFromLinkUsecase getImagesFromLinkUsecase;
   final GetRecentsUsecase getRecentsUsecase;
   final PickImagesUsecase pickImagesUsecase;
+  final SaveImagesUsecase saveImagesUsecase;
   HomeCubit(this.getImagesFromLinkUsecase, this.getRecentsUsecase,
-      this.pickImagesUsecase)
+      this.pickImagesUsecase, this.saveImagesUsecase)
       : super(const HomeState());
 
   TextEditingController searchController = TextEditingController();
@@ -113,8 +116,17 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> onPickImages() async {
     final request = await pickImagesUsecase(NoParams());
     request.fold((error) => emit(state.copyWith(dataStatus: DataStatus.error)),
-        (data) {
-      List<ImageParam> listImage = data;
+        (data) async {
+      final saveImageResponse = await saveImagesUsecase(SaveImagesParams(
+        UploadImageParam(images: data),
+        "x25519_pk16pzmsneut8422jxg3nuvegvpj56gyf47pjc523j8vhhp2q2sy9aqxu7nqk",
+      ));
+      saveImageResponse.fold(
+        (errorMessage) => emit(state.copyWith(dataStatus: DataStatus.error)),
+        (response) async {
+          await getRecents(response.origin);
+        },
+      );
     });
   }
 

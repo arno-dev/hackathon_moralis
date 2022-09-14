@@ -54,32 +54,39 @@ class DboxRepositoryImpl implements DboxRepository {
 
   @override
   Future<Either<Failure, SaveImagesModel>> postSaveImages(
-      UploadImageParam uploadImageParam,
-      AsymmetricPublicKey destinationPublic) async {
+      UploadImageParam uploadImageParam, String destinationPublic) async {
     try {
-      PrivateKey? myIpfsCredential = await dboxLocalDataSource.readIpfsKey();
+      String? myIpfsCredentialString = await dboxLocalDataSource.readIpfsKey();
+      PublicKey destinationPublicKey = PublicKey.decode(destinationPublic);
+
       List<ImageParam>? imageParam = uploadImageParam.images;
-      if (imageParam == null || myIpfsCredential == null) {
+      if (imageParam == null || myIpfsCredentialString == null) {
         return const Left(
             ServerFailure("Your content or key is not availble!"));
       }
-      List<ImageParam?> encryptImages = imageParam.map((data) {
+      PrivateKey privateKey = PrivateKey.decode(myIpfsCredentialString);
+      List<ImageParam?> encryptImages = [];
+      encryptImages = imageParam.map((data) {
         if (data.content == null) {
           return null;
         }
         String encryptContent = dboxLocalDataSource.encryptFileContent(
-            data.content!, myIpfsCredential, destinationPublic);
+            data.content!, privateKey, destinationPublicKey);
         return ImageParam(content: encryptContent, path: data.path);
       }).toList();
       List<ImageParam>? newImageParam = [];
       for (ImageParam? encryptImage in encryptImages) {
-        if (encryptImage == null) {
-          newImageParam.add(encryptImage!);
+        if (encryptImage != null) {
+          newImageParam.add(encryptImage);
         }
       }
 
-      final data = await dboxRemoteDataSource
-          .postSaveImages(uploadImageParam.copyWith(images: newImageParam));
+      final data = await dboxRemoteDataSource.postSaveImages(
+          uploadImageParam.copyWith(
+              origin: "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8",
+              dest: "0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8",
+              images: newImageParam,
+              encryptIpfsKey: privateKey.publicKey.encode()));
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
@@ -103,12 +110,14 @@ class DboxRepositoryImpl implements DboxRepository {
 
   @override
   Future<Either<Failure, bool>> previewFile(
-      ImageParam data, AsymmetricPublicKey destinationPublic) async {
+      ImageParam data, String destinationPublic) async {
     try {
-      PrivateKey? myIpfsCredential = await dboxLocalDataSource.readIpfsKey();
+      String? myIpfsCredential = await dboxLocalDataSource.readIpfsKey();
+      PublicKey destinationPublicKey = PublicKey.decode(destinationPublic);
       if (myIpfsCredential == null) return const Right(false);
+      PrivateKey privateKey = PrivateKey.decode(myIpfsCredential);
       final response = await dboxLocalDataSource.previewFile(
-          data, myIpfsCredential, destinationPublic);
+          data, privateKey, destinationPublicKey);
       return Right(response);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
