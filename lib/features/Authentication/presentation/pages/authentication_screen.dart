@@ -1,7 +1,9 @@
+import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/constants/data_status.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../core/constants/colors.dart';
 import '../../../../core/widgets/d_appbar.dart';
@@ -12,23 +14,23 @@ import '../widgets/authenticate_grid_view.dart';
 import '../widgets/authentication_grid.dart';
 import '../widgets/d_stepper.dart';
 
-class AuthenticationScreen extends StatefulWidget {
+class AuthenticationScreen extends StatelessWidget {
   const AuthenticationScreen({super.key});
 
-  @override
-  State<AuthenticationScreen> createState() => _AuthenticationScreenState();
-}
-
-class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationCubit, AuthenticationState>(
+    return BlocConsumer<AuthenticationCubit, AuthenticationState>(
+      listener: (context, state) {
+        if(state.dataStatus == DataStatus.isVerify){
+          navService.pushNamedAndRemoveUntil(AppRoute.congratulations);
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
             onTap: () => (state.firstStep)
-                ? null
+                ? navService.goBack()
                 : context.read<AuthenticationCubit>().firstStep(true),
             centerTitle: false,
             title: (state.firstStep)
@@ -44,18 +46,16 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     if (index == 0) {
                       context.read<AuthenticationCubit>().firstStep(false);
                     } else {
-                      await context
+                    await context
                           .read<AuthenticationCubit>()
                           .saveCredential();
                     }
                   }
                 : null,
-            physics:
-                (state.firstStep) ? const NeverScrollableScrollPhysics() : null,
             lineColor: AppColors.primaryPurpleColor,
             currentIndex: (state.firstStep) ? 0 : 1,
             stepSize: 30,
-            textWidth: 30.w,
+            textWidth: 30.w, 
             stepperhorizontal: 10.w,
             listOfContentText: [
               LocaleKeys.secureWallet.tr(),

@@ -1,3 +1,4 @@
+import 'package:d_box/features/Authentication/domain/usecases/save_credential_from_private_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,10 +14,11 @@ part 'authentication_cubit_cubit.freezed.dart';
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GetMnemonicUseCase getMnemonicUseCase;
   final SaveCredentialUseCase saveCredentialUseCase;
+  final SaveCredentialFromPrivateKeyUseCase saveCredentialFromPrivateKeyUseCase;
 
   List<String> randomData =[];
   late TextEditingController secretController;
-  AuthenticationCubit(this.getMnemonicUseCase, this.saveCredentialUseCase)
+  AuthenticationCubit(this.getMnemonicUseCase, this.saveCredentialUseCase, this.saveCredentialFromPrivateKeyUseCase,)
       : super(const AuthenticationState(dataStatus: DataStatus.initial)) {
     secretController = TextEditingController();
     secretController.addListener(() {
@@ -39,7 +41,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r,newMnemonic: List.generate(r.length, (index) => "").toList()));
     randomData = [...?state.mnemonic];
     randomData.shuffle();
-      emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r));
+      
     });
   }
 
@@ -66,7 +68,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     }
     emit(state.copyWith(newMnemonic: store));
   }
-
+  
   Future<void> saveCredential() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     if (state.mnemonic.toString() == state.newMnemonic.toString()) {
@@ -76,7 +78,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
             state.copyWith(dataStatus: DataStatus.error, error: error.message)),
         (data) {
           emit(state.copyWith(
-            dataStatus: DataStatus.loaded,
+            dataStatus: DataStatus.isVerify,
           ));
         },
       );
@@ -88,10 +90,29 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   void changeCheckValue(value) {
     emit(state.copyWith(isChecked: value));
   }
-
+  
   @override
   Future<void> close() {
     secretController.dispose();
     return super.close();
   }
+
+   Future<void> saveCredentialFromPrivateKey() async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+
+      // final saveCredential = await saveCredentialFromPrivateKeyUseCase(secretController.text);
+      final saveCredential = await saveCredentialFromPrivateKeyUseCase("1ca5e91ac36132867c3092f68fa794c19721f166c3188aa23fa739e5d30b71bf"); // TODO:hard code private key
+      saveCredential.fold(
+        (error) => emit(
+            state.copyWith(dataStatus: DataStatus.error, error: error.message)),
+        (data) {
+          emit(state.copyWith(
+            dataStatus: DataStatus.isVerify,
+          ));
+        },
+      );
+  
+  }
+
+   
 }

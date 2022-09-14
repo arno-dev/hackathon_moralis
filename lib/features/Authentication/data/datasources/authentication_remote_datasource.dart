@@ -8,6 +8,7 @@ import '../../../../generated/locale_keys.g.dart';
 abstract class AuthenticationRemoteDataSource{
  List<String> getMnemonic();
  WalletCredential getCredential({required List<String> mnemonic} );
+ WalletCredential getCredentialFromPrivate({required String privateKey}); 
 }
 
 @LazySingleton(as: AuthenticationRemoteDataSource)
@@ -36,4 +37,15 @@ class AuthenticationRemoteDataSourceImpl extends AuthenticationRemoteDataSource 
     }  catch (e) {
       throw ServerException(LocaleKeys.somethingWrong.tr());
     }
-  }}
+  }
+  
+  @override
+  WalletCredential getCredentialFromPrivate({required String privateKey}) {
+     try {
+      final data = walletService.getCredentialFromPrivate(privateKey);
+      return data;
+    }  catch (e) {
+      throw ServerException(LocaleKeys.somethingWrong.tr());
+    }
+  }
+}

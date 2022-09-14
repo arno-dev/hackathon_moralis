@@ -40,7 +40,7 @@ class BaseButton extends StatelessWidget {
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        onTap:onTap,
+        onTap:isDisabled? null : onTap,
         child: Container(
           decoration: (borderColor != null)
               ? BoxDecoration(

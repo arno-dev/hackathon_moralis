@@ -23,16 +23,28 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       final res =  authenticationRemoteDataSource.getMnemonic();
       return Right(res);
   }
+
+  Future<bool> _saveCredential(WalletCredential res) async{
+      final saveCredential = await authenticationLocalDataSource.saveCredential(credential: jsonEncode(res.toJson()));
+      final saveIpfsCredential = await  authenticationLocalDataSource.saveIpfsCredential(ipfsCredential: res.privateKey);
+      return  (saveCredential && saveIpfsCredential);
+  }
   
   @override
   Future<Either<Failure, bool>> verifyCredential({required List<String> mnemonic})async  {
    try {
-      WalletCredential res =   authenticationRemoteDataSource.getCredential(mnemonic: mnemonic);
-      final saveCredential = await authenticationLocalDataSource.saveCredential(credential: jsonEncode(res.toJson()));
-      return  Right(saveCredential);
+      WalletCredential res =  authenticationRemoteDataSource.getCredential(mnemonic: mnemonic);
+      final response = await _saveCredential(res);
+      return  Right(response);
    }  on ServerException catch (e) {
      return Left(ServerFailure( e.toString()));
    }
   }
   
+  @override
+  Future<Either<Failure, bool>> verifyCredentialFromPrivateKey({required String privateKey})async {
+    WalletCredential res =  authenticationRemoteDataSource.getCredentialFromPrivate(privateKey: privateKey);
+      final response = await _saveCredential(res);
+      return Right(response);
+  }
 }

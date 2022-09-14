@@ -3,4 +3,5 @@ enum DataStatus {
   loading,
   loaded,
   error,
+  isVerify,
 }

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 import '../../features/home/data/models/alerts_model.dart';
 import '../../features/home/data/models/images_from_link_model.dart';
+import '../../features/home/data/models/save_images_model.dart';
 import '../../features/todo/data/models/todos_model.dart';
 import '../../features/todo/data/models/user_model.dart';
 import '../constants/api_path.dart';
@@ -32,8 +33,13 @@ abstract class ApiClient {
     @Path('recents') String recents,
   );
 
-    @GET(ApiPath.alertAddress)
+  @GET(ApiPath.alertAddress)
   Future<List<AlertsModel>> getAlerts(
     @Path('address') String address,
+  );
+
+  @POST(ApiPath.saveImages)
+  Future<SaveImagesModel> postSaveImages(
+    @Body() Map<String, dynamic> body,
   );
 }

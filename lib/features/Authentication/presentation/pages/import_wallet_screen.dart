@@ -1,15 +1,16 @@
+import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
+import 'package:d_box/core/constants/data_status.dart';
 import 'package:d_box/core/widgets/base_button.dart';
 import 'package:d_box/core/widgets/d_appbar.dart';
-import 'package:d_box/core/widgets/d_box_alert_dialog.dart';
 import 'package:d_box/core/widgets/d_box_check_box.dart';
 import 'package:d_box/core/widgets/d_box_textfield.dart';
-import 'package:d_box/core/widgets/d_box_un_ordered_list.dart';
 import 'package:d_box/generated/assets.gen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 
 import '../cubit/authentication_cubit_cubit.dart';
@@ -19,10 +20,14 @@ class ImportWalletPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationCubit, AuthenticationState>(
+    return BlocConsumer<AuthenticationCubit, AuthenticationState>(
+      listener: (context, state){
+        if(state.dataStatus == DataStatus.isVerify) navService.pushNamedAndRemoveUntil(AppRoute.homeRoute);
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
+            onTap: ()=> navService.goBack(),
             title: tr('importWallet'),
             titleStyle: Theme.of(context).textTheme.caption2,
             centerTitle: false,
@@ -54,8 +59,8 @@ class ImportWalletPage extends StatelessWidget {
                     onTab: (value) {},
                   ),
                   SizedBox(height: 10.w),
-                  BaseButton(
-                    onTap: () => _dialogBuilder(context),
+                    BaseButton(
+                    onTap:  () async  =>  await context.read<AuthenticationCubit>().saveCredentialFromPrivateKey(),
                     text: tr('import'),
                     buttonWidth: 100.w,
                     buttonHeight: 13.w,
@@ -63,6 +68,7 @@ class ImportWalletPage extends StatelessWidget {
                     textColor: Colors.white,
                     isDisabled: !state.isInputValidated,
                   ),
+            
                 ],
               ),
             ),
@@ -71,51 +77,4 @@ class ImportWalletPage extends StatelessWidget {
       },
     );
   }
-}
-
-Future<void> _dialogBuilder(BuildContext context) {
-  return showDialog<void>(
-    context: context,
-    builder: (_) {
-      return BlocProvider.value(
-        value: context.read<AuthenticationCubit>(),
-        child: DboxAlertDialog(
-            title: 'Secure your wallet',
-            titleColor: Colors.red,
-            content: [
-              Assets.images.security.image(),
-              SizedBox(height: 5.w),
-              DboxUnorderedList(
-                [
-                  tr('secureYourWalletListText1'),
-                  tr('secureYourWalletListText2')
-                ],
-                fontSize: 14,
-              ),
-              DboxCheckBox(
-                title: tr('iGotIt'),
-                onTab: (value) {
-                  context.read<AuthenticationCubit>().changeCheckValue(value);
-                },
-              ),
-              SizedBox(height: 3.w),
-              BlocSelector<AuthenticationCubit, AuthenticationState, bool>(
-                selector: (state) {
-                  return state.isChecked;
-                },
-                builder: (context, isChecked) {
-                  return BaseButton(
-                      isDisabled: !isChecked,
-                      text: tr('start'),
-                      buttonWidth: 100.w,
-                      backgroundColor: AppColors.primaryPurpleColor,
-                      textColor: Colors.white,
-                      buttonHeight: 13.w);
-                },
-              ),
-              SizedBox(height: 3.w),
-            ]),
-      );
-    },
-  ).then((_) => context.read<AuthenticationCubit>().changeCheckValue(false));
 }

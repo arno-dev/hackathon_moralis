@@ -1,9 +1,11 @@
+import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
 import 'package:d_box/core/widgets/base_button.dart';
 import 'package:d_box/core/widgets/d_appbar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 
 class CongratulationsPage extends StatelessWidget {
@@ -30,6 +32,7 @@ class CongratulationsPage extends StatelessWidget {
                     textAlign: TextAlign.center),
                 SizedBox(height: 30.w),
                 BaseButton(
+                  onTap: ()=> navService.pushNamedAndRemoveUntil(AppRoute.homeRoute),
                     text: tr('done'),
                     buttonWidth: 100.w,
                     backgroundColor: AppColors.primaryPurpleColor,
