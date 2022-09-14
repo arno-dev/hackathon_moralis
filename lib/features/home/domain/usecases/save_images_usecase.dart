@@ -1,4 +1,3 @@
-import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';

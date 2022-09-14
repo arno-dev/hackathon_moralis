@@ -3,10 +3,8 @@ import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:d_box/core/constants/colors.dart';
 import 'package:d_box/core/widgets/base_button.dart';
 import 'package:d_box/core/widgets/d_appbar.dart';
-import 'package:d_box/core/widgets/d_box_alert_dialog.dart';
 import 'package:d_box/core/widgets/d_box_check_box.dart';
 import 'package:d_box/core/widgets/d_box_textfield.dart';
-import 'package:d_box/core/widgets/d_box_un_ordered_list.dart';
 import 'package:d_box/generated/assets.gen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -75,55 +73,4 @@ class ImportWalletPage extends StatelessWidget {
       },
     );
   }
-}
-
-Future<void> _dialogBuilder(BuildContext context) {
-  return showDialog<void>(
-    context: context,
-    builder: (_) {
-      return BlocProvider.value(
-        value: context.read<AuthenticationCubit>(),
-        child: DboxAlertDialog(
-            title: 'Secure your wallet',
-            titleColor: Colors.red,
-            content: [
-              Assets.images.security.image(),
-              SizedBox(height: 5.w),
-              DboxUnorderedList(
-                [
-                  tr('secureYourWalletListText1'),
-                  tr('secureYourWalletListText2')
-                ],
-                fontSize: 14,
-              ),
-              DboxCheckBox(
-                title: tr('iGotIt'),
-                onTab: (value) {
-                  context.read<AuthenticationCubit>().changeCheckValue(value);
-                },
-              ),
-              SizedBox(height: 3.w),
-              BlocSelector<AuthenticationCubit, AuthenticationState, bool>(
-                selector: (state) {
-                  return state.isChecked;
-                },
-                builder: (context, isChecked) {
-                  return BaseButton(
-                      onTap: () async {
-                         Navigator.pop(context);
-                        await navService.pushNamed(AppRoute.createWallet);
-                      },
-                      isDisabled: !isChecked,
-                      text: tr('start'),
-                      buttonWidth: 100.w,
-                      backgroundColor: AppColors.primaryPurpleColor,
-                      textColor: Colors.white,
-                      buttonHeight: 13.w);
-                },
-              ),
-              SizedBox(height: 3.w),
-            ]),
-      );
-    },
-  ).then((_) => context.read<AuthenticationCubit>().changeCheckValue(false));
 }
