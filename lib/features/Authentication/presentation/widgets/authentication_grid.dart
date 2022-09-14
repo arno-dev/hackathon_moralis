@@ -1,6 +1,6 @@
-import 'package:d_box/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/colors.dart';
 import 'gird_button.dart';
 
 class AuthenticationGrid extends StatelessWidget {
@@ -11,13 +11,16 @@ class AuthenticationGrid extends StatelessWidget {
       required this.gridColor,
       required this.data,
       this.getIndex,
-      required this.currentIndex});
+      required this.currentIndex,
+      this.textColor = AppColors.grey
+      });
   final bool isDisplay;
   final Color borderColor;
   final Color gridColor;
   final List<String> data;
   final int currentIndex;
   final void Function(int)? getIndex;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +43,14 @@ class AuthenticationGrid extends StatelessWidget {
                                 children: [
                                   const SizedBox(height: 16),
                                   GridButton(
+                                    textColor: textColor,
                                     onTap: (_) {
                                       getIndex!(index);
                                     },
                                     index: index + 1,
                                     borderColor: currentIndex == index ||
                                             data[index].isNotEmpty
-                                        ? AppColors.backgroundColor
+                                        ? AppColors.primaryPurpleColor
                                         : borderColor,
                                     isDottedButton: data[index].isEmpty,
                                     text: data[index],
@@ -60,6 +64,7 @@ class AuthenticationGrid extends StatelessWidget {
                                 children: [
                                   const SizedBox(height: 16),
                                   GridButton(
+                                    textColor: textColor,
                                     onTap: (_) {
                                       getIndex!(index + rightLength);
                                     },
@@ -67,7 +72,7 @@ class AuthenticationGrid extends StatelessWidget {
                                     borderColor: currentIndex ==
                                                 index + rightLength ||
                                             data[index + rightLength].isNotEmpty
-                                        ? AppColors.backgroundColor
+                                        ? AppColors.primaryPurpleColor
                                         : borderColor,
                                     isDottedButton:
                                         data[index + rightLength].isEmpty,

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:d_box/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 // TODO(dragostis): Missing functionality:
@@ -199,6 +200,7 @@ class Stepper extends StatefulWidget {
       this.margin,
       this.lineColor,
       this.stepSize,
+      
       this.stepperhorizontal = 40})
       : assert(0 <= currentStep && currentStep < steps.length);
 
@@ -377,9 +379,9 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
       case StepState.disabled:
         return Text(
           '${index + 1}',
-          style: isDarkActive
-              ? _kStepStyle.copyWith(color: Colors.black87)
-              : _kStepStyle,
+          style: widget.steps[index].isActive
+              ? _kStepStyle.copyWith(color: AppColors.secondaryFontColor)
+              : _kStepStyle.copyWith(color: AppColors.primaryPurpleColor),
         );
       case StepState.editing:
         return Icon(
@@ -402,8 +404,19 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     if (!_isDark()) {
       return widget.steps[index].isActive
-          ? colorScheme.primary
-          : colorScheme.onSurface.withOpacity(0.38);
+          ? AppColors.primaryPurpleColor
+          : AppColors.secondaryFontColor;
+    } else {
+      return widget.steps[index].isActive
+          ? colorScheme.secondary
+          : colorScheme.background;
+    }
+  }
+    Color _circleBorderColor(int index) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    if (!_isDark()) {
+      return widget.steps[index].isActive
+          ?  AppColors.secondaryFontColor : AppColors.primaryPurpleColor;
     } else {
       return widget.steps[index].isActive
           ? colorScheme.secondary
@@ -420,6 +433,10 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
         curve: Curves.fastOutSlowIn,
         duration: kThemeAnimationDuration,
         decoration: BoxDecoration(
+           border: Border.all(
+                    color: _circleBorderColor(index),
+                    width: 1,
+                  ),
           color: _circleColor(index),
           shape: BoxShape.circle,
         ),
@@ -771,6 +788,8 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
     final List<Widget> children = <Widget>[
       for (int i = 0; i < widget.steps.length; i += 1) ...<Widget>[
         InkResponse(
+          highlightColor: AppColors.transparentColor,
+          splashColor: AppColors.transparentColor,
           onTap: widget.steps[i].state != StepState.disabled
               ? () {
                   widget.onStepTapped?.call(i);
@@ -780,18 +799,11 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
           child: Row(
             children: <Widget>[
               SizedBox(
-                height: _isLabel() ? 104.0 : 72.0,
+                height: 50,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    if (widget.steps[i].label != null)
-                      const SizedBox(
-                        height: 24.0,
-                      ),
                     Center(child: _buildIcon(i)),
-                    const SizedBox(
-                      height: 24.0,
-                    ),
                     // if (widget.steps[i].label != null) SizedBox(height : 24.0, child: _buildLabelText(i),),
                   ],
                 ),
@@ -839,7 +851,9 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
                     children: children,
                   ),
                 ),
-                Row(children: listTitle)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: listTitle)
               ],
             ),
           ),

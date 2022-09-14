@@ -1,83 +1,73 @@
 import 'package:d_box/core/constants/colors.dart';
+import 'package:d_box/features/Authentication/presentation/cubit/authentication_cubit_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sizer/sizer.dart';
 import '../../../../core/widgets/base_button.dart';
 import 'authentication_grid.dart';
 
-class AuthenticateGridView extends StatefulWidget {
-  const AuthenticateGridView({super.key});
-
-  @override
-  State<AuthenticateGridView> createState() => _AuthenticateGridViewState();
-}
-
-class _AuthenticateGridViewState extends State<AuthenticateGridView> {
-  List<String> initialData = [
-    'banana',
-    'cocotaco',
-    'apple',
-    'mango',
-    'mapao',
-    'berry',
-  ];
-  List<String> dataList = List<String>.filled(6, '');
-
+class AuthenticateGridView extends StatelessWidget {
+  const AuthenticateGridView(
+      {super.key,
+      required this.dataList,
+      required this.onRemove,
+      required this.onAdd,
+      this.isValidated = false});
+  final List<String> dataList;
+  final void Function(int) onRemove;
+  final void Function(int) onAdd;
+  final bool isValidated;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         AuthenticationGrid(
-          gridColor: Colors.grey,
-          data: dataList,
-          currentIndex: dataList.where((value) => value != '').toList().length,
-          getIndex: (index) {
-            var store = [...dataList];
-            store.removeAt(index);
-            store.add('');
-            dataList = [...store];
-            setState(() {});
+            gridColor: isValidated
+                ? AppColors.accentColor
+                : dataList.contains("")
+                    ? AppColors.baseBorderColor
+                    : AppColors.primaryPurpleColor,
+            data: dataList,
+            textColor: dataList.contains("")
+                ? AppColors.grey
+                : AppColors.primaryPurpleColor,
+            borderColor: AppColors.baseBorderColor,
+            currentIndex:
+                dataList.where((value) => value != '').toList().length,
+            getIndex: onRemove),
+        const SizedBox(
+          height: 20,
+        ),
+        BlocSelector<AuthenticationCubit, AuthenticationState, List>(
+          selector: (state) {
+            return state.newMnemonic ?? [];
+          },
+          builder: (context, newMnemonic) {
+            List<String> newRandomMnonic =
+                context.read<AuthenticationCubit>().randomData;
+            return SizedBox(
+              height: 35.w,
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 1.w,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    crossAxisCount: 3),
+                itemBuilder: (_, index) => BaseButton(
+                  textColor: AppColors.grey,
+                  isDisabled: newMnemonic.contains(newRandomMnonic[index]),
+                  borderColor: AppColors.disAbleColor,
+                  text: newRandomMnonic[index],
+                  onTap: newMnemonic[index].contains(newRandomMnonic[index])
+                      ? null
+                      : () => onAdd(index),
+                ),
+                itemCount: newMnemonic.length,
+              ),
+            );
           },
         ),
-        SizedBox(
-          height: 10,
-        ),
-        Wrap(
-          children: List.generate(
-              initialData.length,
-              (index) => Container(
-                    margin: const EdgeInsets.all(3),
-                    child: BaseButton(
-                      isDisabled: dataList.contains(initialData[index]),
-                      borderColor: AppColors.primaryColor,
-                      text: initialData[index],
-                      onTap: () {
-                        // Check is value in dataList exists?
-                        // if (dataList.contains(initialData[index])) {
-                        //   return;
-                        // }
-                        // get current index
-                        int currentIndex = dataList
-                            .where((value) => value != '')
-                            .toList()
-                            .length;
-
-                        if (currentIndex < dataList.length) {
-                          setState(() {
-                            dataList[currentIndex] = initialData[index];
-                          });
-                        }
-                      },
-                    ),
-                  )),
-        ),
-        BaseButton(
-          text: "Clear",
-          onTap: () {
-            setState(() {
-              dataList = List<String>.filled(6, '');
-              // get current index
-            });
-          },
-        )
       ],
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hackathon_moralis/core/constants/colors.dart';
+import 'package:sizer/sizer.dart';
+
+import '../constants/colors.dart';
 
 class DAppBar extends StatelessWidget implements PreferredSizeWidget {
   const DAppBar({
@@ -44,9 +46,11 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
                TextStyle(
                 color: titleColor,
                 fontSize: titleFontSize,
+                fontWeight: FontWeight.w700
               ),
             )
           : Container(),
+      titleSpacing: -3.w,
       centerTitle: centerTitle,
       leading: (leading) ? Center(
               child: InkWell(
@@ -54,12 +58,9 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   onTap: onTap,
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.primaryColor,
-                    ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.primaryColor,
                   )),
             ) : null,
       elevation: elevation,

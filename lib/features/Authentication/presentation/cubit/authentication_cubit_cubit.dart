@@ -4,25 +4,72 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/constants/data_status.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/authentication_usecase.dart';
+import '../../domain/usecases/save_credential_usecase.dart';
 part 'authentication_cubit_state.dart';
 part 'authentication_cubit_cubit.freezed.dart';
+
 @injectable
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GetMnemonicUseCase getMnemonicUseCase;
+  final SaveCredentialUseCase saveCredentialUseCase;
 
-  AuthenticationCubit(this.getMnemonicUseCase) : super(const AuthenticationState(dataStatus: DataStatus.initial));
+  AuthenticationCubit(this.getMnemonicUseCase, this.saveCredentialUseCase) : super(const AuthenticationState(dataStatus: DataStatus.initial));
+      
 
-  Future<void> getMnemonicData() async{
+  List<String> randomData =[];
+  Future<void> getMnemonicData() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     final res = await getMnemonicUseCase(NoParams());
-    res.fold((failure) => emit(state.copyWith(dataStatus: DataStatus.error,error: failure.message),), (r) {
-      emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r));
+    res.fold(
+        (failure) => emit(
+              state.copyWith(
+                  dataStatus: DataStatus.error, error: failure.message),
+            ), (r) {
+    emit(state.copyWith(dataStatus: DataStatus.loaded, mnemonic: r,newMnemonic: List.generate(r.length, (index) => "").toList()));
+    randomData = [...?state.mnemonic];
+    randomData.shuffle();
     });
-
   }
 
-  Future<void> nextStep() async {
-    emit(state.copyWith(firstStep: false));
+  Future<void> firstStep(bool isNext) async {
+    emit(state.copyWith(firstStep: isNext));
   }
-  
+
+  void updateNewMnemonic(int index, {bool isAdding = false}) {
+    List<String> store = [...?state.newMnemonic];
+    if (isAdding) {
+      int? currentIndex =
+          state.newMnemonic?.where((value) => value != '').toList().length;
+
+      if (currentIndex == null) {
+        return;
+      }
+
+      if (currentIndex < state.newMnemonic!.length) {
+        store[currentIndex] = randomData[index];
+      }
+    } else {
+      store.removeAt(index);
+      store.add('');
+    }
+    emit(state.copyWith(newMnemonic: store));
+  }
+
+  Future<void> saveCredential() async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+    if (state.mnemonic.toString() == state.newMnemonic.toString()) {
+      final saveCredential = await saveCredentialUseCase(state.mnemonic!);
+      saveCredential.fold(
+        (error) => emit(
+            state.copyWith(dataStatus: DataStatus.error, error: error.message)),
+        (data) {
+          emit(state.copyWith(
+            dataStatus: DataStatus.loaded,
+          ));
+        },
+      );
+    }else{
+      emit(state.copyWith(dataStatus: DataStatus.error));
+    }
+  }
 }
