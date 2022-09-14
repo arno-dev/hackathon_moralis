@@ -25,96 +25,98 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthenticationCubit, AuthenticationState>(
       builder: (context, state) {
-        return Sizer(builder: ((context, orientation, deviceType) {
-          return Scaffold(
-            appBar: DAppBar(
-              onTap: () => (state.firstStep)
-                  ? null
-                  : context.read<AuthenticationCubit>().firstStep(true),
-              centerTitle: false,
-              title: (state.firstStep)
-                  ? LocaleKeys.createWallet.tr()
-                  : LocaleKeys.confirmSecretRecoveryPhrase.tr(),
-            ),
-            body: DCustomStepper(
-              isValidated: state.firstStep ? false : (state.newMnemonic!.contains("") || state.firstStep ) ,
-              onTap: (state.firstStep || !state.newMnemonic!.contains(""))?     (index) async {
-                if (index == 0) {
-                  context.read<AuthenticationCubit>().firstStep(false);
-                } else {
-                  await context.read<AuthenticationCubit>().saveCredential();
-                }
-              } : null,
-              physics: (state.firstStep)
-                  ? const NeverScrollableScrollPhysics()
-                  : null,
-              lineColor: AppColors.primaryPurpleColor,
-              currentIndex: (state.firstStep) ? 0 : 1,
-              stepSize: 30,
-              textWidth: 30.w,
-              stepperhorizontal: 10.w,
-              listOfContentText: [
-                LocaleKeys.secureWallet.tr(),
-                LocaleKeys.confirmSecretRecoveryPhrase.tr()
-              ],
-              listOfContent: [
-                Column(
-                  children: [
-                    Text(
-                      LocaleKeys.getSetGo.tr(),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.caption1,
+        return Scaffold(
+          appBar: DAppBar(
+            onTap: () => (state.firstStep)
+                ? null
+                : context.read<AuthenticationCubit>().firstStep(true),
+            centerTitle: false,
+            title: (state.firstStep)
+                ? LocaleKeys.createWallet.tr()
+                : LocaleKeys.confirmSecretRecoveryPhrase.tr(),
+          ),
+          body: DCustomStepper(
+            isValidated: state.firstStep
+                ? false
+                : (state.newMnemonic!.contains("") || state.firstStep),
+            onTap: (state.firstStep || !state.newMnemonic!.contains(""))
+                ? (index) async {
+                    if (index == 0) {
+                      context.read<AuthenticationCubit>().firstStep(false);
+                    } else {
+                      await context
+                          .read<AuthenticationCubit>()
+                          .saveCredential();
+                    }
+                  }
+                : null,
+            physics:
+                (state.firstStep) ? const NeverScrollableScrollPhysics() : null,
+            lineColor: AppColors.primaryPurpleColor,
+            currentIndex: (state.firstStep) ? 0 : 1,
+            stepSize: 30,
+            textWidth: 30.w,
+            stepperhorizontal: 10.w,
+            listOfContentText: [
+              LocaleKeys.secureWallet.tr(),
+              LocaleKeys.confirmSecretRecoveryPhrase.tr()
+            ],
+            listOfContent: [
+              Column(
+                children: [
+                  Text(
+                    LocaleKeys.getSetGo.tr(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.caption1,
+                  ),
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  Text(LocaleKeys.thisIsYourSecretRecoveryPhrase.tr(),
+                      textAlign: TextAlign.center),
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  AuthenticationGrid(
+                    borderColor: AppColors.primaryPurpleColor,
+                    data: state.mnemonic ?? [],
+                    gridColor: AppColors.primaryPurpleColor,
+                    isDisplay: true,
+                    currentIndex: 0,
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    LocaleKeys.lastStep.tr(),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  BlocProvider.value(
+                    value: context.read<AuthenticationCubit>(),
+                    child: AuthenticateGridView(
+                      isValidated: state.dataStatus == DataStatus.error,
+                      dataList: state.newMnemonic ?? [],
+                      onRemove: (index) {
+                        context
+                            .read<AuthenticationCubit>()
+                            .updateNewMnemonic(index);
+                      },
+                      onAdd: (index) {
+                        context
+                            .read<AuthenticationCubit>()
+                            .updateNewMnemonic(index, isAdding: true);
+                      },
                     ),
-                    const SizedBox(
-                      height: 18,
-                    ),
-                    Text(LocaleKeys.thisIsYourSecretRecoveryPhrase.tr(),
-                        textAlign: TextAlign.center),
-                    const SizedBox(
-                      height: 18,
-                    ),
-                    AuthenticationGrid(
-                      borderColor: AppColors.primaryPurpleColor,
-                      data: state.mnemonic ?? [],
-                      gridColor: AppColors.primaryPurpleColor,
-                      isDisplay: true,
-                      currentIndex: 0,
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text(
-                      LocaleKeys.lastStep.tr(),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(
-                      height: 18,
-                    ),
-                    BlocProvider.value(
-                      value:  context
-                              .read<AuthenticationCubit>(),
-                      child: AuthenticateGridView(
-                        isValidated: state.dataStatus == DataStatus.error,
-                        dataList: state.newMnemonic ?? [],
-                        onRemove: (index) {
-                          context
-                              .read<AuthenticationCubit>()
-                              .updateNewMnemonic(index);
-                        },
-                        onAdd: (index) {
-                          context
-                              .read<AuthenticationCubit>()
-                              .updateNewMnemonic(index, isAdding: true);
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          );
-        }));
+                  )
+                ],
+              ),
+            ],
+          ),
+        );
       },
     );
   }

@@ -11,37 +11,33 @@ class CongratulationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: DAppBar(
-              title: tr('congretulations'),
-              titleStyle: Theme.of(context).textTheme.caption1,
-              leading: false),
-          body: SafeArea(
-              child: SingleChildScrollView(
-            child: Container(
-                margin: EdgeInsets.only(left: 5.w, right: 5.w),
-                child: Column(
-                  children: [
-                    Image.asset('assets/gifs/bingo.gif',
-                        gaplessPlayback: true, fit: BoxFit.fill),
-                    SizedBox(height: 5.w),
-                    Text(tr('congretulationsContentText'),
-                        textAlign: TextAlign.center),
-                    SizedBox(height: 30.w),
-                    BaseButton(
-                        text: tr('done'),
-                        buttonWidth: 100.w,
-                        backgroundColor: AppColors.primaryPurpleColor,
-                        textColor: Colors.white,
-                        buttonHeight: 13.w),
-                  ],
-                )),
-          )),
-        );
-      },
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: DAppBar(
+          title: tr('congretulations'),
+          titleStyle: Theme.of(context).textTheme.caption1,
+          leading: false),
+      body: SafeArea(
+          child: SingleChildScrollView(
+        child: Container(
+            margin: EdgeInsets.only(left: 5.w, right: 5.w),
+            child: Column(
+              children: [
+                Image.asset('assets/gifs/bingo.gif',
+                    gaplessPlayback: true, fit: BoxFit.fill),
+                SizedBox(height: 5.w),
+                Text(tr('congretulationsContentText'),
+                    textAlign: TextAlign.center),
+                SizedBox(height: 30.w),
+                BaseButton(
+                    text: tr('done'),
+                    buttonWidth: 100.w,
+                    backgroundColor: AppColors.primaryPurpleColor,
+                    textColor: Colors.white,
+                    buttonHeight: 13.w),
+              ],
+            )),
+      )),
     );
   }
 }

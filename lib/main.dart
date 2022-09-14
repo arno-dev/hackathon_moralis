@@ -4,6 +4,7 @@ import 'package:no_context_navigation/no_context_navigation.dart';
 import 'core/config/DI/configure_dependencies.dart';
 import 'core/config/routes/router.dart';
 import 'core/config/themes/app_theme.dart';
+import 'package:sizer/sizer.dart';
 
 Future<void> main() async {
   await configureDependencies();
@@ -29,20 +30,24 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Clean Architecture',
-      //set up theme
-      theme: AppTheme.mainTheme,
-      //set up localization
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      //set up navigation
-      navigatorKey: NavigationService.navigationKey,
-      onGenerateRoute: (settings) => AppRoute.routeGenerate(settings, this),
-      initialRoute: AppRoute.initialRoute,
-      //disable debug
-      debugShowCheckedModeBanner: false,
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MaterialApp(
+          title: 'Flutter Clean Architecture',
+          //set up theme
+          theme: AppTheme.mainTheme,
+          //set up localization
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          //set up navigation
+          navigatorKey: NavigationService.navigationKey,
+          onGenerateRoute: (settings) => AppRoute.routeGenerate(settings, this),
+          initialRoute: AppRoute.initialRoute,
+          //disable debug
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }
