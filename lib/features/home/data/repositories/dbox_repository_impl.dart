@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/data/models/alerts_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
@@ -43,6 +44,16 @@ class DboxRepositoryImpl implements DboxRepository {
         onMessageOpenedApp: onMessageOpenedApp,
         onSelectNotification: onSelectNotification,
       );
+      return Right(data);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AlertsModel>>> getAlerts(String address)async {
+    try {
+      final data = await dboxRemoteDataSource.getAlerts(address);
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));

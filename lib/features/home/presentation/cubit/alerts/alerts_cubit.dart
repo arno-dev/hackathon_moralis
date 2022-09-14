@@ -1,0 +1,29 @@
+import 'package:d_box/features/home/domain/entities/alerts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:injectable/injectable.dart';
+import '../../../../../core/constants/data_status.dart';
+import '../../../domain/usecases/alerts_usecase.dart';
+
+part 'alerts_state.dart';
+part 'alerts_cubit.freezed.dart';
+
+@injectable
+class AlertsCubit extends Cubit<AlertsState> {
+  final GetAlertsUseCase getAlertsUseCase;
+  AlertsCubit(this.getAlertsUseCase) : super(const AlertsState());
+
+  Future<void> getAlerts(String address) async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+    final request = await getAlertsUseCase(GetAlertsParams(address));
+    request.fold(
+      (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+      (data) {
+        emit(state.copyWith(
+          dataStatus: DataStatus.loaded,
+          alerts: data,
+        ));
+      },
+    );
+  }
+}

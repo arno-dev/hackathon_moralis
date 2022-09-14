@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 
+import '../../features/home/data/models/alerts_model.dart';
 import '../../features/home/data/models/images_from_link_model.dart';
 import '../../features/todo/data/models/todos_model.dart';
 import '../../features/todo/data/models/user_model.dart';
@@ -29,5 +30,10 @@ abstract class ApiClient {
   @GET(ApiPath.recent)
   Future<List<ImagesFromLinkModel>> getRecents(
     @Path('recents') String recents,
+  );
+
+    @GET(ApiPath.alertAddress)
+  Future<List<AlertsModel>> getAlerts(
+    @Path('address') String address,
   );
 }

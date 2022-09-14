@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/domain/entities/alerts.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -10,4 +11,5 @@ abstract class DboxRepository {
   Future<Either<Failure, bool>> initializeFirebaseMessaging(
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});
+  Future<Either<Failure, List<Alerts>>> getAlerts(String address);
 }
