@@ -61,7 +61,7 @@ class ImportWalletPage extends StatelessWidget {
                         buttonWidth: 100.w,
                         buttonHeight: 13.w,
                         backgroundColor: AppColors.primaryPurpleColor,
-                        color: Colors.white,
+                        textColor: Colors.white,
                         isDisabled: !state.isInputValidated,
                       ),
                     ],
@@ -106,7 +106,7 @@ Future<void> _dialogBuilder(BuildContext context) {
                   text: tr('start'),
                   buttonWidth: 100.w,
                   backgroundColor: AppColors.primaryPurpleColor,
-                  color: Colors.white,
+                  textColor: Colors.white,
                   buttonHeight: 13.w);
             },
           ),

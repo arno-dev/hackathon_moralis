@@ -20,7 +20,6 @@ class BaseButton extends StatelessWidget {
       });
   final String? text;
   final Color? backgroundColor;
-  final Color color;
   final double buttonHeight;
   final double? buttonWidth;
   final double borderRadius;

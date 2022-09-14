@@ -14,12 +14,9 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GetMnemonicUseCase getMnemonicUseCase;
   final SaveCredentialUseCase saveCredentialUseCase;
 
-  AuthenticationCubit(this.getMnemonicUseCase, this.saveCredentialUseCase) : super(const AuthenticationState(dataStatus: DataStatus.initial));
-      
-
   List<String> randomData =[];
   late TextEditingController secretController;
-  AuthenticationCubit(this.getMnemonicUseCase)
+  AuthenticationCubit(this.getMnemonicUseCase, this.saveCredentialUseCase)
       : super(const AuthenticationState(dataStatus: DataStatus.initial)) {
     secretController = TextEditingController();
     secretController.addListener(() {
