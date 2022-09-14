@@ -7,7 +7,7 @@ import '../../../../generated/locale_keys.g.dart';
 import 'stepper.dart';
 
 class DCustomStepper extends StatelessWidget {
-  DCustomStepper(
+  const DCustomStepper(
       {super.key,
       this.currentIndex = 0,
       this.onTap,
@@ -31,7 +31,7 @@ class DCustomStepper extends StatelessWidget {
   final ScrollPhysics? physics;
   final void Function(int)? onTap;
   final Color textColor;
-  int currentIndex;
+  final int currentIndex;
 
   @override
   Widget build(BuildContext context) {

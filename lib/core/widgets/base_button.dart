@@ -16,7 +16,7 @@ class BaseButton extends StatelessWidget {
       this.verticalPadding = 5,
       this.isDisabled = false,
       this.textColor = AppColors.primaryFontColor,
-      this.isDisabledColor = AppColors.secondaryFontColor
+      this.isDisabledColor = AppColors.secondaryFontColor,
       });
   final String? text;
   final Color? backgroundColor;

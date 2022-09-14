@@ -37,7 +37,7 @@ class DottedButton extends StatelessWidget {
                   buttonWidth: buttonWidth,
                   backgroundColor: backgroundColor,
                   borderRadius: borderRadius,
-                  onTap: onTap,
+                  onTap: onTap
                 ),
                 );
   }

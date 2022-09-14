@@ -35,7 +35,7 @@ class CongratulationsPage extends StatelessWidget {
                         text: tr('done'),
                         buttonWidth: 100.w,
                         backgroundColor: AppColors.primaryPurpleColor,
-                        color: Colors.white,
+                        textColor: Colors.white,
                         buttonHeight: 13.w),
                   ],
                 )),
