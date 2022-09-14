@@ -16,8 +16,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   @override
   Future<Either<Failure, List<String>>> getMnemonic() async {
     try {
-      final res = await authenticationRemoteDataSource.getMnemonic();
-     
+      final res = authenticationRemoteDataSource.getMnemonic();
       return Right(res);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));

@@ -3,6 +3,7 @@
     "todosTitle": "Todos",
     "rootTitle": "Root",
     "somethingWrong": "Error occured",
+    "extensionNotSupport": "The app can read this file, will be support as soon as posible!",
     "laucherError": "Could not launch {}",
     "secureWallet" :"Secure wallet",
     "confirmSecretRecoveryPhrase" : "Confirm Secret Recovery Phrase",
@@ -25,5 +26,4 @@
     "secureYourWalletListText2":"Make sure no one is watching your screen",
     "iGotIt":"I go it!",
     "start":"Start"
-
- }
+}

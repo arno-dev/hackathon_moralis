@@ -8,5 +8,6 @@ class HomeState with _$HomeState {
     ImagesFromLink? imagesFromLink,
     List<Images>? currentFolder,
     List<Images>? prevFolder,
+    @Default([]) List<int> stack,
   }) = _Loaded;
 }

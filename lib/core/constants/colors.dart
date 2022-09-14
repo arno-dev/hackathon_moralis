@@ -28,4 +28,6 @@ class AppColors {
   static const Color grey = Color(0xff495567);
   static const Color disAbleButtonColor = Color(0xffEFF1FE);
   static const Color shadowColor = Color(0xffDCE2EB);
+  static const Color backgroundColor = Color(0xffDCE2EB);
+  static const Color fontColor = Color(0xffDCE2EB);
 }

@@ -7,7 +7,7 @@ class ImagesFromLink extends Equatable {
   final String originEntity;
   final String destEntity;
   final String cidEntity;
-  final DateTime createdAt;
+  final DateTime createdAtEntity;
   final Images? filetreeEntity;
 
   const ImagesFromLink(
@@ -15,7 +15,7 @@ class ImagesFromLink extends Equatable {
     this.originEntity,
     this.destEntity,
     this.cidEntity,
-    this.createdAt,
+    this.createdAtEntity,
     this.filetreeEntity,
   );
 

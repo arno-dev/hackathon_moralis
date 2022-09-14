@@ -5,9 +5,9 @@ import '../constants/colors.dart';
 class BaseButton extends StatelessWidget {
   const BaseButton(
       {super.key,
-       this.text,
+      this.text,
       this.backgroundColor,
-       this.buttonHeight = 32,
+      this.buttonHeight = 32,
       this.buttonWidth = 116,
       this.borderRadius = 28,
       this.onTap,
@@ -33,12 +33,12 @@ class BaseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(borderRadius),
-      color: isDisabled?Colors.grey:backgroundColor,
+      color: isDisabled ? Colors.grey : backgroundColor,
       child: InkWell(
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        onTap: isDisabled?null:onTap,
+        onTap: isDisabled ? null : onTap,
         child: Container(
           decoration: (borderColor != null)
               ? BoxDecoration(

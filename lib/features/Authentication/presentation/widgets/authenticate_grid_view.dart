@@ -37,7 +37,7 @@ class _AuthenticateGridViewState extends State<AuthenticateGridView> {
             setState(() {});
           },
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Wrap(
