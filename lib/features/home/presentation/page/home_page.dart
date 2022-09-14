@@ -72,7 +72,7 @@ class HomePage extends StatelessWidget {
                             : ChildFolderView(
                                 folders: state.currentFolder,
                                 modified:
-                                    state.recents![state.stack[0]].createdAt,
+                                    state.recents![state.stack[0]].createdAtEntity,
                                 rootIndex: state.stack[0])
                         : const EmtryFileWidget(),
                   ],
