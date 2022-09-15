@@ -12,9 +12,28 @@ const imagesController = require('./controllers/imagesController');
 const alertsController = require('./controllers/alertsController');
 
 // Parse JSON bodies (as sent by API clients)
-app.use(json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: "50mb",
+    parameterLimit: 100000
+  })
+);
+
+app.use(
+  bodyParser.json({
+    limit: "50mb",
+    parameterLimit: 100000
+  })
+);
+
+app.use(
+  bodyParser.raw({
+    limit: "50mb",
+    inflate: true,
+    parameterLimit: 100000
+  })
+);
 
 const {
   MORALIS_API_KEY,
