@@ -1,3 +1,4 @@
+import 'package:d_box/core/usecases/usecase.dart';
 import 'package:d_box/features/home/domain/entities/alerts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,9 +14,9 @@ class AlertsCubit extends Cubit<AlertsState> {
   final GetAlertsUseCase getAlertsUseCase;
   AlertsCubit(this.getAlertsUseCase) : super(const AlertsState());
 
-  Future<void> getAlerts(String address) async {
+  Future<void> getAlerts() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
-    final request = await getAlertsUseCase(GetAlertsParams(address));
+    final request = await getAlertsUseCase(NoParams());
     request.fold(
       (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
       (data) {

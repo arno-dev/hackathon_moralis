@@ -1,5 +1,6 @@
 import 'package:d_box/features/Authentication/presentation/pages/wallet_screen.dart';
 import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
+import 'package:d_box/features/home/presentation/page/notifications_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../features/Authentication/presentation/cubit/authentication_cubit_cubit.dart';
@@ -7,6 +8,8 @@ import '../../../features/Authentication/presentation/pages/authentication_scree
 import '../../../features/Authentication/presentation/pages/congratulations_screen.dart';
 import '../../../features/Authentication/presentation/pages/import_wallet_screen.dart';
 import '../../../features/home/presentation/cubit/Home/home_cubit.dart';
+import '../../../features/home/presentation/cubit/account/my_account_cubit.dart';
+import '../../../features/home/presentation/cubit/alerts/alerts_cubit.dart';
 import '../../../features/home/presentation/page/home_page.dart';
 import '../../../features/todo/presentation/cubit/todo_cubit.dart';
 import '../../../features/todo/presentation/pages/todos_page.dart';
@@ -19,6 +22,7 @@ class AppRoute {
   static const String congratulations = "/congratulations";
   static const String todosRoute = "/todos";
   static const String homeRoute = "/home";
+  static const String notifications = "/notifications";
   static Route<dynamic>? routeGenerate(
       RouteSettings settings, TickerProvider tickerProvider) {
     switch (settings.name) {
@@ -60,8 +64,18 @@ class AppRoute {
                       create: (context) => getIt<PushNotificationCubit>()
                         ..initializeFirebaseMessaging(),
                     ),
+                      BlocProvider(
+                      create: (context) => getIt<MyAccountCubit>(),
+                    ),
                   ],
                   child: const HomePage(),
+                ));
+      case notifications:
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) =>
+                      getIt<AlertsCubit>()..getAlerts(),
+                  child: const NotificationPage(),
                 ));
       case todosRoute:
         return MaterialPageRoute(

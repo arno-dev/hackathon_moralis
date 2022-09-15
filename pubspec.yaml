@@ -55,6 +55,7 @@ dependencies:
   web3dart: 2.3.5
   dotted_border: ^2.0.0+2
   timeago: ^3.3.0
+  qr_flutter: ^4.0.0
 
   # Encryption
   bip32: ^2.0.0
