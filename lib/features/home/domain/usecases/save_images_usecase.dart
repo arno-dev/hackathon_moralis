@@ -16,14 +16,19 @@ class SaveImagesUsecase implements UseCase<SaveImagesModel, SaveImagesParams> {
   Future<Either<Failure, SaveImagesModel>> call(
       SaveImagesParams saveImagesParams) async {
     return await dboxRepository.postSaveImages(
-      saveImagesParams.uploadImageParam,
-      saveImagesParams.destinationPublic,
-    );
+        saveImagesParams.uploadImageParam,
+        saveImagesParams.destinationPublic,
+        saveImagesParams.path);
   }
 }
 
 class SaveImagesParams {
   final UploadImageParam uploadImageParam;
   final String destinationPublic;
-  SaveImagesParams(this.uploadImageParam, this.destinationPublic);
+  final String path;
+  SaveImagesParams({
+    required this.uploadImageParam,
+    required this.destinationPublic,
+    this.path = "",
+  });
 }
