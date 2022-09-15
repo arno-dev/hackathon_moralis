@@ -31,5 +31,11 @@
     "congretulationsContentText":"You’ve successfully protected your wallet. Remember to keep your Secret Recovery Phrase safe, it’s your responsibility!",
     "notifiCations":"Notifications",
     "send": "Send",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save":"save",
+    "showThisToYourFriends":"Show this to your friends!",
+    "logout":"logout",
+    "pushNotification":"Push notification",
+    "myQrCode":"My QR Code",
+    "myAccount":"My Account"
 }

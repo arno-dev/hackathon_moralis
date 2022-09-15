@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class DboxAlertDialog extends StatelessWidget {
   final String title;
@@ -16,7 +17,7 @@ class DboxAlertDialog extends StatelessWidget {
       this.textContent,
       required this.content,
       this.titleColor = Colors.black,
-      this.borderRadius = 16.0,
+      this.borderRadius = 8.0,
       this.contentPadding = 16.0,
       this.actionsPadding = 12.0,
       this.actions});
@@ -24,6 +25,7 @@ class DboxAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: EdgeInsets.zero,
       actionsPadding: EdgeInsets.all(actionsPadding),
       contentPadding: EdgeInsets.all(contentPadding),
       shape: RoundedRectangleBorder(
@@ -33,13 +35,16 @@ class DboxAlertDialog extends StatelessWidget {
         title,
         style: TextStyle(fontWeight: FontWeight.w700, color: titleColor),
       )),
-      content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            (textContent != null) ? Text(textContent!) : Container(),
-            ...content
-          ]),
+      content: SizedBox(
+        width: 90.w,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              (textContent != null) ? Text(textContent!) : Container(),
+              ...content
+            ]),
+      ),
       actions: actions ?? [],
     );
   }
