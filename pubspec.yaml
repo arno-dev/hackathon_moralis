@@ -60,6 +60,7 @@ dependencies:
   path_provider: ^2.0.11
   pinenacl: ^0.5.1
   pointycastle: ^3.6.1
+  qr_flutter: ^4.0.0
   retrofit: ^3.0.1+1
   sizer: ^2.0.15
   timeago: ^3.3.0
