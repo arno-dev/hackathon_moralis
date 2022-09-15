@@ -10,9 +10,9 @@ import '../entities/images_from_link.dart';
 
 abstract class DboxRepository {
   Future<Either<Failure, ImagesFromLink>> getImagesFromLink(String link);
-  Future<Either<Failure, List<ImagesFromLink>>> getRecents(String recents);
+  Future<Either<Failure, List<ImagesFromLink>>> getRecents();
   Future<Either<Failure, SaveImagesModel>> postSaveImages(
-      UploadImageParam uploadImageParam, String destinationPublic);
+      UploadImageParam uploadImageParam, String destinationPublic, String path);
   Future<Either<Failure, bool>> previewFile(
     ImageParam data,
     String destinationPublic,

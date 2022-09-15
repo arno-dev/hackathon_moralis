@@ -47,9 +47,9 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  Future<void> getRecents(String recents) async {
+  Future<void> getRecents() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
-    final request = await getRecentsUsecase(GetRecentsParams(recents));
+    final request = await getRecentsUsecase(NoParams());
     request.fold(
       (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
       (data) {
@@ -117,17 +117,31 @@ class HomeCubit extends Cubit<HomeState> {
     final request = await pickImagesUsecase(NoParams());
     request.fold((error) => emit(state.copyWith(dataStatus: DataStatus.error)),
         (data) async {
-      final saveImageResponse = await saveImagesUsecase(SaveImagesParams(
-        UploadImageParam(images: data),
-        "x25519_pk16pzmsneut8422jxg3nuvegvpj56gyf47pjc523j8vhhp2q2sy9aqxu7nqk",
-      ));
-      saveImageResponse.fold(
-        (errorMessage) => emit(state.copyWith(dataStatus: DataStatus.error)),
-        (response) async {
-          await getRecents(response.origin);
-        },
-      );
+      emit(state.copyWith(listImages: data, isHasImage: data.isNotEmpty));
     });
+  }
+
+  Future<void> onSaveImage() async {
+    final saveImageResponse = await saveImagesUsecase(SaveImagesParams(
+      destinationPublic: state.addPeople,
+      uploadImageParam: UploadImageParam(images: state.listImages),
+      path: state.addFolder,
+    ));
+    saveImageResponse.fold(
+      (errorMessage) => emit(state.copyWith(dataStatus: DataStatus.error)),
+      (response) async {
+        await getRecents();
+      },
+    );
+  }
+
+  void onCancelDialog() {
+    emit(state.copyWith(
+      addFolder: "",
+      addPeople: "",
+      listImages: [],
+      isHasImage: false,
+    ));
   }
 
   void onAddPeopleChange(String text) {

@@ -8,8 +8,10 @@ class HomeState with _$HomeState {
     ImagesFromLink? imagesFromLink,
     List<Images>? currentFolder,
     List<Images>? prevFolder,
-    @Default('') String addPeople,
-    @Default('') String addFolder,
+    @Default([]) List<ImageParam>? listImages,
+    @Default(false) bool isHasImage,
+    @Default("") String addPeople,
+    @Default("") String addFolder,
     @Default([]) List<int> stack,
   }) = _Loaded;
 }

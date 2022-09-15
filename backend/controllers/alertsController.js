@@ -95,8 +95,8 @@ exports.getAlerts = async (request, response) => {
         return response.send(shareLink);
     }
     catch (e) {
+        return response.send([]);
     }
-    return response.sendStatus(204);
 }
 
 exports.saveAlert = async (alertType, address, payload) => {

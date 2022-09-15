@@ -56,9 +56,7 @@ class AppRoute {
             builder: (_) => MultiBlocProvider(
                   providers: [
                     BlocProvider(
-                      create: (context) => getIt<HomeCubit>()
-                        ..getRecents(
-                            '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'), // hard code link for test
+                      create: (context) => getIt<HomeCubit>()..getRecents(),
                     ),
                     BlocProvider(
                       create: (context) => getIt<PushNotificationCubit>()

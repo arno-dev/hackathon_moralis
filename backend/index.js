@@ -1,8 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 
-const { urlencoded, json } = require('express');
-const { default: Moralis }  = require("moralis");
 const bodyParser = require("body-parser")
 const codec = require('json-url')('lzw');
 const app = express()
@@ -15,28 +13,27 @@ const alertsController = require('./controllers/alertsController');
 app.use(
   bodyParser.urlencoded({
     extended: true,
-    limit: "50mb",
+    limit: "Infinity",
     parameterLimit: 100000
   })
 );
 
 app.use(
   bodyParser.json({
-    limit: "50mb",
+    limit: "Infinity",
     parameterLimit: 100000
   })
 );
 
 app.use(
   bodyParser.raw({
-    limit: "50mb",
+    limit: "Infinity",
     inflate: true,
     parameterLimit: 100000
   })
 );
 
 const {
-  MORALIS_API_KEY,
   PORT
 } = process.env;
 
@@ -65,7 +62,4 @@ app.get('/v2/alerts/:address', alertsController.getAlerts);
 
 app.listen(PORT || 3000, async () => {
   console.log("listening on localhost:3000");
-  await Moralis.start({
-    apiKey: MORALIS_API_KEY,
-  })
 });
