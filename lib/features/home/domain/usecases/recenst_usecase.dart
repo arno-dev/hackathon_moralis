@@ -7,19 +7,12 @@ import '../entities/images_from_link.dart';
 import '../repositories/dbox_repository.dart';
 
 @lazySingleton
-class GetRecentsUsecase
-    implements UseCase<List<ImagesFromLink>, GetRecentsParams> {
+class GetRecentsUsecase implements UseCase<List<ImagesFromLink>, NoParams> {
   final DboxRepository dboxRepository;
   GetRecentsUsecase(this.dboxRepository);
 
   @override
-  Future<Either<Failure, List<ImagesFromLink>>> call(
-      GetRecentsParams params) async {
-    return await dboxRepository.getRecents(params.recents);
+  Future<Either<Failure, List<ImagesFromLink>>> call(NoParams noParams) async {
+    return await dboxRepository.getRecents();
   }
-}
-
-class GetRecentsParams {
-  final String recents;
-  GetRecentsParams(this.recents);
 }

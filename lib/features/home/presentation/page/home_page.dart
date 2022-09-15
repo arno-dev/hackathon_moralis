@@ -47,12 +47,13 @@ class HomePage extends StatelessWidget {
               label: 'Upload Photos',
               onTap: () async {
                 await context.read<HomeCubit>().onPickImages();
+                Navigator.pop(context);
               },
             ),
             DboxButtonBottomSheet(
               label: 'Take Photos',
               onTap: () {
-                _dialogBuilder(context);
+                // _dialogBuilder(context);
               },
             ),
             DboxButtonBottomSheet(
@@ -72,7 +73,15 @@ class HomePage extends StatelessWidget {
       ),
       body: BlocBuilder<PushNotificationCubit, PushNotificationState>(
         builder: (context, state) {
-          return BlocBuilder<HomeCubit, HomeState>(
+          return BlocConsumer<HomeCubit, HomeState>(
+            listener: ((context, state) {
+              if (state.listImages != null) {
+                _dialogBuilder(context: context);
+              }
+            }),
+            listenWhen: ((previous, current) {
+              return previous.listImages != current.listImages;
+            }),
             builder: (context, state) {
               if (state.dataStatus == DataStatus.initial) {
                 return const SizedBox();
@@ -131,14 +140,17 @@ class HomePage extends StatelessWidget {
   }
 }
 
-Future<void> _dialogBuilder(BuildContext context) {
+Future<void> _dialogBuilder({
+  required BuildContext context,
+  bool isAddFolder = false,
+}) {
   return showDialog<void>(
     context: context,
     builder: (_) {
       return BlocProvider.value(
         value: context.read<HomeCubit>(),
         child: DboxAlertDialog(
-          title: 'Send to your friend',
+          title: isAddFolder ? "Add to folder" : 'Send to your friend',
           titleColor: Colors.black,
           content: [
             DboxTextFieldDialog(
@@ -173,41 +185,44 @@ Future<void> _dialogBuilder(BuildContext context) {
               ),
             ),
             SizedBox(height: 15.w),
-            BlocSelector<HomeCubit, HomeState, String>(
-              selector: (state) {
-                return state.addPeople;
-              },
-              builder: (context, addPeople) {
-                return BaseButton(
-                  text: tr('send'),
-                  buttonWidth: 100.w,
-                  backgroundColor: AppColors.primaryPurpleColor,
-                  isDisabled: addPeople == "",
-                  textColor: Colors.white,
-                  buttonHeight: 4.5.h,
-                );
-              },
-            ),
+            isAddFolder
+                ? const SizedBox.shrink()
+                : BlocSelector<HomeCubit, HomeState, String>(
+                    selector: (state) {
+                      return state.addPeople;
+                    },
+                    builder: (context, addPeople) {
+                      return BaseButton(
+                        text: tr('send'),
+                        buttonWidth: 100.w,
+                        backgroundColor: AppColors.primaryPurpleColor,
+                        isDisabled: addPeople == "",
+                        textColor: Colors.white,
+                        buttonHeight: 6.h,
+                        onTap: () async {
+                          await context.read<HomeCubit>().onSaveImage();
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
             SizedBox(height: 3.w),
             BaseButton(
               text: tr('cancel'),
               onTap: () {
-                context.read<HomeCubit>().onAddFolderChange("");
-                context.read<HomeCubit>().onAddPeopleChange("");
+                context.read<HomeCubit>().onCancelDialog();
                 Navigator.pop(context);
               },
               buttonWidth: 100.w,
               backgroundColor: Colors.white,
               textColor: Colors.black,
-              buttonHeight: 4.5.h,
+              buttonHeight: 6.h,
             ),
-            SizedBox(height: 3.w),
           ],
         ),
       );
     },
   ).then((value) {
-    context.read<HomeCubit>().onAddFolderChange("");
-    context.read<HomeCubit>().onAddPeopleChange("");
+    context.read<HomeCubit>().onCancelDialog();
   });
 }
