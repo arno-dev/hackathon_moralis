@@ -24,11 +24,11 @@ class SaveImagesUsecase implements UseCase<SaveImagesModel, SaveImagesParams> {
 
 class SaveImagesParams {
   final UploadImageParam uploadImageParam;
-  final String destinationPublic;
+  final String? destinationPublic;
   final String path;
   SaveImagesParams({
     required this.uploadImageParam,
-    required this.destinationPublic,
+    this.destinationPublic,
     this.path = "",
   });
 }

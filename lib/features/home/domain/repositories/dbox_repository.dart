@@ -12,9 +12,11 @@ abstract class DboxRepository {
   Future<Either<Failure, ImagesFromLink>> getImagesFromLink(String link);
   Future<Either<Failure, List<ImagesFromLink>>> getRecents();
   Future<Either<Failure, SaveImagesModel>> postSaveImages(
-      UploadImageParam uploadImageParam, String destinationPublic, String path);
+      UploadImageParam uploadImageParam,
+      String? destinationPublic,
+      String path);
   Future<Either<Failure, bool>> previewFile(
-    ImageParam data,
+    String url,
     String destinationPublic,
   );
   Future<Either<Failure, List<ImageParam>>> pickImages();

@@ -61,20 +61,36 @@ class DboxRepositoryImpl implements DboxRepository {
 
   @override
   Future<Either<Failure, SaveImagesModel>> postSaveImages(
-      UploadImageParam uploadImageParam,
-      String destinationPublicAndIpfsKey,
-      String path) async {
+    UploadImageParam uploadImageParam,
+    String? destinationPublicAndIpfsKey,
+    String path,
+  ) async {
     try {
-      List<String> userShare = destinationPublicAndIpfsKey.split("-+-");
-      if (userShare.length != 2) {
-        return const Left(
-            ServerFailure("Your content or key is not availble!"));
-      }
-      String dest = userShare[0];
-      String encryptIpfsKey = userShare[1];
+      String? origin;
+      String? dest;
+      List<ImageParam>? newImageParam = [];
       String? myIpfsCredentialString = await dboxLocalDataSource.readIpfsKey();
-      // this is a ipfs public key of destination
-      PublicKey destinationPublicKey = PublicKey.decode(encryptIpfsKey);
+      PrivateKey privateKey = PrivateKey.decode(myIpfsCredentialString ?? "");
+      PublicKey destinationPublicKey = privateKey.publicKey;
+      final wallet = await dboxLocalDataSource.readWalletCredential();
+      if (wallet != null) {
+        origin = wallet.address;
+        dest = origin;
+      } else {
+        return const Left(ServerFailure("Your address is invalid"));
+      }
+
+      if (destinationPublicAndIpfsKey != null) {
+        List<String> userShare = destinationPublicAndIpfsKey.split("-+-");
+        if (userShare.length != 2) {
+          return const Left(
+              ServerFailure("Your content or key is not availble!"));
+        }
+        dest = userShare[0];
+        String? destinationPublicKeyString = userShare[1];
+        // this is a ipfs public key of destination
+        destinationPublicKey = PublicKey.decode(destinationPublicKeyString);
+      }
 
       List<ImageParam>? imageParam = uploadImageParam.images;
       if (imageParam == null || myIpfsCredentialString == null) {
@@ -82,7 +98,6 @@ class DboxRepositoryImpl implements DboxRepository {
             ServerFailure("Your content or key is not availble!"));
       }
       // this is the private ipfs key
-      PrivateKey privateKey = PrivateKey.decode(myIpfsCredentialString);
       List<ImageParam?> encryptImages = [];
       encryptImages = imageParam.map((data) {
         if (data.content == null) {
@@ -93,19 +108,14 @@ class DboxRepositoryImpl implements DboxRepository {
         String encryptContent = dboxLocalDataSource.encryptFileContent(
             data.content!, privateKey, destinationPublicKey);
         return ImageParam(
-            content: encryptContent, path: path != "" ? path : data.path);
+            content: encryptContent,
+            path: path != "" ? "$path/${data.path}" : data.path);
       }).toList();
-      List<ImageParam>? newImageParam = [];
+
       for (ImageParam? encryptImage in encryptImages) {
         if (encryptImage != null) {
           newImageParam.add(encryptImage);
         }
-      }
-
-      final wallet = await dboxLocalDataSource.readWalletCredential();
-      String origin = "";
-      if (wallet != null) {
-        origin = wallet.address;
       }
 
       final data =
@@ -150,7 +160,7 @@ class DboxRepositoryImpl implements DboxRepository {
 
   @override
   Future<Either<Failure, bool>> previewFile(
-      ImageParam data, String destinationPublic) async {
+      String url, String destinationPublic) async {
     try {
       // your ipfs private key
       String? myIpfsCredential = await dboxLocalDataSource.readIpfsKey();
@@ -159,9 +169,9 @@ class DboxRepositoryImpl implements DboxRepository {
       PrivateKey privateKey = PrivateKey.decode(myIpfsCredential);
       // destination's ipfs public key
       PublicKey destinationPublicKey = PublicKey.decode(destinationPublic);
-
+      final test = destinationPublicKey.encode();
       final response = await dboxLocalDataSource.previewFile(
-        data,
+        url,
         privateKey,
         destinationPublicKey,
       );

@@ -10,9 +10,7 @@ import 'package:injectable/injectable.dart';
 import 'package:pinenacl/x25519.dart';
 
 abstract class DboxLocalDataSource {
-  Future<bool> previewFile(
-      ImageParam data,
-      AsymmetricPrivateKey sourcePrivateKey,
+  Future<bool> previewFile(String url, AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic);
   Future<List<ImageParam>> pickFile();
   Future<String?> readIpfsKey();
@@ -79,21 +77,16 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
   }
 
   @override
-  Future<bool> previewFile(
-      ImageParam data,
-      AsymmetricPrivateKey sourcePrivateKey,
+  Future<bool> previewFile(String url, AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic) async {
-    if (data.content == null || data.path == null) {
+    try {
+      String content = await fileHandler.networkFileToBase64(url);
+      String base64String = asymmetricEncryption.decryptData(
+          content, sourcePrivateKey, destinationPublic);
+      await fileHandler.getPreviewFile(base64String, url.split("/").last);
+      return true;
+    } catch (e) {
       return false;
-    } else {
-      try {
-        String base64String = asymmetricEncryption.decryptData(
-            data.content!, sourcePrivateKey, destinationPublic);
-        await fileHandler.getPreviewFile(base64String, data.path!);
-        return true;
-      } catch (e) {
-        return false;
-      }
     }
   }
 }

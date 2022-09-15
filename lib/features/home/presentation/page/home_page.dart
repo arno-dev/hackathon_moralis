@@ -8,6 +8,7 @@ import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/constants/colors.dart';
@@ -47,7 +48,7 @@ class HomePage extends StatelessWidget {
               label: 'Upload Photos',
               onTap: () async {
                 await context.read<HomeCubit>().onPickImages();
-                Navigator.pop(context);
+                navService.goBack();
               },
             ),
             DboxButtonBottomSheet(
@@ -75,12 +76,33 @@ class HomePage extends StatelessWidget {
         builder: (context, state) {
           return BlocConsumer<HomeCubit, HomeState>(
             listener: ((context, state) {
-              if (state.listImages != null) {
-                _dialogBuilder(context: context);
+              if (state.isHasImage) {
+                Navigation.bottomSheetModel(context, [
+                  DboxButtonBottomSheet(
+                    label: 'Upload to cloud',
+                    onTap: () async {
+                      context.read<HomeCubit>().onSaveImage();
+                    },
+                  ),
+                  DboxButtonBottomSheet(
+                    label: 'Add address',
+                    onTap: () {
+                      _dialogBuilder(context: context);
+                    },
+                  ),
+                  DboxButtonBottomSheet(
+                    label: 'Scan QR Code',
+                    onTap: () {},
+                  ),
+                  Platform.isIOS
+                      ? const SizedBox(height: 20)
+                      : const SizedBox.shrink()
+                ]).then((value) => context.read<HomeCubit>().onCancelDialog());
+                // _dialogBuilder(context: context);
               }
             }),
             listenWhen: ((previous, current) {
-              return previous.listImages != current.listImages;
+              return previous.isHasImage != current.isHasImage;
             }),
             builder: (context, state) {
               if (state.dataStatus == DataStatus.initial) {
@@ -153,16 +175,18 @@ Future<void> _dialogBuilder({
           title: isAddFolder ? "Add to folder" : 'Send to your friend',
           titleColor: Colors.black,
           content: [
-            DboxTextFieldDialog(
-              hintText: "Add people",
-              icons: Assets.icons.userplusicon.svg(
-                width: 8.w,
-                height: 8.w,
-              ),
-              onChange: (String text) {
-                context.read<HomeCubit>().onAddPeopleChange(text);
-              },
-            ),
+            isAddFolder
+                ? const SizedBox.shrink()
+                : DboxTextFieldDialog(
+                    hintText: "Add people",
+                    icons: Assets.icons.userplusicon.svg(
+                      width: 8.w,
+                      height: 8.w,
+                    ),
+                    onChange: (String text) {
+                      context.read<HomeCubit>().onAddPeopleChange(text);
+                    },
+                  ),
             DboxTextFieldDialog(
               hintText: "Add folder",
               icons: Assets.icons.foldericon.svg(
@@ -185,37 +209,35 @@ Future<void> _dialogBuilder({
               ),
             ),
             SizedBox(height: 15.w),
-            isAddFolder
-                ? const SizedBox.shrink()
-                : BlocSelector<HomeCubit, HomeState, String>(
-                    selector: (state) {
-                      return state.addPeople;
-                    },
-                    builder: (context, addPeople) {
-                      return BaseButton(
-                        text: tr('send'),
-                        buttonWidth: 100.w,
-                        backgroundColor: AppColors.primaryPurpleColor,
-                        isDisabled: addPeople == "",
-                        textColor: Colors.white,
-                        buttonHeight: 6.h,
-                        onTap: () async {
-                          await context.read<HomeCubit>().onSaveImage();
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
+            BlocSelector<HomeCubit, HomeState, String?>(
+              selector: (state) {
+                return state.addPeople;
+              },
+              builder: (context, addPeople) {
+                return BaseButton(
+                  text: tr('send'),
+                  buttonWidth: 100.w,
+                  backgroundColor: AppColors.primaryPurpleColor,
+                  isDisabled: !isAddFolder && addPeople != null,
+                  textColor: Colors.white,
+                  buttonHeight: 6.h,
+                  onTap: () async {
+                    await context.read<HomeCubit>().onSaveImage();
+                    navService.goBack();
+                  },
+                );
+              },
+            ),
             SizedBox(height: 3.w),
             BaseButton(
-              text: tr('cancel'),
+              text: isAddFolder ? "Not now" : tr('cancel'),
               onTap: () {
                 context.read<HomeCubit>().onCancelDialog();
                 Navigator.pop(context);
               },
               buttonWidth: 100.w,
               backgroundColor: Colors.white,
-              textColor: Colors.black,
+              textColor: isAddFolder ? Colors.red : Colors.black,
               buttonHeight: 6.h,
             ),
           ],

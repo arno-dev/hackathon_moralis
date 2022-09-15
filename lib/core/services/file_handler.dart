@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:d_box/core/error/exceptions.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -51,10 +52,13 @@ class FileHandler {
       allowedExtensions: allowedExtensions,
     );
     List<ImageParam> files = [];
+    double size = 0;
     if (result != null) {
       for (var path in result.paths) {
         if (path != null) {
-          final imageBase64 = await _convertFileToBase64(File(path));
+          File file = File(path);
+          size += getFileSizeInMb(file);
+          final imageBase64 = await _convertFileToBase64(file);
           files.add(
             ImageParam(
               content: imageBase64,
@@ -63,6 +67,9 @@ class FileHandler {
           );
         }
       }
+    }
+    if (size > 50) {
+      throw ServerException("Over size file");
     }
     return files;
   }
@@ -90,7 +97,7 @@ class FileHandler {
   }
 
   // Return size of file in MB form
-  double getFileSizeInMb(File file, int decimals) {
+  double getFileSizeInMb(File file) {
     int sizeInBytes = file.lengthSync();
     double sizeInMb = sizeInBytes / (1024 * 1024);
     return sizeInMb;

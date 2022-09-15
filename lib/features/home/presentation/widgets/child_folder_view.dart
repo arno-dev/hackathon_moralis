@@ -28,11 +28,15 @@ class ChildFolderView extends StatelessWidget {
         ...List.generate(
           children.length,
           (index) => GestureDetector(
-            onTap: () {
+            onTap: () async {
               if (folders != null && folders![index].isFolderEntity) {
                 context
                     .read<HomeCubit>()
                     .onOpenFolder(childIndex: index, rootIndex: rootIndex);
+              } else {
+                await context
+                    .read<HomeCubit>()
+                    .onPreview(rootIndex: rootIndex, childIndex: index);
               }
             },
             child: Column(

@@ -10,7 +10,8 @@ class HomeState with _$HomeState {
     List<Images>? prevFolder,
     @Default([]) List<ImageParam>? listImages,
     @Default(false) bool isHasImage,
-    @Default("") String addPeople,
+    String? addPeople,
+    String? urlPath,
     @Default("") String addFolder,
     @Default([]) List<int> stack,
   }) = _Loaded;
