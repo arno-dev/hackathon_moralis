@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
@@ -7,14 +9,17 @@ class SecureStorage {
 
   SecureStorage(this.storage);
 
-  Future<void> writeSecureData(String key, String value) async {
-    var writeData = await storage.write(key: key, value: value);
+  Future<void> writeSecureData(String key, Object object) async {
+    var writeData = await storage.write(key: key, value: jsonEncode(object));
     return writeData;
   }
 
-  Future<String?> readSecureData(String key) async {
-    var readData = await storage.read(key: key);
-    return readData;
+  Future<T?> readSecureData<T>(String key) async {
+    String? readData = await storage.read(key: key);
+    if (readData != null) {
+      return jsonDecode(readData);
+    }
+    return null;
   }
 
   Future<void> deleteSecureData(String key) async {

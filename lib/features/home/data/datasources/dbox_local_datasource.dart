@@ -1,6 +1,7 @@
 import 'dart:core';
 
 import 'package:d_box/core/constants/local_storage_path.dart';
+import 'package:d_box/core/models/wallet_credential.dart';
 import 'package:d_box/core/services/asymmetic_encryption.dart';
 import 'package:d_box/core/services/file_handler.dart';
 import 'package:d_box/core/services/secure_storage.dart';
@@ -15,6 +16,7 @@ abstract class DboxLocalDataSource {
       AsymmetricPublicKey destinationPublic);
   Future<List<ImageParam>> pickFile();
   Future<String?> readIpfsKey();
+  Future<WalletCredential?> readWalletCredential();
   String encryptFileContent(
       String content,
       AsymmetricPrivateKey sourcePrivateKey,
@@ -63,9 +65,17 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
 
   @override
   Future<String?> readIpfsKey() async {
-    String? rawData =
-        await secureStorage.readSecureData(LocalStoragePath.ipfsCredential);
+    String? rawData = await secureStorage
+        .readSecureData<String?>(LocalStoragePath.ipfsCredential);
     return rawData;
+  }
+
+  @override
+  Future<WalletCredential?> readWalletCredential() async {
+    Map<String, dynamic>? rawData =
+        await secureStorage.readSecureData(LocalStoragePath.walletCredential);
+    if (rawData != null) return WalletCredential.fromJson(rawData);
+    return null;
   }
 
   @override

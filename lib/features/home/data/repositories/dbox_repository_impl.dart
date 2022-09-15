@@ -36,7 +36,12 @@ class DboxRepositoryImpl implements DboxRepository {
   Future<Either<Failure, List<ImagesFromLink>>> getRecents(
       String recents) async {
     try {
-      final data = await dboxRemoteDataSource.getRecents(recents);
+      final wallet = await dboxLocalDataSource.readWalletCredential();
+      String address = "";
+      if (wallet != null) {
+        address = wallet.address;
+      }
+      final data = await dboxRemoteDataSource.getRecents(address);
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
@@ -110,7 +115,7 @@ class DboxRepositoryImpl implements DboxRepository {
   }
 
   @override
-  Future<Either<Failure, List<AlertsModel>>> getAlerts(String address)async {
+  Future<Either<Failure, List<AlertsModel>>> getAlerts(String address) async {
     try {
       final data = await dboxRemoteDataSource.getAlerts(address);
       return Right(data);
