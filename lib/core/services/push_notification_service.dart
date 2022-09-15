@@ -15,7 +15,9 @@ class PushNotificationService {
   PushNotificationService(this.flutterLocalNotificationsPlugin, this.messaging);
 
   Future<String?> _registerNotification(
-      void Function(RemoteMessage)? onMessageOpenedApp) async {
+    void Function(RemoteMessage)? onMessageOpenedApp,
+    void Function(String?) onGetToken,
+  ) async {
     try {
       FirebaseMessaging.onBackgroundMessage(messageHandler);
       NotificationSettings settings = await messaging.requestPermission(
@@ -26,6 +28,7 @@ class PushNotificationService {
       );
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         final token = await messaging.getToken();
+        onGetToken(token);
 
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
           showLocalNotification(
@@ -44,7 +47,8 @@ class PushNotificationService {
     }
   }
 
-  Future<void> initializePlatformNotifications({
+  Future<void> initializePlatformNotifications(
+    void Function(String?) onGetToken, {
     void Function(RemoteMessage)? onMessageOpenedApp,
     void Function(String?)? onSelectNotification,
   }) async {
@@ -62,7 +66,7 @@ class PushNotificationService {
           ?.requestPermission();
       flutterLocalNotificationsPlugin.initialize(initializationSettings,
           onSelectNotification: onSelectNotification);
-      _registerNotification(onMessageOpenedApp);
+      _registerNotification(onMessageOpenedApp, onGetToken);
     } catch (_) {
       rethrow;
     }

@@ -92,7 +92,7 @@ class WalletPage extends StatelessWidget {
                                       builder: (context, isChecked) {
                                         return BaseButton(
                                             onTap: () async {
-                                              Navigator.pop(context);
+                                              navService.goBack();
                                               await navService.pushNamed(
                                                   AppRoute.createWallet);
                                             },

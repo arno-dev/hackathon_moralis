@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:d_box/core/constants/data_status.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
+import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
 import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
+import 'package:d_box/features/home/presentation/widgets/d_box_switch.dart';
+import 'package:flutter/services.dart';
 import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
 import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/constants/colors.dart';
@@ -35,10 +39,17 @@ class HomePage extends StatelessWidget {
         titleColor: Colors.black,
         centerTitle: false,
         listOfAction: [
-          Assets.icons.user.svg(),
+          IconButton(
+              icon: Assets.icons.user.svg(),
+              onPressed: () => _myAccountDialog(context)),
           const SizedBox(width: 10),
-          Assets.icons.notification.svg(),
-          const SizedBox(width: 10)
+          IconButton(
+            icon: Assets.icons.notification.svg(),
+            onPressed: () {
+              navService.pushNamed('/notifications');
+            },
+          ),
+          const SizedBox(width: 10),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -66,7 +77,7 @@ class HomePage extends StatelessWidget {
                 : const SizedBox.shrink()
           ]);
         },
-        backgroundColor: const Color(0xFFA24FFD),
+        backgroundColor: AppColors.primaryPurpleColor,
         child: const Icon(
           Icons.add,
           size: 30,
@@ -233,7 +244,7 @@ Future<void> _dialogBuilder({
               text: isAddFolder ? "Not now" : tr('cancel'),
               onTap: () {
                 context.read<HomeCubit>().onCancelDialog();
-                Navigator.pop(context);
+                navService.goBack();
               },
               buttonWidth: 100.w,
               backgroundColor: Colors.white,
@@ -248,3 +259,143 @@ Future<void> _dialogBuilder({
     context.read<HomeCubit>().onCancelDialog();
   });
 }
+
+Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
+      context: context,
+      builder: (_) {
+        return BlocProvider.value(
+          value: context.read<MyAccountCubit>(),
+          child: DboxAlertDialog(
+              title: tr('myAccount'),
+              contentPadding: 0,
+              actionsPadding: 0,
+              content: [
+                SizedBox(height: 2.w),
+                Center(
+                    child: InkWell(
+                        highlightColor: AppColors.disAbleButtonColor,
+                        splashColor: AppColors.transparentColor,
+                        onTap: () {
+                          Clipboard.setData(const ClipboardData(
+                              text: "54rrfdsfsfdsf@dasc4342624324.com"));
+                        },
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    '${"54rrfdsfsfdsf@dasc4342624324.com".substring(0, 20)}...',
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                              WidgetSpan(child: Assets.icons.document.svg()),
+                            ],
+                          ),
+                        ))),
+                Container(
+                  padding: const EdgeInsets.all(29),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: InkWell(
+                          splashColor: AppColors.transparentColor,
+                          splashFactory: NoSplash.splashFactory,
+                          highlightColor: AppColors.transparentColor,
+                          hoverColor: AppColors.transparentColor,
+                          child: Text(tr('myQrCode')),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _qrDialog(context);
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5.w,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(tr('pushNotification')),
+                            BlocSelector<MyAccountCubit, MyAccountState, bool>(
+                              selector: (state) {
+                                return state.isPushNotifacationChecked;
+                              },
+                              builder: (context, isPushNotifacationChecked) {
+                                return Transform.scale(
+                                    scale: 0.2.w,
+                                    child: DboxSwitch(
+                                        value: isPushNotifacationChecked,
+                                        onChanged: (value) {
+                                          context
+                                              .read<MyAccountCubit>()
+                                              .changeSwitchPushNotification(
+                                                  value);
+                                        }));
+                              },
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                    height: 48,
+                    width: 100.w,
+                    child: InkWell(
+                      customBorder: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16)),
+                      ),
+                      highlightColor: AppColors.disAbleButtonColor,
+                      splashColor: AppColors.transparentColor,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 29, top: 10, bottom: 10),
+                        child: Text(
+                          tr('logout'),
+                          style: const TextStyle(color: AppColors.accentColor),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ))
+              ]),
+        );
+      },
+    );
+
+Future<void> _qrDialog(context) => showDialog<void>(
+      context: context,
+      builder: (context) {
+        return DboxAlertDialog(
+            title: tr('showThisToYourFriends'),
+            contentPadding: 0,
+            actionsPadding: 0,
+            content: [
+              SizedBox(height: 5.w),
+              Center(
+                child: QrImage(
+                  data: "1234567890",
+                  version: QrVersions.auto,
+                  size: 200.0,
+                ),
+              ),
+              SizedBox(height: 5.w),
+              Center(
+                child: BaseButton(
+                    onTap: () {},
+                    text: tr('save'),
+                    buttonWidth: 50.w,
+                    backgroundColor: AppColors.primaryPurpleColor,
+                    textColor: Colors.white,
+                    buttonHeight: 13.w),
+              ),
+              SizedBox(height: 5.w)
+            ]);
+      },
+    );
