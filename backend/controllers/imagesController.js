@@ -4,7 +4,10 @@ const { JsonDB, Config } = require('node-json-db');
 const { getIPFSCid } = require('../utils/utils');
 const merge = require('deepmerge');
 const { nanoid } = require('nanoid');
-const e = require("express");
+const axios = require("axios");
+const {
+    MORALIS_API_KEY
+  } = process.env;
 
 var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
 
@@ -14,21 +17,37 @@ const alertsController = require('./alertsController');
 // Ty[e]
 const ALERT = require('../utils/alertType.js');
 
-exports.uploadImagesToIpfs = async (request, res, next) => {
+exports.uploadImagesToIpfs = async (request, response, next) => {
     const { images, origin, dest, encryptIpfsKey } = request.body;
     var data = {};
     if (!images || !origin || !dest || !encryptIpfsKey) {
         return response.sendStatus(400);
     }
-    const options = { abi: request.body.images };
-    const imagePath = await Moralis.EvmApi.ipfs.uploadFolder(options);
-    if (imagePath.data.length == 0) {
-        return response.sendStatus(400);
+    const options = request.body.images;
+   
+    try {
+        const imagePath = await axios.post('https://deep-index.moralis.io/api/v2/ipfs/uploadFolder',
+            JSON.stringify(options),
+            {
+                headers: {
+                    'X-API-KEY': MORALIS_API_KEY,
+                    'Content-Type': 'application/json',
+                    accept: 'application/json'
+                },
+                maxBodyLength: Infinity
+            }
+        )
+        if (imagePath.data.length == 0) {
+            return response.sendStatus(400);
+        }
+        let firstImagePath = imagePath.data[0]["path"];
+        let ipfs = getIPFSCid(firstImagePath);
+        request.ipfs = { "cid": ipfs, imagePath, "origin": origin, "dest": dest, "ipfsKey": encryptIpfsKey };
+        next();
+    } catch (error) {
+        response.status(500).json({ message: "Your files size is over 50MB" });
     }
-    let firstImagePath = imagePath.data[0]["path"];
-    let ipfs = getIPFSCid(firstImagePath);
-    request.ipfs = { "cid": ipfs, imagePath, "origin": origin, "dest": dest, "ipfsKey": encryptIpfsKey };
-    next();
+
 }
 
 exports.saveIpfsPathToDB = async (request, response, next) => {

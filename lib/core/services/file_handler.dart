@@ -89,6 +89,13 @@ class FileHandler {
     return response;
   }
 
+  // Return size of file in MB form
+  double getFileSizeInMb(File file, int decimals) {
+    int sizeInBytes = file.lengthSync();
+    double sizeInMb = sizeInBytes / (1024 * 1024);
+    return sizeInMb;
+  }
+
   Future<String> _convertFileToBase64(File file) async {
     List<int> imageBytes = await file.readAsBytes();
     return base64Encode(imageBytes);
