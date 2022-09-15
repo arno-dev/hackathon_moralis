@@ -14,6 +14,7 @@ import '../../../../generated/locale_keys.g.dart';
 import '../../domain/entities/images_from_link.dart';
 import '../../domain/repositories/dbox_repository.dart';
 import '../datasources/dbox_remote_datasource.dart';
+import '../models/params/firebase_param/firebase_token_param.dart';
 import '../models/save_images_model.dart';
 
 @LazySingleton(as: DboxRepository)
@@ -129,6 +130,13 @@ class DboxRepositoryImpl implements DboxRepository {
       void Function(String? payload)? onSelectNotification}) async {
     try {
       final data = await dboxRemoteDataSource.initializeFirebaseMessaging(
+        (token) async {
+          final wallet = await dboxLocalDataSource.readWalletCredential();
+          await dboxRemoteDataSource.saveFirebaseToken(FirebaseTokenParam(
+            address: wallet?.address,
+            token: token,
+          ));
+        },
         onMessageOpenedApp: onMessageOpenedApp,
         onSelectNotification: onSelectNotification,
       );

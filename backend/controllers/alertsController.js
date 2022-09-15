@@ -24,7 +24,7 @@ exports.saveRegistrationToken = async (request, response) => {
     }
     try {
         await alertDB.push("/token/" + address, token);
-        return response.sendStatus(200)
+        return response.status(200).send({ message: "Save token success." });
     } catch (error) {
         return response.sendStatus(500)
     }

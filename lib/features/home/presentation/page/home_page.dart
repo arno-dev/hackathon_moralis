@@ -8,6 +8,7 @@ import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/constants/colors.dart';
@@ -47,7 +48,7 @@ class HomePage extends StatelessWidget {
               label: 'Upload Photos',
               onTap: () async {
                 await context.read<HomeCubit>().onPickImages();
-                Navigator.pop(context);
+                navService.goBack();
               },
             ),
             DboxButtonBottomSheet(
@@ -201,7 +202,7 @@ Future<void> _dialogBuilder({
                         buttonHeight: 6.h,
                         onTap: () async {
                           await context.read<HomeCubit>().onSaveImage();
-                          Navigator.pop(context);
+                          navService.goBack();
                         },
                       );
                     },
@@ -211,7 +212,7 @@ Future<void> _dialogBuilder({
               text: tr('cancel'),
               onTap: () {
                 context.read<HomeCubit>().onCancelDialog();
-                Navigator.pop(context);
+                navService.goBack();
               },
               buttonWidth: 100.w,
               backgroundColor: Colors.white,
