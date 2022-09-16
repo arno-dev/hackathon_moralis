@@ -25,4 +25,5 @@ abstract class DboxRepository {
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});
   Future<Either<Failure, List<Alerts>>> getAlerts();
+  Future<Either<Failure, String>> getMyQrCode();
 }

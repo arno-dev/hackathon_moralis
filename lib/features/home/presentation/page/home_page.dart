@@ -13,6 +13,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sizer/sizer.dart';
 
@@ -334,6 +335,7 @@ Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
                           child: Text(tr('myQrCode')),
                           onTap: () {
                             Navigator.pop(context);
+                            context.read<MyAccountCubit>().getMyQrCode();
                             _qrDialog(context);
                           },
                         ),
@@ -398,22 +400,31 @@ Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
       },
     );
 
-Future<void> _qrDialog(context) => showDialog<void>(
+Future<void> _qrDialog(BuildContext context) => showDialog<void>(
       context: context,
-      builder: (context) {
-        return DboxAlertDialog(
-            title: tr('showThisToYourFriends'),
-            contentPadding: 0,
-            actionsPadding: 0,
-            content: [
-              SizedBox(height: 5.w),
-              Center(
-                child: QrImage(
-                  data: "1234567890",
-                  version: QrVersions.auto,
-                  size: 200.0,
+      builder: (_) {
+        return BlocProvider.value(
+          value: context.read<MyAccountCubit>(),
+          child: DboxAlertDialog(
+              title: tr('showThisToYourFriends'),
+              contentPadding: 0,
+              actionsPadding: 0,
+              content: [
+                SizedBox(height: 5.w),
+                Center(
+                  child: BlocSelector<MyAccountCubit, MyAccountState, String>(
+                    selector: (state) {
+                      return state.qrCode;
+                    },
+                    builder: (context, qrCode) {
+                      return QrImage(
+                        data: qrCode,
+                        version: QrVersions.auto,
+                        size: 200.0,
+                      );
+                    },
+                  ),
                 ),
-              ),
               SizedBox(height: 5.w),
               Center(
                 child: BaseButton(
@@ -425,6 +436,7 @@ Future<void> _qrDialog(context) => showDialog<void>(
                     buttonHeight: 13.w),
               ),
               SizedBox(height: 5.w)
-            ]);
+            ]),
+        );
       },
     );
