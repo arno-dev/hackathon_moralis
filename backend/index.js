@@ -40,10 +40,10 @@ const {
   PORT
 } = process.env;
 
+// !important : this one will be used
 app.get('/v2/share/recents/:address', imagesController.getRecentImagesSharedWithMyself);
 app.get('/v2/images/link/:link', imagesController.getImagesFromLink);
 app.get('/v2/alerts/:address', alertsController.getAlerts);
-// !important : this one will be used
 app.post('/v2/share/images', imagesController.uploadImagesToIpfs, imagesController.saveIpfsPathToDB, imagesController.createShareableLink);
 app.post('/v2/saveRegistrationToken', alertsController.saveRegistrationToken)
 

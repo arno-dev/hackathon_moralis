@@ -52,7 +52,7 @@ async function main() {
     }
     catch (e) {
         console.log("error " + e);
-    }   
+    }
 }
 
 // main();
@@ -85,12 +85,11 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
     if (!cid || !imagePath || !ipfsKey || !origin || !dest) {
         return response.sendStatus(400);
     }
-    var ipfsData = {};
-    ipfsData[cid] = {
+    var ipfsData = {
         "paths": imagePath["data"],
         "ipfsKey": ipfsKey
     };
-    await db.push("" + cid + "/paths", ipfsData)
+    await db.push("/" + cid, ipfsData)
 
     request.body = {
         "cid": cid,
@@ -181,9 +180,9 @@ exports.getImagesFromLink = async (request, response) => {
         // This can 
         const imagesFromLink = await db.getData("/links/" + link);
         const { cid, ipfsKey, origin, dest } = imagesFromLink;
-        const ipfsInfo = await db.getData("" + cid + "/paths");
-        const ipfsImages = ipfsInfo[cid]["paths"];
-        paths = await this.getImages(ipfsImages, cid);
+        const ipfsInfo = await db.getData("/" + cid);
+        const ipfsImages = ipfsInfo["paths"];
+        const paths = await this.getImages(ipfsImages, cid);
 
         return response.send({
             "ipfsKey": ipfsKey,
@@ -214,9 +213,10 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
 
             const imagesFromLink = await db.getData("/links/" + link);
             const { cid, ipfsKey, origin, dest } = imagesFromLink;
-            const ipfsInfo = await db.getData("" + cid + "/paths");
-            const ipfsImages = ipfsInfo[cid]["paths"];
-            paths = await this.getImages(ipfsImages, cid);
+            const ipfsInfo = await db.getData("/" + cid);
+            const ipfsImages = ipfsInfo["paths"];
+            const paths = await this.getImages(ipfsImages, cid);
+    
             files.push({
                 "ipfsKey": ipfsKey,
                 "origin": origin,
@@ -273,8 +273,6 @@ exports.getImages = async (imagesPath, ipfs) => {
     var result = merge.all(organizedPath, combineMerge);
 
     const childrenTest = result;
-    // result =  mergeChildrenIfNameExists(result["children"]);
-    // var resultTree = {};
     mergeChildren(result);
 
     // response.send(result);return
