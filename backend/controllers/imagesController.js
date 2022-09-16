@@ -41,8 +41,12 @@ async function main() {
         orbitdb = await OrbitDB.createInstance(ipfs);
         console.log("LOG:: we are creating a doc store from Orbit DB");
 
-        db = await orbitdb.docstore("test-db");
-        console.log("LOG:: we are creating a doc store at address : " + db.address);
+        const ipfs_db = await orbitdb.docstore("ipfs-db");
+        db = await orbitdb.open(ipfs_db.address.toString())
+        await db.load()
+        await db.put({ _id: 'gaddasg' +  Math.random() , doc: Math.random() });
+        
+        console.log("LOG:: we are creating a doc store at address : " + db.address.toString());
         isDBReady = true;
         console.log("LOG:: Orbit DB init done");
     }
