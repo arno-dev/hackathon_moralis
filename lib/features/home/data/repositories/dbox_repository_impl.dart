@@ -195,4 +195,23 @@ class DboxRepositoryImpl implements DboxRepository {
       return Left(ServerFailure(LocaleKeys.somethingWrong.tr()));
     }
   }
+
+    @override
+  Future<Either<Failure, String>> getMyQrCode() async {
+    try {
+      String? myIpfsCredentialString = await dboxLocalDataSource.readIpfsKey();
+      PrivateKey privateKey = PrivateKey.decode(myIpfsCredentialString??"");
+      String publicKey = privateKey.publicKey.encode();
+      final wallet = await dboxLocalDataSource.readWalletCredential();
+      String address = "";
+      if (wallet != null) {
+        address = wallet.address;
+      }
+
+      String qrString = '$address-+-$publicKey';
+      return Right(qrString);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message.toString()));
+    }
+  }
 }
