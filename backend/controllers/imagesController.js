@@ -85,12 +85,6 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
     if (!cid || !imagePath || !ipfsKey || !origin || !dest) {
         return response.sendStatus(400);
     }
-
-    // We want to save owner ship of IPFS along publid address
-    var ownerShipData = {};
-
-    await db.push("/ownership/" + origin + "[]", cid, true);
-
     var ipfsData = {};
     ipfsData[cid] = {
         "paths": imagePath["data"],
@@ -105,22 +99,6 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "dest": dest
     }
     next();
-}
-
-exports.getSharedUsers = async (request, response) => {
-    const { address } = request.params;
-    if (!address) {
-        return response.sendStatus(400);
-    }
-
-    try {
-        const sharedUsers = await db.getData("/sharing/" + address + "/users");
-        const sharedUserAddresses = sharedUsers.map((e) => e["user"]);
-        return response.send(sharedUserAddresses);
-    }
-    catch (e) {
-        return response.sendStatus(204);
-    }
 }
 
 exports.createShareableLink = async (request, response) => {
@@ -176,21 +154,6 @@ exports.createShareableLink = async (request, response) => {
     }
 }
 
-exports.getShareableLinkByAddresses = async (request, response) => {
-    const { dest, origin } = request.body;
-    if (!dest || !origin) {
-        return response.sendStatus(400);
-    }
-
-    try {
-        const link = await db.getData("/sharing/" + origin + "/" + dest);
-        return response.send(link);
-    }
-    catch (e) {
-        return response.sendStatus(204);
-    }
-}
-
 exports.getShareableLinkByCID = async (request, response) => {
     const { cid } = request.body;
     if (!cid) {
@@ -215,6 +178,7 @@ exports.getImagesFromLink = async (request, response) => {
     }
 
     try {
+        // This can 
         const imagesFromLink = await db.getData("/links/" + link);
         const { cid, ipfsKey, origin, dest } = imagesFromLink;
         const ipfsInfo = await db.getData("" + cid + "/paths");
@@ -266,32 +230,6 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
     }
     catch (e) {
         return response.send([]);
-    }
-}
-
-// !Important : this is used before to get all the filestree related to the owner address (not receievers)
-exports.getImagesFromAddress = async (request, response) => {
-    const { address } = request.params;
-    if (!address) {
-        return response.sendStatus(400);
-    }
-
-    try {
-        const imagesFromAddress = await db.getData("/images/" + address);
-        const cid = imagesFromAddress["cid"];
-        // const ipfsInfo = await db.getData("" + cid);
-        // const ipfsKey = imagesFromLink["ipfsKey"];
-        const ipfsImages = imagesFromAddress["imagePath"];
-        paths = await this.getImages(ipfsImages, cid);
-
-        response.send({
-            // "ipfsKey": ipfsKey, // We intentionally hide the ipfsKey
-            "cid": cid,
-            "filetree": paths
-        });
-    }
-    catch (e) {
-        return response.sendStatus(204);
     }
 }
 

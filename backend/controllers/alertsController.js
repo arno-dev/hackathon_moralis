@@ -29,15 +29,6 @@ exports.saveRegistrationToken = async (request, response) => {
         return response.sendStatus(500)
     }
 }
-// get firebase token from address
-exports.getRegistrationTokenFromAddress = async (request, response) => {
-    const { address } = request.params;
-    if (!address) {
-        return response.status(400);
-    }
-    const firebaseToken = await alertDB.getData("/token/" + address);
-    return response.send({ "token": firebaseToken });
-}
 
 async function sendPush(dest, message) {
     const options = notification_options;
@@ -57,22 +48,6 @@ async function sendPush(dest, message) {
     catch (e) {
         console.log("No firebase token was found for : " + dest);
     }
-}
-
-// send invite link via firebase cloud messaging
-exports.sendNotifications = async (request, response) => {
-    const { registrationToken, message } = request.body
-    const options = notification_options
-    if (!registrationToken || !message) {
-        return response.status(400)
-    }
-    admin.messaging().sendToDevice(registrationToken, message, options)
-        .then(data => {
-            return response.status(200).send(data)
-        })
-        .catch(error => {
-            return response.status(500).send(error)
-        });
 }
 
 
