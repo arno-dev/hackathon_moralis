@@ -18,7 +18,8 @@ let db
 let orbitdb
 var isDBReady = false;
 // Moving to orbitDB
-async function main() {
+
+exports.main = async () => {
     const { create } = await import('ipfs-core')
     try {
         console.log("ipfs");
@@ -44,8 +45,8 @@ async function main() {
         const ipfs_db = await orbitdb.docstore("ipfs-db");
         db = await orbitdb.open(ipfs_db.address.toString())
         await db.load()
-        await db.put({ _id: 'gaddasg' +  Math.random() , doc: Math.random() });
-        
+        // await db.put({ _id: 'gaddasg' +  Math.random() , doc: Math.random() });
+
         console.log("LOG:: we are creating a doc store at address : " + db.address.toString());
         isDBReady = true;
         console.log("LOG:: Orbit DB init done");
@@ -55,7 +56,7 @@ async function main() {
     }
 }
 
-main();
+
 
 // Controllers
 const alertsController = require('./alertsController');
@@ -89,7 +90,9 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "paths": imagePath["data"],
         "ipfsKey": ipfsKey
     };
-    await db.push("/" + cid, ipfsData)
+
+    await db.put({ _id: "/" + cid, doc: ipfsData })
+    // await db.push("/" + cid, ipfsData)
 
     request.body = {
         "cid": cid,
@@ -107,46 +110,25 @@ exports.createShareableLink = async (request, response) => {
         return response.sendStatus(400);
     }
     var ID = nanoid();
-
-    // We want to save the list of users somewhere
-    try {
-        const sharedUsers = await db.getData("/sharing/" + origin + "/users");
-        const sharedUserAddresses = sharedUsers.map((e) => e["user"]);
-        if (sharedUserAddresses.indexOf(dest) < 0) {
-            // Doesn't exist so we can push it
-            await db.push("/sharing/" + origin + "/users[]/user", dest);
-
-            // We should save the alert
-            await alertsController.saveAlert(AlertType.AddedInContact, dest, { "origin": origin });
-        }
-    }
-    catch (e) {
-        // Doesn't exist so we can push it
-        await db.push("/sharing/" + origin + "/users[]/user", dest);
-
-        // We should save the alert
-        await alertsController.saveAlert(ALERT.AddedInContact, dest, { "origin": origin, "ipfsKey": ipfsKey });
-    }
-
-
-
+    
     // We will create our share links
     const createdAt = new Date().toISOString();
     try {
-        const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
+
+        const shareLink = await db.query((doc) => doc._id == "/sharing/" + origin + "/" + dest + "/" + cid)[0];
+        // const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
         const { cid, link } = shareLink;
         await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link, "createdAt": createdAt });
         return response.send(shareLink);
     }
     catch (e) {
         var shareData = { "origin": origin, "dest": dest, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "link": ID, "createdAt": createdAt };
-        await db.push("/links/" + ID, shareData, true);
-        await db.push("/cid/links/" + cid, shareData, true);
-        await db.push("/sharing/" + origin + "/" + dest + "/" + cid, shareData, true);
-
+        await db.put({ _id: "/links/" + ID, doc: shareData });
+        await db.put({ _id: "/cid/links/" + cid, doc: shareData });
+        await db.put({ _id: "/sharing/" + origin + "/" + dest + "/" + cid, doc: shareData });
         // We want to store the receivers so they can retrieve all the links shared to themselves
-        await db.push("/receivers/" + dest + "/links[]", shareData, true);
 
+        await db.put({ _id: "/receivers/" + dest + "/links/" + ID, type: "links", dest: dest, doc: shareData });
         await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "createdAt": createdAt });
 
         return response.send(shareData);
@@ -178,10 +160,12 @@ exports.getImagesFromLink = async (request, response) => {
 
     try {
         // This can 
-        const imagesFromLink = await db.getData("/links/" + link);
-        const { cid, ipfsKey, origin, dest } = imagesFromLink;
-        const ipfsInfo = await db.getData("/" + cid);
-        const ipfsImages = ipfsInfo["paths"];
+        // const imagesFromLink = await db.getData("/links/" + link);
+        const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
+        const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
+        const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
+        // const ipfsInfo = await db.getData("/" + cid);
+        const ipfsImages = ipfsInfo["doc"]["paths"];
         const paths = await this.getImages(ipfsImages, cid);
 
         return response.send({
@@ -204,17 +188,41 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
     }
 
     try {
-        const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
+        // const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
+
+        // const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
+
+        // await db.put({ _id: "/receivers/" + dest + "/links/" + ID, type: "links", doc: shareData });dest
+        
+        const linksAddressedToMyselfRaw = await db.query((doc) => doc.type == "links" && doc.dest == address);
+        // const linksAddressedToMyselfRaw = await db.query((doc) => doc._id == "/receivers/" + address + "/links[]")[0];
+        var linksAddressedToMyself = []; 
+        for (var i = 0; i < linksAddressedToMyselfRaw.length; i++) {
+            linksAddressedToMyself.push(linksAddressedToMyselfRaw[i]["doc"]);
+        }
+        // const linksAddressedToMyself = linksAddressedToMyselfRaw.map((e) => e["doc"]);
         // Now we want to grab all the files from those links
         const linksUniqueAddressedToMyself = [...new Set(linksAddressedToMyself)];
         var files = [];
         for (var i = 0; i < linksUniqueAddressedToMyself.length; i++) {
             const { link } = linksUniqueAddressedToMyself[i];
 
-            const imagesFromLink = await db.getData("/links/" + link);
-            const { cid, ipfsKey, origin, dest } = imagesFromLink;
-            const ipfsInfo = await db.getData("/" + cid);
-            const ipfsImages = ipfsInfo["paths"];
+            const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
+            // const imagesFromLink = await db.getData("/links/" + link);
+            const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
+            const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
+            // const ipfsInfo = await db.getData("/" + cid);
+            const ipfsImages = ipfsInfo["doc"]["paths"];
+
+            /*
+
+        const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
+        const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
+        const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
+        // const ipfsInfo = await db.getData("/" + cid);
+        const ipfsImages = ipfsInfo["doc"]["paths"];
+        const paths = await this.getImages(ipfsImages, cid);
+        */
             const paths = await this.getImages(ipfsImages, cid);
 
             files.push({

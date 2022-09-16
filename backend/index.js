@@ -53,4 +53,6 @@ app.listen(PORT || 3000, async () => {
   await Moralis.start({
     apiKey: MORALIS_API_KEY,
   })
+
+  await imagesController.main();
 });

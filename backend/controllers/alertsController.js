@@ -39,10 +39,10 @@ async function sendPush(dest, message) {
 
         admin.messaging().sendToDevice(firebaseToken, message, options)
             .then(_ => {
-                return response.status(200).send("Notification sent successfully")
+                console.log("Notification sent successfully");
             })
             .catch(error => {
-                return response.status(500).send(error)
+                console.log("Notification error : " + error);
             });
     }
     catch (e) {
