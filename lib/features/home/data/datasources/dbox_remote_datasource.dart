@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:core';
 
 import 'package:d_box/core/services/push_notification_service.dart';
 import 'package:d_box/core/services/file_handler.dart';
+import 'package:d_box/features/home/data/models/notification_payload_model.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,7 +25,7 @@ abstract class DboxRemoteDataSource {
   Future<SaveImagesModel> postSaveImages(UploadImageParam uploadImageParam);
   Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
       {void Function(RemoteMessage)? onMessageOpenedApp,
-      void Function(String?)? onSelectNotification});
+       void Function(NotificationPayloadModel?)? onSelectNotification});
   Future<List<AlertsModel>> getAlerts(String address);
   Future<bool> saveFirebaseToken(FirebaseTokenParam firebaseTokenParam);
 }
@@ -73,12 +75,24 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   @override
   Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
       {void Function(RemoteMessage)? onMessageOpenedApp,
-      void Function(String?)? onSelectNotification}) async {
+      void Function(NotificationPayloadModel?)? onSelectNotification}) async {
     try {
       await notificationService.initializePlatformNotifications(
         onGetToken,
         onMessageOpenedApp: onMessageOpenedApp,
-        onSelectNotification: onSelectNotification,
+        onSelectNotification: (String? stringPayload) {
+          if (stringPayload != null) {
+            Map<String, dynamic> payload = jsonDecode(stringPayload);
+            if (payload.isEmpty) {
+              onSelectNotification!(null);
+              
+            } else {
+              onSelectNotification!(NotificationPayloadModel.fromJson(payload));
+            }
+          } else {
+            onSelectNotification!(null);
+          }
+        },
       );
       return true;
     } catch (e) {

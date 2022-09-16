@@ -28,6 +28,7 @@ class PushNotificationService {
       );
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         final token = await messaging.getToken();
+        print(token);
         onGetToken(token);
 
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -93,7 +94,7 @@ class PushNotificationService {
 
   void _onSelectNotification(String? payload) {
     if (payload != null) {
-      debugPrint(jsonDecode(payload));
+      debugPrint(payload);
     }
   }
 

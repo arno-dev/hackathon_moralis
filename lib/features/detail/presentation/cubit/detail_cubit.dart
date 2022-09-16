@@ -4,11 +4,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/constants/data_status.dart';
+import '../../../../core/constants/url.dart';
 import '../../../../generated/locale_keys.g.dart';
-import '../../../home/data/models/params/upload_image_param/image_param.dart';
 import '../../../home/domain/entities/images.dart';
 import '../../../home/domain/entities/images_from_link.dart';
 import '../../../home/domain/usecases/image_from_link_usecase.dart';
+import '../../../home/domain/usecases/preview_image_usecase.dart';
 
 part 'detail_state.dart';
 part 'detail_cubit.freezed.dart';
@@ -16,7 +17,9 @@ part 'detail_cubit.freezed.dart';
 @injectable
 class DetailCubit extends Cubit<DetailState> {
   final GetImagesFromLinkUsecase getImagesFromLinkUsecase;
-  DetailCubit(this.getImagesFromLinkUsecase) : super(const DetailState());
+  final PreviewImageUsecase previewImageUsecase;
+
+  DetailCubit(this.getImagesFromLinkUsecase, this.previewImageUsecase) : super(const DetailState());
 
   Future<void> getUserFromLink(String link) async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
@@ -98,5 +101,31 @@ class DetailCubit extends Cubit<DetailState> {
       currentFolder: current,
       stackName: newStackName
     ));
+  }
+  Future<void> onPreview(
+      {required int rootIndex, required int childIndex}) async {
+    emit(state.copyWith(dataStatus: DataStatus.opening));
+    String? newPath;
+    newPath = AppUrl.urlMoralis;
+    newPath = "$newPath${state.recents?[rootIndex].cidEntity}";
+    if (state.stack.isEmpty) {
+      String? nameFile = state.recents?[rootIndex].filetreeEntity
+          ?.childrenEntity?[childIndex].nameEntity;
+      newPath = "$newPath/$nameFile";
+    } else {
+      for (String folderName in state.stackName) {
+        newPath = "$newPath/$folderName";
+      }
+      String? fileName = state.currentFolder?[childIndex].nameEntity;
+      newPath = "$newPath/$fileName";
+    }
+    String? destinationPublic = state.recents?[rootIndex].ipfsKeyEntity;
+    print(newPath);
+    if (destinationPublic != null) {
+      await previewImageUsecase(PreviewImageParam(newPath, destinationPublic));
+      emit(state.copyWith(dataStatus: DataStatus.loaded));
+    } else {
+      return emit(state.copyWith(dataStatus: DataStatus.error));
+    }
   }
 }

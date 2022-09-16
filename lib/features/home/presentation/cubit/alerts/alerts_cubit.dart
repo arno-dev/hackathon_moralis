@@ -18,7 +18,9 @@ class AlertsCubit extends Cubit<AlertsState> {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     final request = await getAlertsUseCase(NoParams());
     request.fold(
-      (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+      (error) {
+        emit(state.copyWith(dataStatus: DataStatus.error));
+      },
       (data) {
         emit(state.copyWith(
           dataStatus: DataStatus.loaded,

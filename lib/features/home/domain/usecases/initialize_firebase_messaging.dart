@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../entities/notification_payload.dart';
 import '../repositories/dbox_repository.dart';
 
 @lazySingleton
@@ -24,7 +25,7 @@ class InitializeFirebaseMessagingUsecase
 
 class InitializeFirebaseMessagingParams {
   final void Function(RemoteMessage)? onMessageOpenedApp;
-  final void Function(String?)? onSelectNotification;
+  final void Function(NotificationPayload?)? onSelectNotification;
   InitializeFirebaseMessagingParams({
     this.onMessageOpenedApp,
     this.onSelectNotification,

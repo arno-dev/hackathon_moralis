@@ -1,5 +1,4 @@
 import 'package:d_box/features/detail/presentation/page/detail_screen.dart';
-import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
 import 'package:d_box/features/home/presentation/page/notifications_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +11,7 @@ import '../../../features/detail/presentation/cubit/detail_cubit.dart';
 import '../../../features/home/presentation/cubit/Home/home_cubit.dart';
 import '../../../features/home/presentation/cubit/account/my_account_cubit.dart';
 import '../../../features/home/presentation/cubit/alerts/alerts_cubit.dart';
+import '../../../features/home/presentation/cubit/push_notification/push_notification_cubit.dart';
 import '../../../features/home/presentation/page/home_page.dart';
 import '../../../features/todo/presentation/cubit/todo_cubit.dart';
 import '../../../features/todo/presentation/pages/todos_page.dart';
@@ -65,7 +65,7 @@ class AppRoute {
                       create: (context) => getIt<PushNotificationCubit>()
                         ..initializeFirebaseMessaging(),
                     ),
-                      BlocProvider(
+                    BlocProvider(
                       create: (context) => getIt<MyAccountCubit>(),
                     ),
                   ],
@@ -74,24 +74,17 @@ class AppRoute {
       case notifications:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                  create: (context) =>
-                      getIt<AlertsCubit>()..getAlerts(),
+                  create: (context) => getIt<AlertsCubit>()..getAlerts(),
                   child: const NotificationPage(),
                 ));
       case detailRoute:
-       String? link = settings.arguments as String?;
+        String? link = settings.arguments as String?;
         return MaterialPageRoute(
             builder: (_) => MultiBlocProvider(
                   providers: [
                     BlocProvider(
-                      create: (context) => getIt<DetailCubit>()..getUserFromLink(link??""),
-                    ),
-                    BlocProvider(
-                      create: (context) => getIt<PushNotificationCubit>()
-                        ..initializeFirebaseMessaging(),
-                    ),
-                      BlocProvider(
-                      create: (context) => getIt<MyAccountCubit>(),
+                      create: (context) =>
+                          getIt<DetailCubit>()..getUserFromLink(link ?? ""),
                     ),
                   ],
                   child: const DetailScreen(),

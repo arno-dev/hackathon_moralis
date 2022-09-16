@@ -4,4 +4,5 @@ enum DataStatus {
   loaded,
   error,
   isVerify,
+  opening
 }

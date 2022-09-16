@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/constants/data_status.dart';
 import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
-import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
 import 'package:d_box/features/home/presentation/widgets/d_box_switch.dart';
 import 'package:flutter/services.dart';
 import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
@@ -24,8 +24,10 @@ import '../../../../core/widgets/d_box_alert_dialog.dart';
 import '../../../../core/widgets/d_box_button_bottom_sheet.dart';
 import '../../../../core/widgets/d_box_textfield.dart';
 import '../../../../core/widgets/d_box_textfield_dialog.dart';
+import '../../../../core/widgets/loading.dart';
 import '../../../../generated/assets.gen.dart';
 import '../cubit/Home/home_cubit.dart';
+import '../cubit/push_notification/push_notification_cubit.dart';
 import '../widgets/child_folder_view.dart';
 import '../widgets/root_folder.view.dart';
 
@@ -95,136 +97,151 @@ class HomePage extends StatelessWidget {
           size: 30,
         ),
       ),
-      body: BlocBuilder<PushNotificationCubit, PushNotificationState>(
-        builder: (context, state) {
-          return BlocConsumer<HomeCubit, HomeState>(
-            listener: ((context, state) {
-              if (state.isHasImage) {
-                Navigation.bottomSheetModel(context, [
-                  DboxButtonBottomSheet(
-                    label: 'Upload to cloud',
-                    onTap: () async {
-                      context.read<HomeCubit>().onSaveImage();
-                    },
-                  ),
-                  DboxButtonBottomSheet(
-                    label: 'Add address',
-                    onTap: () {
-                      _dialogBuilder(context: context);
-                    },
-                  ),
-                  DboxButtonBottomSheet(
-                    label: 'Scan QR Code',
-                    onTap: () {},
-                  ),
-                  Platform.isIOS
-                      ? const SizedBox(height: 20)
-                      : const SizedBox.shrink()
-                ]).then((value) => context.read<HomeCubit>().onCancelDialog());
-                // _dialogBuilder(context: context);
-              }
-            }),
-            listenWhen: ((previous, current) {
-              return previous.isHasImage != current.isHasImage;
-            }),
-            builder: (context, state) {
-              if (state.dataStatus == DataStatus.initial) {
-                return const SizedBox();
-              } else if (state.dataStatus == DataStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state.dataStatus == DataStatus.loaded) {
-                List<ImagesFromLink>? recents = state.recents ?? [];
-                String name =
-                    state.nameStack.isNotEmpty ? state.nameStack.last : "";
-                return SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DboxTextField(
-                          hintText: 'Search your files',
-                          isSearch: true,
-                          controller:
-                              context.read<HomeCubit>().searchController,
-                        ),
-                        state.stack.isNotEmpty
-                            ? TextButton(
-                                onPressed: () {
-                                  context.read<HomeCubit>().onBackFolder();
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_back_ios_new_rounded,
-                                      color: AppColors.primaryColor,
-                                      size: 14.sp,
+      body: BlocListener<PushNotificationCubit, PushNotificationState>(
+        listener: (context, state) async {
+          if (state.link != null) {
+            navService
+                .pushNamed(AppRoute.detailRoute, args: state.link)
+                .then((_) {
+              context.read<PushNotificationCubit>().resetLink();
+            });
+          }
+        },
+        child: BlocConsumer<HomeCubit, HomeState>(
+          listener: ((context, state) {
+            if (state.isHasImage) {
+              Navigation.bottomSheetModel(context, [
+                DboxButtonBottomSheet(
+                  label: 'Upload to cloud',
+                  onTap: () async {
+                    context.read<HomeCubit>().onSaveImage();
+                  },
+                ),
+                DboxButtonBottomSheet(
+                  label: 'Add address',
+                  onTap: () {
+                    _dialogBuilder(context: context);
+                  },
+                ),
+                DboxButtonBottomSheet(
+                  label: 'Scan QR Code',
+                  onTap: () {},
+                ),
+                Platform.isIOS
+                    ? const SizedBox(height: 20)
+                    : const SizedBox.shrink()
+              ]).then((value) => context.read<HomeCubit>().onCancelDialog());
+              // _dialogBuilder(context: context);
+            }
+          }),
+          listenWhen: ((previous, current) {
+            return previous.isHasImage != current.isHasImage;
+          }),
+          builder: (context, state) {
+            if (state.dataStatus == DataStatus.initial) {
+              return const SizedBox();
+            } else if (state.dataStatus == DataStatus.loading) {
+              return const LoadingWidget();
+            } else if (state.dataStatus == DataStatus.loaded) {
+              List<ImagesFromLink>? recents = state.recents ?? [];
+              String name =
+                  state.nameStack.isNotEmpty ? state.nameStack.last : "";
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DboxTextField(
+                        hintText: 'Search your files',
+                        isSearch: true,
+                        controller: context.read<HomeCubit>().searchController,
+                      ),
+                      state.stack.isNotEmpty
+                          ? TextButton(
+                              onPressed: () {
+                                context.read<HomeCubit>().onBackFolder();
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.arrow_back_ios_new_rounded,
+                                    color: AppColors.primaryColor,
+                                    size: 14.sp,
+                                  ),
+                                  Text(
+                                    name,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Text(
-                                      name,
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ))
-                            : CustomButtonRecent(
-                                onPressed: ()  {},
-                              ),
-                        recents.isNotEmpty
-                            ? state.stack.isEmpty
-                                ? RootFolderView(recents: recents, onTap: (index, rootIndex) async { 
-                                   if (state.recents?[rootIndex] != null &&
-                                          state.recents?[rootIndex].filetreeEntity?.childrenEntity?[index].isFolderEntity == true) {
-                                        context.read<HomeCubit>().onOpenFolder(
-                                            childIndex: index,
-                                            rootIndex: rootIndex);
-                                      } else {
-                                        await context
-                                            .read<HomeCubit>()
-                                            .onPreview(
-                                                rootIndex: rootIndex,
-                                                childIndex: index);
+                                  ),
+                                ],
+                              ))
+                          : CustomButtonRecent(
+                              onPressed: () {},
+                            ),
+                      recents.isNotEmpty
+                          ? state.stack.isEmpty
+                              ? RootFolderView(
+                                  recents: recents,
+                                  onTap: (index, rootIndex) async {
+                                    if (state.recents?[rootIndex] != null &&
+                                        state
+                                                .recents?[rootIndex]
+                                                .filetreeEntity
+                                                ?.childrenEntity?[index]
+                                                .isFolderEntity ==
+                                            true) {
+                                      context.read<HomeCubit>().onOpenFolder(
+                                          childIndex: index,
+                                          rootIndex: rootIndex);
+                                    } else {
+                                      await context.read<HomeCubit>().onPreview(
+                                          rootIndex: rootIndex,
+                                          childIndex: index);
                                     }
-                                },)
-                                : ChildFolderView(
-                                    onTap: (int index, int rootIndex) async {
-                                      if (state.currentFolder != null &&
-                                          state.currentFolder![index]
-                                              .isFolderEntity) {
-                                        context.read<HomeCubit>().onOpenFolder(
-                                            childIndex: index,
-                                            rootIndex: rootIndex);
-                                      }else {
-                                        await context
-                                            .read<HomeCubit>()
-                                            .onPreview(
-                                                rootIndex: rootIndex,
-                                                childIndex: index);
+                                  },
+                                )
+                              : ChildFolderView(
+                                  onTap: (int index, int rootIndex) async {
+                                    if (state.currentFolder != null &&
+                                        state.currentFolder![index]
+                                            .isFolderEntity) {
+                                      context.read<HomeCubit>().onOpenFolder(
+                                          childIndex: index,
+                                          rootIndex: rootIndex);
+                                    } else {
+                                      await context.read<HomeCubit>().onPreview(
+                                          rootIndex: rootIndex,
+                                          childIndex: index);
                                     }
-                                    },
-                                    folders: state.currentFolder,
-                                    modified: state.recents![state.stack[0]]
-                                        .createdAtEntity,
-                                    rootIndex: state.stack[0])
-                            : const EmtryFileWidget(),
-                      ],
-                    ),
+                                  },
+                                  folders: state.currentFolder,
+                                  modified: state
+                                      .recents![state.stack[0]].createdAtEntity,
+                                  rootIndex: state.stack[0])
+                          : const EmtryFileWidget(),
+                    ],
                   ),
-                );
-              } else if (state.dataStatus == DataStatus.error) {
-                return Center(
+                ),
+              );
+            } else if (state.dataStatus == DataStatus.error) {
+              return Center(
+                child: InkWell(
+                  onTap: () async {
+                    await context.read<HomeCubit>().getRecents();
+                  },
                   child: Text(
                     "ERROR",
                     style: Theme.of(context).textTheme.displaySmall,
                   ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          );
-        },
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -283,10 +300,10 @@ Future<void> _dialogBuilder({
               },
               builder: (context, addPeople) {
                 return BaseButton(
-                  text: tr('send'),
+                  text: tr('sendasaSAsaSAsaSAA'),
                   buttonWidth: 100.w,
                   backgroundColor: AppColors.primaryPurpleColor,
-                  isDisabled: !isAddFolder && addPeople != null,
+                  isDisabled: false,
                   textColor: Colors.white,
                   buttonHeight: 6.h,
                   onTap: () async {

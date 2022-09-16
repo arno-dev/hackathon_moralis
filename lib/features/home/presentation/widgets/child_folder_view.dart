@@ -7,14 +7,13 @@ import '../../../../generated/assets.gen.dart';
 import '../../domain/entities/images.dart';
 
 class ChildFolderView extends StatelessWidget {
-  const ChildFolderView({
-    Key? key,
-    required this.folders,
-     this.modified,
-    required this.rootIndex,
-    required this.onTap
-
-  }) : super(key: key);
+  const ChildFolderView(
+      {Key? key,
+      required this.folders,
+      this.modified,
+      required this.rootIndex,
+      required this.onTap})
+      : super(key: key);
 
   final List<Images>? folders;
   final DateTime? modified;
@@ -47,11 +46,30 @@ class ChildFolderView extends StatelessWidget {
                             width: 50,
                             height: 50,
                           )
-                        : const Icon(
-                            Icons.image,
-                            size: 50,
-                            color: AppColors.primaryPurpleColor,
-                          ),
+                        : (children.first.nameEntity.split(".").last == "pdf")
+                            ? Assets.icons.pdficon.svg()
+                            : (children.first.nameEntity.split(".").last ==
+                                    "png")
+                                ? Assets.icons.pngicon.svg()
+                                : (children.first.nameEntity.split(".").last ==
+                                        "mp3")
+                                    ? Assets.icons.mp3icon.svg()
+                                    : (children.first.nameEntity
+                                                .split(".")
+                                                .last ==
+                                            "mp4")
+                                        ? Assets.icons.mp4icon.svg()
+                                        : (children.first.nameEntity
+                                                    .split(".")
+                                                    .last ==
+                                                "ppt")
+                                            ? Assets.icons.ppticon.svg()
+                                            : (children.first.nameEntity
+                                                        .split(".")
+                                                        .last ==
+                                                    "jpg")
+                                                ? Assets.icons.jpgicon.svg()
+                                                : Assets.icons.erricon.svg(),
                     const SizedBox(
                       width: 10,
                     ),
@@ -70,13 +88,15 @@ class ChildFolderView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        if(modified != null) ...[Text(
-                          'Modified ${DateFormat('dd MMM yyyy').format(modified!)}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.grey.withOpacity(.5),
+                        if (modified != null) ...[
+                          Text(
+                            'Modified ${DateFormat('dd MMM yyyy').format(modified!)}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.grey.withOpacity(.5),
+                            ),
                           ),
-                        ),]
+                        ]
                       ],
                     )
                   ],

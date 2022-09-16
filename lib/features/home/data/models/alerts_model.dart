@@ -1,3 +1,4 @@
+import 'package:d_box/features/home/data/models/push_notification_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'alerts_payload_model.dart';
 import '../../domain/entities/alerts.dart';
@@ -6,7 +7,7 @@ part 'alerts_model.g.dart';
 
 @JsonSerializable()
 class AlertsModel extends Alerts {
-  final String message;
+  final PushNotificationModel message;
   final AlertsPayloadModel payload;
   final DateTime createdAt;
 

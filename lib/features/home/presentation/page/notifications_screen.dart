@@ -9,7 +9,6 @@ import '../../../../core/constants/data_status.dart';
 import '../../../../core/widgets/d_appbar.dart';
 import '../../../../generated/assets.gen.dart';
 import '../cubit/alerts/alerts_cubit.dart';
-import '../widgets/notifications_list_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationPage extends StatelessWidget {
@@ -69,7 +68,7 @@ class NotificationPage extends StatelessWidget {
                                             width: 74.w,
                                             child: Text(
                                               state
-                                                  .alerts![index].messageEntity,
+                                                  .alerts![index].messageEntity.notificationEntity.bodyEnitity,
                                               maxLines: 2,
                                               style: const TextStyle(
                                                   fontSize: 14,

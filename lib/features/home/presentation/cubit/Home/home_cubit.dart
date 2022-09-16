@@ -40,7 +40,9 @@ class HomeCubit extends Cubit<HomeState> {
     final request =
         await getImagesFromLinkUsecase(GetImagesFromLinkParams(link));
     request.fold(
-      (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+      (error) {
+        emit(state.copyWith(dataStatus: DataStatus.error));
+      },
       (imagesFromLink) {
         emit(state.copyWith(
           dataStatus: DataStatus.loaded,
@@ -55,7 +57,9 @@ class HomeCubit extends Cubit<HomeState> {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     final request = await getRecentsUsecase(NoParams());
     request.fold(
-      (error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+      (error) {
+        emit(state.copyWith(dataStatus: DataStatus.error));
+      },
       (data) {
         emit(state.copyWith(
           dataStatus: DataStatus.loaded,
@@ -159,7 +163,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> onPickImages(PickFileType pickFileType) async {
     final request = await pickImagesUsecase(pickFileType);
-    request.fold((error) => emit(state.copyWith(dataStatus: DataStatus.error)),
+    request.fold((error){
+        emit(state.copyWith(dataStatus: DataStatus.error));
+      },
         (data) async {
       emit(state.copyWith(listImages: data, isHasImage: data.isNotEmpty));
     });
@@ -172,7 +178,9 @@ class HomeCubit extends Cubit<HomeState> {
       path: state.addFolder,
     ));
     saveImageResponse.fold(
-      (errorMessage) => {emit(state.copyWith(dataStatus: DataStatus.error))},
+      (errorMessage){
+        emit(state.copyWith(dataStatus: DataStatus.error));
+      },
       (response) async {
         emit(state.copyWith(
             addPeople: null, addFolder: "", listImages: [], isHasImage: false));
@@ -184,7 +192,7 @@ class HomeCubit extends Cubit<HomeState> {
   void onCancelDialog() {
     emit(state.copyWith(
       addFolder: "",
-      addPeople: "",
+      addPeople: null,
       listImages: [],
       isHasImage: false,
     ));

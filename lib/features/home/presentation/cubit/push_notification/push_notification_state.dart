@@ -4,7 +4,7 @@ part of 'push_notification_cubit.dart';
 class PushNotificationState with _$PushNotificationState {
   const factory PushNotificationState({
     @Default(DataStatus.initial) DataStatus dataStatus,
-    PushNotificationPath? pushNotificationPath,
+    String? link,
     String? error,
   }) = _PushNotificationState;
 }

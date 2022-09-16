@@ -7,8 +7,8 @@ import '../../../../core/config/routes/router.dart';
 import '../../../../core/constants/colors.dart';
 import '../../../../core/constants/data_status.dart';
 import '../../../../core/widgets/d_appbar.dart';
+import '../../../../core/widgets/loading.dart';
 import '../../../../generated/assets.gen.dart';
-import '../../../home/presentation/cubit/cubit/push_notification_cubit.dart';
 import '../../../home/presentation/widgets/child_folder_view.dart';
 import '../../../home/presentation/widgets/emtry_file.dart';
 import '../cubit/detail_cubit.dart';
@@ -21,23 +21,16 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: DAppBar(
         title: "My Cloundmet",
-        titleColor: Colors.black,
+        titleColor: AppColors.primaryColor,
         backgroundColor: AppColors.subAppbarColor,
         centerTitle: false,
         onTap: () => navService.pushNamedAndRemoveUntil(AppRoute.homeRoute),
       ),
-      body: BlocBuilder<PushNotificationCubit, PushNotificationState>(
-        builder: (context, state) {
-          return BlocConsumer<DetailCubit, DetailState>(
-            listener: ((context, state) {}),
-            listenWhen: ((previous, current) {
-              return previous.imagesFromLink != current.imagesFromLink;
-            }),
-            builder: (context, state) {
-              if (state.dataStatus == DataStatus.initial) {
+      body: BlocBuilder<DetailCubit,DetailState>(builder: ((context, state) {
+            if (state.dataStatus == DataStatus.initial) {
                 return const SizedBox();
-              } else if (state.dataStatus == DataStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
+              } else if (state.dataStatus == DataStatus.loading || state.dataStatus == DataStatus.opening) {
+                return const LoadingWidget();
               } else if (state.dataStatus == DataStatus.loaded) {
                 String stackName = state.stackName.isNotEmpty ? state.stackName.last :"";
                 return SafeArea(
@@ -75,14 +68,21 @@ class DetailScreen extends StatelessWidget {
                         state.imagesFromLink != null
                             ?
                         ChildFolderView(
-                                    onTap: (int index, int rootIndex) {
+                                    onTap: (int index, int rootIndex) async {
                                       if (state.currentFolder != null &&
                                           state.currentFolder![index]
                                               .isFolderEntity) {
                                         context.read<DetailCubit>().onOpenFolder(
                                             childIndex: index,
                                             rootIndex: rootIndex);
+                                      } else{
+                                          await context
+                                            .read<DetailCubit>()
+                                            .onPreview(
+                                                rootIndex: rootIndex,
+                                                childIndex: index);
                                       }
+
                                     },
                                     folders: state.currentFolder,
                                     modified: state.recents![0]
@@ -102,10 +102,8 @@ class DetailScreen extends StatelessWidget {
                 );
               }
               return const SizedBox.shrink();
-            },
-          );
-        },
-      ),
+            
+          })),
     );
   }
 }

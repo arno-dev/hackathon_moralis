@@ -13,6 +13,7 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../domain/entities/images_from_link.dart';
+import '../../domain/entities/notification_payload.dart';
 import '../../domain/repositories/dbox_repository.dart';
 import '../datasources/dbox_remote_datasource.dart';
 import '../models/params/firebase_param/firebase_token_param.dart';
@@ -138,7 +139,7 @@ class DboxRepositoryImpl implements DboxRepository {
   @override
   Future<Either<Failure, bool>> initializeFirebaseMessaging(
       {void Function(RemoteMessage message)? onMessageOpenedApp,
-      void Function(String? payload)? onSelectNotification}) async {
+       void Function(NotificationPayload?)? onSelectNotification}) async {
     try {
       final data = await dboxRemoteDataSource.initializeFirebaseMessaging(
         (token) async {

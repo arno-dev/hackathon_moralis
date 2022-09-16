@@ -43,7 +43,7 @@ class NotificationListView extends StatelessWidget {
                         SizedBox(
                           width: 74.w,
                           child: Text(
-                            alerts![index].messageEntity,
+                            alerts![index].messageEntity.notificationEntity.bodyEnitity,
                             maxLines: 2,
                             style: const TextStyle(
                                 fontSize: 14,
