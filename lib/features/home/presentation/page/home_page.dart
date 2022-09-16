@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:d_box/core/constants/data_status.dart';
-import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
 import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
@@ -28,6 +27,8 @@ import '../../../../generated/assets.gen.dart';
 import '../cubit/Home/home_cubit.dart';
 import '../widgets/child_folder_view.dart';
 import '../widgets/root_folder.view.dart';
+import '../widgets/share_bottom_sheet.dart';
+import '../widgets/upload_buttom_sheet.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -55,39 +56,13 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigation.bottomSheetModel(context, [
-            DboxButtonBottomSheet(
-              label: 'Upload Photos',
-              onTap: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.photos);
-                navService.goBack();
-              },
+          Navigation.bottomSheetModel(
+            context,
+            BlocProvider.value(
+              value: context.read<HomeCubit>(),
+              child: const UploadBottomSheetWidget(),
             ),
-            DboxButtonBottomSheet(
-              label: 'Take Photos',
-              onTap: () async {
-                // _dialogBuilder(context);
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.takePhoto);
-                navService.goBack();
-              },
-            ),
-            DboxButtonBottomSheet(
-              label: 'Upload files',
-              onTap: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.files);
-                navService.goBack();
-              },
-            ),
-            Platform.isIOS
-                ? const SizedBox(height: 20)
-                : const SizedBox.shrink()
-          ]);
+          );
         },
         backgroundColor: AppColors.primaryPurpleColor,
         child: const Icon(
@@ -100,27 +75,13 @@ class HomePage extends StatelessWidget {
           return BlocConsumer<HomeCubit, HomeState>(
             listener: ((context, state) {
               if (state.isHasImage) {
-                Navigation.bottomSheetModel(context, [
-                  DboxButtonBottomSheet(
-                    label: 'Upload to cloud',
-                    onTap: () async {
-                      context.read<HomeCubit>().onSaveImage();
-                    },
+                Navigation.bottomSheetModel(
+                  context,
+                  BlocProvider.value(
+                    value: context.read<HomeCubit>(),
+                    child: ShareBottomSheetWidget(),
                   ),
-                  DboxButtonBottomSheet(
-                    label: 'Add address',
-                    onTap: () {
-                      _dialogBuilder(context: context);
-                    },
-                  ),
-                  DboxButtonBottomSheet(
-                    label: 'Scan QR Code',
-                    onTap: () {},
-                  ),
-                  Platform.isIOS
-                      ? const SizedBox(height: 20)
-                      : const SizedBox.shrink()
-                ]).then((value) => context.read<HomeCubit>().onCancelDialog());
+                ).then((value) => context.read<HomeCubit>().onCancelDialog());
                 // _dialogBuilder(context: context);
               }
             }),
@@ -170,13 +131,20 @@ class HomePage extends StatelessWidget {
                                   ],
                                 ))
                             : CustomButtonRecent(
-                                onPressed: ()  {},
+                                onPressed: () {},
                               ),
                         recents.isNotEmpty
                             ? state.stack.isEmpty
-                                ? RootFolderView(recents: recents, onTap: (index, rootIndex) async { 
-                                   if (state.recents?[rootIndex] != null &&
-                                          state.recents?[rootIndex].filetreeEntity?.childrenEntity?[index].isFolderEntity == true) {
+                                ? RootFolderView(
+                                    recents: recents,
+                                    onTap: (index, rootIndex) async {
+                                      if (state.recents?[rootIndex] != null &&
+                                          state
+                                                  .recents?[rootIndex]
+                                                  .filetreeEntity
+                                                  ?.childrenEntity?[index]
+                                                  .isFolderEntity ==
+                                              true) {
                                         context.read<HomeCubit>().onOpenFolder(
                                             childIndex: index,
                                             rootIndex: rootIndex);
@@ -186,8 +154,9 @@ class HomePage extends StatelessWidget {
                                             .onPreview(
                                                 rootIndex: rootIndex,
                                                 childIndex: index);
-                                    }
-                                },)
+                                      }
+                                    },
+                                  )
                                 : ChildFolderView(
                                     onTap: (int index, int rootIndex) async {
                                       if (state.currentFolder != null &&
@@ -196,13 +165,13 @@ class HomePage extends StatelessWidget {
                                         context.read<HomeCubit>().onOpenFolder(
                                             childIndex: index,
                                             rootIndex: rootIndex);
-                                      }else {
+                                      } else {
                                         await context
                                             .read<HomeCubit>()
                                             .onPreview(
                                                 rootIndex: rootIndex,
                                                 childIndex: index);
-                                    }
+                                      }
                                     },
                                     folders: state.currentFolder,
                                     modified: state.recents![state.stack[0]]
