@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/constants/data_status.dart';
-import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
 import 'package:d_box/features/home/presentation/widgets/d_box_switch.dart';
@@ -12,8 +11,11 @@ import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/constants/colors.dart';
@@ -30,6 +32,8 @@ import '../cubit/Home/home_cubit.dart';
 import '../cubit/push_notification/push_notification_cubit.dart';
 import '../widgets/child_folder_view.dart';
 import '../widgets/root_folder.view.dart';
+import '../widgets/share_bottom_sheet.dart';
+import '../widgets/upload_buttom_sheet.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -57,39 +61,13 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigation.bottomSheetModel(context, [
-            DboxButtonBottomSheet(
-              label: 'Upload Photos',
-              onTap: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.photos);
-                navService.goBack();
-              },
+          Navigation.bottomSheetModel(
+            context,
+            BlocProvider.value(
+              value: context.read<HomeCubit>(),
+              child: const UploadBottomSheetWidget(),
             ),
-            DboxButtonBottomSheet(
-              label: 'Take Photos',
-              onTap: () async {
-                // _dialogBuilder(context);
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.takePhoto);
-                navService.goBack();
-              },
-            ),
-            DboxButtonBottomSheet(
-              label: 'Upload files',
-              onTap: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.files);
-                navService.goBack();
-              },
-            ),
-            Platform.isIOS
-                ? const SizedBox(height: 20)
-                : const SizedBox.shrink()
-          ]);
+          );
         },
         backgroundColor: AppColors.primaryPurpleColor,
         child: const Icon(
@@ -109,31 +87,17 @@ class HomePage extends StatelessWidget {
         },
         child: BlocConsumer<HomeCubit, HomeState>(
           listener: ((context, state) {
-            if (state.isHasImage) {
-              Navigation.bottomSheetModel(context, [
-                DboxButtonBottomSheet(
-                  label: 'Upload to cloud',
-                  onTap: () async {
-                    context.read<HomeCubit>().onSaveImage();
-                  },
-                ),
-                DboxButtonBottomSheet(
-                  label: 'Add address',
-                  onTap: () {
-                    _dialogBuilder(context: context);
-                  },
-                ),
-                DboxButtonBottomSheet(
-                  label: 'Scan QR Code',
-                  onTap: () {},
-                ),
-                Platform.isIOS
-                    ? const SizedBox(height: 20)
-                    : const SizedBox.shrink()
-              ]).then((value) => context.read<HomeCubit>().onCancelDialog());
-              // _dialogBuilder(context: context);
-            }
-          }),
+              if (state.isHasImage) {
+                Navigation.bottomSheetModel(
+                  context,
+                  BlocProvider.value(
+                    value: context.read<HomeCubit>(),
+                    child: ShareBottomSheetWidget(),
+                  ),
+                ).then((value) => context.read<HomeCubit>().onCancelDialog());
+                // _dialogBuilder(context: context);
+              }
+            }),
           listenWhen: ((previous, current) {
             return previous.isHasImage != current.isHasImage;
           }),
@@ -379,6 +343,7 @@ Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
                           child: Text(tr('myQrCode')),
                           onTap: () {
                             Navigator.pop(context);
+                            context.read<MyAccountCubit>().getMyQrCode();
                             _qrDialog(context);
                           },
                         ),
@@ -443,33 +408,56 @@ Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
       },
     );
 
-Future<void> _qrDialog(context) => showDialog<void>(
+Future<void> _qrDialog(BuildContext context) => showDialog<void>(
       context: context,
-      builder: (context) {
-        return DboxAlertDialog(
-            title: tr('showThisToYourFriends'),
-            contentPadding: 0,
-            actionsPadding: 0,
-            content: [
-              SizedBox(height: 5.w),
-              Center(
-                child: QrImage(
-                  data: "1234567890",
-                  version: QrVersions.auto,
-                  size: 200.0,
+      builder: (_) {
+        ScreenshotController screenshotController = ScreenshotController();
+        return BlocProvider.value(
+          value: context.read<MyAccountCubit>(),
+          child: DboxAlertDialog(
+              title: tr('showThisToYourFriends'),
+              contentPadding: 0,
+              actionsPadding: 0,
+              content: [
+                SizedBox(height: 5.w),
+                Center(
+                  child: BlocSelector<MyAccountCubit, MyAccountState, String>(
+                    selector: (state) {
+                      return state.qrCode;
+                    },
+                    builder: (context, qrCode) {
+                      return Screenshot(
+                          controller: screenshotController,
+                          child: QrImage(
+                            data: qrCode,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                          ));
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(height: 5.w),
-              Center(
-                child: BaseButton(
-                    onTap: () {},
-                    text: tr('save'),
-                    buttonWidth: 50.w,
-                    backgroundColor: AppColors.primaryPurpleColor,
-                    textColor: Colors.white,
-                    buttonHeight: 13.w),
-              ),
-              SizedBox(height: 5.w)
-            ]);
+                SizedBox(height: 5.w),
+                Center(
+                  child: BaseButton(
+                      onTap: () {
+                        screenshotController
+                            .capture(delay: const Duration(milliseconds: 10))
+                            .then((capturedImage) async {
+                          await [Permission.storage].request();
+                          var result = await ImageGallerySaver.saveImage(
+                              capturedImage!,
+                              name: 'screenshot');
+                          return result['filePath'];
+                        });
+                      },
+                      text: tr('save'),
+                      buttonWidth: 50.w,
+                      backgroundColor: AppColors.primaryPurpleColor,
+                      textColor: Colors.white,
+                      buttonHeight: 13.w),
+                ),
+                SizedBox(height: 5.w)
+              ]),
+        );
       },
     );

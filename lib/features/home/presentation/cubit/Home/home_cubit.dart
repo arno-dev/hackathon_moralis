@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import '../../../../../core/constants/data_status.dart';
 import '../../../domain/entities/images.dart';
@@ -34,6 +35,8 @@ class HomeCubit extends Cubit<HomeState> {
   TextEditingController searchController = TextEditingController();
   TextEditingController addPeopleController = TextEditingController(text: "");
   TextEditingController addFolderController = TextEditingController(text: "");
+
+  QRViewController? qrController;
 
   Future<void> getUserFromLink(String link) async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
@@ -195,6 +198,7 @@ class HomeCubit extends Cubit<HomeState> {
       addPeople: null,
       listImages: [],
       isHasImage: false,
+      isHasQrAddress: false,
     ));
   }
 
@@ -204,5 +208,10 @@ class HomeCubit extends Cubit<HomeState> {
 
   void onAddFolderChange(String text) {
     emit(state.copyWith(addFolder: text));
+  }
+
+  void onQrCode(String text) {
+    String addPeople = text.toString();
+    emit(state.copyWith(addPeople: addPeople, isHasQrAddress: true));
   }
 }
