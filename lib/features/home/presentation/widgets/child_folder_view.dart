@@ -1,23 +1,24 @@
 import 'package:d_box/core/constants/colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../generated/assets.gen.dart';
 import '../../domain/entities/images.dart';
-import '../cubit/Home/home_cubit.dart';
 
 class ChildFolderView extends StatelessWidget {
   const ChildFolderView({
     Key? key,
     required this.folders,
-    required this.modified,
+     this.modified,
     required this.rootIndex,
+    required this.onTap
+
   }) : super(key: key);
 
   final List<Images>? folders;
-  final DateTime modified;
+  final DateTime? modified;
   final int rootIndex;
+  final void Function(int, int) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +30,7 @@ class ChildFolderView extends StatelessWidget {
           children.length,
           (index) => GestureDetector(
             onTap: () {
-              if (folders != null && folders![index].isFolderEntity) {
-                context
-                    .read<HomeCubit>()
-                    .onOpenFolder(childIndex: index, rootIndex: rootIndex);
-              }
+              onTap(index, rootIndex);
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,13 +65,13 @@ class ChildFolderView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Text(
-                          'Modified ${DateFormat('dd MMM yyyy').format(modified)}',
+                        if(modified != null) ...[Text(
+                          'Modified ${DateFormat('dd MMM yyyy').format(modified!)}',
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.grey.withOpacity(.5),
                           ),
-                        ),
+                        ),]
                       ],
                     )
                   ],

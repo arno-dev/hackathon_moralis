@@ -23,7 +23,7 @@ class AuthenticationScreen extends StatelessWidget {
     return BlocConsumer<AuthenticationCubit, AuthenticationState>(
       listener: (context, state) {
         if(state.dataStatus == DataStatus.isVerify){
-          navService.pushNamedAndRemoveUntil(AppRoute.congratulations);
+          navService.pushNamedAndRemoveUntil(AppRoute.congratulationsRoute);
         }
       },
       builder: (context, state) {

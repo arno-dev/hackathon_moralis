@@ -1,9 +1,9 @@
 import 'package:d_box/core/constants/colors.dart';
-import 'package:d_box/features/Authentication/presentation/cubit/authentication_cubit_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../core/widgets/base_button.dart';
+import '../cubit/authentication_cubit_cubit.dart';
 import 'authentication_grid.dart';
 
 class AuthenticateGridView extends StatelessWidget {

@@ -30,4 +30,5 @@ class AppColors {
   static const Color shadowColor = Color(0xffDCE2EB);
   static const Color backgroundColor = Color(0xffDCE2EB);
   static const Color fontColor = Color(0xffDCE2EB);
+  static const Color subAppbarColor = Color(0x4DEFE5FB);
 }

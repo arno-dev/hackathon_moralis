@@ -1,4 +1,3 @@
-import 'package:d_box/features/Authentication/domain/usecases/save_credential_from_private_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -6,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/constants/data_status.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/authentication_usecase.dart';
+import '../../domain/usecases/save_credential_from_private_usecase.dart';
 import '../../domain/usecases/save_credential_usecase.dart';
 part 'authentication_cubit_state.dart';
 part 'authentication_cubit_cubit.freezed.dart';
@@ -100,8 +100,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
    Future<void> saveCredentialFromPrivateKey() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
 
-      // final saveCredential = await saveCredentialFromPrivateKeyUseCase(secretController.text);
-      final saveCredential = await saveCredentialFromPrivateKeyUseCase("1ca5e91ac36132867c3092f68fa794c19721f166c3188aa23fa739e5d30b71bf"); // TODO:hard code private key
+      final saveCredential = await saveCredentialFromPrivateKeyUseCase(secretController.text);
+      // final saveCredential = await saveCredentialFromPrivateKeyUseCase("0x71C7656EC7ab88b098defB751B7401B5f6d8976F"); // TODO:hard code private key
       saveCredential.fold(
         (error) => emit(
             state.copyWith(dataStatus: DataStatus.error, error: error.message)),

@@ -11,7 +11,7 @@ class ImagesFromLinkModel extends ImagesFromLink {
   final String origin;
   final String dest;
   final String cid;
-  final DateTime createdAt;
+  final DateTime? createdAt;
   final ImagesModel? filetree;
   const ImagesFromLinkModel(
     this.ipfsKey,

@@ -124,8 +124,25 @@ class HomePage extends StatelessWidget {
                               ),
                         recents.isNotEmpty
                             ? state.stack.isEmpty
-                                ? RootFolderView(recents: recents)
+                                ? RootFolderView(recents: recents, onTap: (index, rootIndex) { 
+                                   if (state.recents?[rootIndex] != null &&
+                                          state.recents?[rootIndex].filetreeEntity?.childrenEntity?[index].isFolderEntity == true) {
+                                        context.read<HomeCubit>().onOpenFolder(
+                                            childIndex: index,
+                                            rootIndex: rootIndex);
+                                      }
+
+                                },)
                                 : ChildFolderView(
+                                    onTap: (int index, int rootIndex) {
+                                      if (state.currentFolder != null &&
+                                          state.currentFolder![index]
+                                              .isFolderEntity) {
+                                        context.read<HomeCubit>().onOpenFolder(
+                                            childIndex: index,
+                                            rootIndex: rootIndex);
+                                      }
+                                    },
                                     folders: state.currentFolder,
                                     modified: state.recents![state.stack[0]]
                                         .createdAtEntity,

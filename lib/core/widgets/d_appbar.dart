@@ -11,7 +11,6 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.appBarHeight = 65,
     this.elevation = 0,
     this.listOfAction,
-    this.leading = true,
     this.centerTitle = true,
     this.automaticallyImplyLeading = false,
     this.titleColor = AppColors.primaryFontColor,
@@ -24,7 +23,6 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double appBarHeight;
   final double elevation;
   final List<Widget>? listOfAction;
-  final bool leading;
   final bool centerTitle;
   final bool automaticallyImplyLeading;
   final Color titleColor;
@@ -50,9 +48,9 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : Container(),
-      titleSpacing: leading? -2.w : null,
+      titleSpacing: onTap != null ? -1.w : null,
       centerTitle: centerTitle,
-      leading: (leading) ? Center(
+      leading: (onTap != null ) ? Center(
               child: InkWell(
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -62,7 +60,7 @@ class DAppBar extends StatelessWidget implements PreferredSizeWidget {
                     padding: EdgeInsets.all(8.0),
                     child: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.primaryColor,
+                      color: AppColors.primaryFontColor,
                     ),
                   )),
             ) : null,
