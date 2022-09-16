@@ -141,6 +141,8 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> onPreview(
       {required int rootIndex, required int childIndex}) async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
+
     String? newPath;
     newPath = AppUrl.urlMoralis;
     newPath = "$newPath${state.recents?[rootIndex].cidEntity}";
@@ -159,6 +161,8 @@ class HomeCubit extends Cubit<HomeState> {
     print(newPath);
     if (destinationPublic != null) {
       await previewImageUsecase(PreviewImageParam(newPath, destinationPublic));
+    emit(state.copyWith(dataStatus: DataStatus.loaded));
+
     } else {
       return emit(state.copyWith(dataStatus: DataStatus.error));
     }
@@ -175,10 +179,11 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future<void> onSaveImage() async {
+    emit(state.copyWith(dataStatus: DataStatus.loading));
     final saveImageResponse = await saveImagesUsecase(SaveImagesParams(
       destinationPublic: state.addPeople,
       uploadImageParam: UploadImageParam(images: state.listImages),
-      path: state.addFolder,
+      path: addFolderController.text,
     ));
     saveImageResponse.fold(
       (errorMessage){
@@ -186,6 +191,7 @@ class HomeCubit extends Cubit<HomeState> {
       },
       (response) async {
         emit(state.copyWith(
+          dataStatus: DataStatus.loaded,
             addPeople: null, addFolder: "", listImages: [], isHasImage: false));
         await getRecents();
       },

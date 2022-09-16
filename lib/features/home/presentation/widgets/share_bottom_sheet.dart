@@ -41,8 +41,9 @@ class _ShareBottomSheetWidgetState extends State<ShareBottomSheetWidget> {
           DboxButtonBottomSheet(
             label: 'Upload to cloud',
             onTap: () async {
-              context.read<HomeCubit>().onSaveImage();
               navService.goBack();
+              await context.read<HomeCubit>().onSaveImage();
+              
             },
           ),
           DboxButtonBottomSheet(
@@ -130,8 +131,8 @@ Future<void> _dialogBuilder({
                   textColor: Colors.white,
                   buttonHeight: 6.h,
                   onTap: () async {
-                    await context.read<HomeCubit>().onSaveImage();
                     navService.goBack();
+                    await context.read<HomeCubit>().onSaveImage();
                   },
                 );
               },

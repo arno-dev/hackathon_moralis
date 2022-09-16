@@ -1,13 +1,15 @@
-import 'package:d_box/core/config/routes/router.dart';
 import 'package:d_box/core/config/themes/app_text_theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
+import '../../../../core/config/routes/router.dart';
 import '../../../../core/constants/data_status.dart';
 import '../../../../core/widgets/d_appbar.dart';
+import '../../../../core/widgets/loading.dart';
 import '../../../../generated/assets.gen.dart';
+import '../../domain/entities/alerts.dart';
 import '../cubit/alerts/alerts_cubit.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -29,8 +31,9 @@ class NotificationPage extends StatelessWidget {
             if (state.dataStatus == DataStatus.initial) {
               return const SizedBox();
             } else if (state.dataStatus == DataStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
+              return const LoadingWidget();
             } else if (state.dataStatus == DataStatus.loaded) {
+              List<Alerts> listOfAlert =  state.alerts ??[];
               return SafeArea(
                 child: SingleChildScrollView(
                   child: Container(
@@ -38,9 +41,9 @@ class NotificationPage extends StatelessWidget {
                       child: Column(
                         children: [
                           ...List.generate(
-                            state.alerts!.length,
+                           listOfAlert.length,
                             (index) => GestureDetector(
-                              onTap: () =>  navService.pushNamed(AppRoute.detailRoute,args: state.alerts?[index].payloadEntity.linkEntity),
+                              onTap: () =>  navService.pushNamed(AppRoute.detailRoute,args: listOfAlert[index].payloadEntity.linkEntity),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -67,8 +70,7 @@ class NotificationPage extends StatelessWidget {
                                           SizedBox(
                                             width: 74.w,
                                             child: Text(
-                                              state
-                                                  .alerts![index].messageEntity.notificationEntity.bodyEnitity,
+                                             listOfAlert[index].messageEntity.notificationEntity.bodyEnitity,
                                               maxLines: 2,
                                               style: const TextStyle(
                                                   fontSize: 14,
@@ -78,9 +80,9 @@ class NotificationPage extends StatelessWidget {
                                             ),
                                           ),
                                           const SizedBox(height: 10),
-                                          Text(
+                                         Text(
                                               timeago.format(
-                                                  state.alerts![index]
+                                                  listOfAlert[index]
                                                       .createdAtEntity,
                                                   locale: 'en_short'),
                                               style: Theme.of(context)
@@ -96,8 +98,6 @@ class NotificationPage extends StatelessWidget {
                           )
                         ],
                       )
-
-                      // NotificationListView(alerts: state.alerts),
                       ),
                 ),
               );

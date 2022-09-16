@@ -1,13 +1,4 @@
-import 'dart:io';
-
-import 'package:d_box/core/config/routes/router.dart';
-import 'package:d_box/core/constants/data_status.dart';
-import 'package:d_box/features/home/domain/entities/images_from_link.dart';
-import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
-import 'package:d_box/features/home/presentation/widgets/d_box_switch.dart';
 import 'package:flutter/services.dart';
-import 'package:d_box/features/home/presentation/widgets/custom_button_recent.dart';
-import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,20 +8,25 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:sizer/sizer.dart';
-
+import '../../../../core/config/routes/router.dart';
 import '../../../../core/constants/colors.dart';
+import '../../../../core/constants/data_status.dart';
 import '../../../../core/services/navigation.dart';
 import '../../../../core/widgets/base_button.dart';
 import '../../../../core/widgets/d_appbar.dart';
 import '../../../../core/widgets/d_box_alert_dialog.dart';
-import '../../../../core/widgets/d_box_button_bottom_sheet.dart';
 import '../../../../core/widgets/d_box_textfield.dart';
-import '../../../../core/widgets/d_box_textfield_dialog.dart';
 import '../../../../core/widgets/loading.dart';
 import '../../../../generated/assets.gen.dart';
+import '../../../../generated/locale_keys.g.dart';
+import '../../domain/entities/images_from_link.dart';
 import '../cubit/Home/home_cubit.dart';
+import '../cubit/account/my_account_cubit.dart';
 import '../cubit/push_notification/push_notification_cubit.dart';
 import '../widgets/child_folder_view.dart';
+import '../widgets/custom_button_recent.dart';
+import '../widgets/d_box_switch.dart';
+import '../widgets/emtry_file.dart';
 import '../widgets/root_folder.view.dart';
 import '../widgets/share_bottom_sheet.dart';
 import '../widgets/upload_buttom_sheet.dart';
@@ -42,7 +38,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DAppBar(
-        title: "My Cloundmet",
+        title: LocaleKeys.myCloundmet.tr(),
         titleColor: Colors.black,
         centerTitle: false,
         listOfAction: [
@@ -92,7 +88,7 @@ class HomePage extends StatelessWidget {
                   context,
                   BlocProvider.value(
                     value: context.read<HomeCubit>(),
-                    child: ShareBottomSheetWidget(),
+                    child: const ShareBottomSheetWidget(),
                   ),
                 ).then((value) => context.read<HomeCubit>().onCancelDialog());
                 // _dialogBuilder(context: context);
@@ -117,7 +113,7 @@ class HomePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DboxTextField(
-                        hintText: 'Search your files',
+                        hintText: LocaleKeys.searchYourFiles.tr(),
                         isSearch: true,
                         controller: context.read<HomeCubit>().searchController,
                       ),
@@ -211,92 +207,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-Future<void> _dialogBuilder({
-  required BuildContext context,
-  bool isAddFolder = false,
-}) {
-  return showDialog<void>(
-    context: context,
-    builder: (_) {
-      return BlocProvider.value(
-        value: context.read<HomeCubit>(),
-        child: DboxAlertDialog(
-          title: isAddFolder ? "Add to folder" : 'Send to your friend',
-          titleColor: Colors.black,
-          content: [
-            isAddFolder
-                ? const SizedBox.shrink()
-                : DboxTextFieldDialog(
-                    hintText: "Add people",
-                    icons: Assets.icons.userplusicon.svg(
-                      width: 8.w,
-                      height: 8.w,
-                    ),
-                    onChange: (String text) {
-                      context.read<HomeCubit>().onAddPeopleChange(text);
-                    },
-                  ),
-            DboxTextFieldDialog(
-              hintText: "Add folder",
-              icons: Assets.icons.foldericon.svg(
-                width: 8.w,
-                height: 8.w,
-              ),
-              onChange: (String text) {
-                context.read<HomeCubit>().onAddFolderChange(text);
-              },
-            ),
-            SizedBox(height: 1.w),
-            Padding(
-              padding: EdgeInsets.only(left: 6.w),
-              child: Text(
-                "*Optional",
-                style: TextStyle(
-                  color: AppColors.lighterGrey,
-                  fontSize: 12.0.sp,
-                ),
-              ),
-            ),
-            SizedBox(height: 15.w),
-            BlocSelector<HomeCubit, HomeState, String?>(
-              selector: (state) {
-                return state.addPeople;
-              },
-              builder: (context, addPeople) {
-                return BaseButton(
-                  text: tr('sendasaSAsaSAsaSAA'),
-                  buttonWidth: 100.w,
-                  backgroundColor: AppColors.primaryPurpleColor,
-                  isDisabled: false,
-                  textColor: Colors.white,
-                  buttonHeight: 6.h,
-                  onTap: () async {
-                    await context.read<HomeCubit>().onSaveImage();
-                    navService.goBack();
-                  },
-                );
-              },
-            ),
-            SizedBox(height: 3.w),
-            BaseButton(
-              text: isAddFolder ? "Not now" : tr('cancel'),
-              onTap: () {
-                context.read<HomeCubit>().onCancelDialog();
-                navService.goBack();
-              },
-              buttonWidth: 100.w,
-              backgroundColor: Colors.white,
-              textColor: isAddFolder ? Colors.red : Colors.black,
-              buttonHeight: 6.h,
-            ),
-          ],
-        ),
-      );
-    },
-  ).then((value) {
-    context.read<HomeCubit>().onCancelDialog();
-  });
-}
 
 Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
       context: context,
@@ -446,7 +356,7 @@ Future<void> _qrDialog(BuildContext context) => showDialog<void>(
                           await [Permission.storage].request();
                           var result = await ImageGallerySaver.saveImage(
                               capturedImage!,
-                              name: 'screenshot');
+                              name: LocaleKeys.screenshot.tr());
                           return result['filePath'];
                         });
                       },

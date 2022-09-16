@@ -5,20 +5,20 @@ import 'package:sizer/sizer.dart';
 class DboxTextFieldDialog extends StatelessWidget {
   final Widget icons;
   final String hintText;
-  final Function onChange;
+  final void Function(String)? onChange;
+  final TextEditingController? controller;
   const DboxTextFieldDialog({
     Key? key,
     required this.icons,
     required this.hintText,
-    required this.onChange,
+     this.onChange, this.controller,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      onChanged: (String text) {
-        onChange(text);
-      },
+      onChanged: onChange ,
+      controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(

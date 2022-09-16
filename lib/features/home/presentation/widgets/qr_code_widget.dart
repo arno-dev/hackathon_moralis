@@ -133,11 +133,6 @@ class _DboxQRViewState extends State<DboxQRView> {
     });
   }
 
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
-  }
 }
 
 Future<void> _dialogBuilder({
@@ -166,14 +161,13 @@ Future<void> _dialogBuilder({
                     },
                   ),
             DboxTextFieldDialog(
+              controller: context.read<HomeCubit>().addFolderController,
               hintText: "Add folder",
               icons: Assets.icons.foldericon.svg(
                 width: 8.w,
                 height: 8.w,
               ),
-              onChange: (String text) {
-                context.read<HomeCubit>().onAddFolderChange(text);
-              },
+           
             ),
             SizedBox(height: 1.w),
             Padding(
@@ -223,6 +217,6 @@ Future<void> _dialogBuilder({
       );
     },
   ).then((value) {
-    context.read<HomeCubit>().onCancelDialog();
+    // context.read<HomeCubit>().onCancelDialog();
   });
 }

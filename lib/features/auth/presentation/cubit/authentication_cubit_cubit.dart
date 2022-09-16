@@ -100,8 +100,8 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
    Future<void> saveCredentialFromPrivateKey() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
 
-      // final saveCredential = await saveCredentialFromPrivateKeyUseCase(secretController.text);
-      final saveCredential = await saveCredentialFromPrivateKeyUseCase("1ca5e91ac36132867c3092f68fa794c19721f166c3188aa23fa739e5d30b71bf"); // TODO:hard code private key
+      final saveCredential = await saveCredentialFromPrivateKeyUseCase(secretController.text);
+      // final saveCredential = await saveCredentialFromPrivateKeyUseCase("1ca5e91ac36132867c3092f68fa794c19721f166c3188aa23fa739e5d30b71bf"); // TODO:hard code private key
       saveCredential.fold(
         (error) => emit(
             state.copyWith(dataStatus: DataStatus.error, error: error.message)),

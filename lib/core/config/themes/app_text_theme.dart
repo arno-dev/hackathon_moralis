@@ -118,4 +118,12 @@ extension CustomTextTheme on TextTheme {
         height: 1.5,
         fontWeight: FontWeight.w700,
       );
+
+   TextStyle get overflow1 => const TextStyle(
+        fontSize: 16.0,
+        color: AppColors.primaryFontColor,
+        letterSpacing: -.3,
+        height: 1.5,
+        fontWeight: FontWeight.w700,
+      );
 }

@@ -38,5 +38,9 @@
     "pushNotification":"Push notification",
     "myQrCode":"My QR Code",
     "myAccount":"My Account",
-    "noName":"No Name"
+    "noName":"No Name",
+    "searchYourFiles" : "Search your files",
+    "myCloundmet" : "My Cloundmet",
+    "screenshot" : "Screen Shot",
+    "modified" : "Modified"
 }
