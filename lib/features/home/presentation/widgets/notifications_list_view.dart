@@ -41,7 +41,7 @@ class NotificationListView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 74.w,
+                          width: 70.w,
                           child: Text(
                             alerts![index].messageEntity,
                             maxLines: 2,

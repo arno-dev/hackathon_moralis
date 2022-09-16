@@ -12,9 +12,11 @@ import 'package:d_box/features/home/presentation/widgets/emtry_file.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/constants/colors.dart';
@@ -171,13 +173,20 @@ class HomePage extends StatelessWidget {
                                   ],
                                 ))
                             : CustomButtonRecent(
-                                onPressed: ()  {},
+                                onPressed: () {},
                               ),
                         recents.isNotEmpty
                             ? state.stack.isEmpty
-                                ? RootFolderView(recents: recents, onTap: (index, rootIndex) async { 
-                                   if (state.recents?[rootIndex] != null &&
-                                          state.recents?[rootIndex].filetreeEntity?.childrenEntity?[index].isFolderEntity == true) {
+                                ? RootFolderView(
+                                    recents: recents,
+                                    onTap: (index, rootIndex) async {
+                                      if (state.recents?[rootIndex] != null &&
+                                          state
+                                                  .recents?[rootIndex]
+                                                  .filetreeEntity
+                                                  ?.childrenEntity?[index]
+                                                  .isFolderEntity ==
+                                              true) {
                                         context.read<HomeCubit>().onOpenFolder(
                                             childIndex: index,
                                             rootIndex: rootIndex);
@@ -187,8 +196,9 @@ class HomePage extends StatelessWidget {
                                             .onPreview(
                                                 rootIndex: rootIndex,
                                                 childIndex: index);
-                                    }
-                                },)
+                                      }
+                                    },
+                                  )
                                 : ChildFolderView(
                                     onTap: (int index, int rootIndex) async {
                                       if (state.currentFolder != null &&
@@ -197,13 +207,13 @@ class HomePage extends StatelessWidget {
                                         context.read<HomeCubit>().onOpenFolder(
                                             childIndex: index,
                                             rootIndex: rootIndex);
-                                      }else {
+                                      } else {
                                         await context
                                             .read<HomeCubit>()
                                             .onPreview(
                                                 rootIndex: rootIndex,
                                                 childIndex: index);
-                                    }
+                                      }
                                     },
                                     folders: state.currentFolder,
                                     modified: state.recents![state.stack[0]]
@@ -431,6 +441,7 @@ Future<void> _myAccountDialog(BuildContext context) => showDialog<void>(
 Future<void> _qrDialog(BuildContext context) => showDialog<void>(
       context: context,
       builder: (_) {
+        ScreenshotController screenshotController = ScreenshotController();
         return BlocProvider.value(
           value: context.read<MyAccountCubit>(),
           child: DboxAlertDialog(
@@ -445,26 +456,38 @@ Future<void> _qrDialog(BuildContext context) => showDialog<void>(
                       return state.qrCode;
                     },
                     builder: (context, qrCode) {
-                      return QrImage(
-                        data: qrCode,
-                        version: QrVersions.auto,
-                        size: 200.0,
-                      );
+                      return Screenshot(
+                          controller: screenshotController,
+                          child: QrImage(
+                            data: qrCode,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                          ));
                     },
                   ),
                 ),
-              SizedBox(height: 5.w),
-              Center(
-                child: BaseButton(
-                    onTap: () {},
-                    text: tr('save'),
-                    buttonWidth: 50.w,
-                    backgroundColor: AppColors.primaryPurpleColor,
-                    textColor: Colors.white,
-                    buttonHeight: 13.w),
-              ),
-              SizedBox(height: 5.w)
-            ]),
+                SizedBox(height: 5.w),
+                Center(
+                  child: BaseButton(
+                      onTap: () {
+                        screenshotController
+                            .capture(delay: const Duration(milliseconds: 10))
+                            .then((capturedImage) async {
+                          await [Permission.storage].request();
+                          var result = await ImageGallerySaver.saveImage(
+                              capturedImage!,
+                              name: 'screenshot');
+                          return result['filePath'];
+                        });
+                      },
+                      text: tr('save'),
+                      buttonWidth: 50.w,
+                      backgroundColor: AppColors.primaryPurpleColor,
+                      textColor: Colors.white,
+                      buttonHeight: 13.w),
+                ),
+                SizedBox(height: 5.w)
+              ]),
         );
       },
     );
