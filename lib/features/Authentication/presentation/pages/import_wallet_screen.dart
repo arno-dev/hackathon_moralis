@@ -68,7 +68,7 @@ class ImportWalletPage extends StatelessWidget {
                     textColor: Colors.white,
                     isDisabled: !state.isInputValidated,
                   ),
-            
+                  SizedBox(height: 5.w),
                 ],
               ),
             ),
