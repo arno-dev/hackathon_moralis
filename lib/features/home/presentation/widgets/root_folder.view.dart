@@ -7,10 +7,13 @@ import 'child_folder_view.dart';
 class RootFolderView extends StatelessWidget {
   const RootFolderView({
     Key? key,
-    required this.recents,
+    required this.recents, required this.onTap,
+    
+    
   }) : super(key: key);
 
   final List<ImagesFromLink>? recents;
+  final void Function(int, int) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class RootFolderView extends StatelessWidget {
       child: ListView.builder(
         itemCount: listRecent.length,
         itemBuilder: (BuildContext context, int index) {
-          DateTime modified = listRecent[index].createdAtEntity;
+          DateTime? modified = listRecent[index].createdAtEntity;
           List<Images>? folders =
               listRecent[index].filetreeEntity?.childrenEntity ?? [];
           return Column(
@@ -29,7 +32,7 @@ class RootFolderView extends StatelessWidget {
               ChildFolderView(
                 folders: folders,
                 modified: modified,
-                rootIndex: index,
+                rootIndex: index, onTap: onTap,
               ),
             ],
           );

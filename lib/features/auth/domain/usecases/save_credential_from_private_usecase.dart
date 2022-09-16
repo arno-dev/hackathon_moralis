@@ -6,7 +6,6 @@ import '../../../../core/usecases/usecase.dart';
 import '../repositories/authentication_repositories.dart';
 
 @lazySingleton
-
 class SaveCredentialFromPrivateKeyUseCase implements UseCase<bool, String> {
   final AuthenticationRepository authenticationRepository;
 

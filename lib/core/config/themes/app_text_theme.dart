@@ -103,6 +103,13 @@ extension CustomTextTheme on TextTheme {
         height: 1.5,
         fontWeight: FontWeight.w400,
       );
+  TextStyle get customText7 => const TextStyle(
+        fontSize: 14.0,
+        color: AppColors.disAbleColor,
+        letterSpacing: -.3,
+        height: 1.5,
+        fontWeight: FontWeight.w400,
+      );
 
   TextStyle get subtitle3 => const TextStyle(
         fontSize: 18.0,

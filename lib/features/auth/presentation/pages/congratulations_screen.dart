@@ -17,8 +17,7 @@ class CongratulationsPage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: DAppBar(
           title: tr('congretulations'),
-          titleStyle: Theme.of(context).textTheme.caption1,
-          leading: false),
+          titleStyle: Theme.of(context).textTheme.caption1,),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Container(

@@ -171,12 +171,40 @@ class HomePage extends StatelessWidget {
                                   ],
                                 ))
                             : CustomButtonRecent(
-                                onPressed: () {},
+                                onPressed: ()  {},
                               ),
                         recents.isNotEmpty
                             ? state.stack.isEmpty
-                                ? RootFolderView(recents: recents)
+                                ? RootFolderView(recents: recents, onTap: (index, rootIndex) async { 
+                                   if (state.recents?[rootIndex] != null &&
+                                          state.recents?[rootIndex].filetreeEntity?.childrenEntity?[index].isFolderEntity == true) {
+                                        context.read<HomeCubit>().onOpenFolder(
+                                            childIndex: index,
+                                            rootIndex: rootIndex);
+                                      } else {
+                                        await context
+                                            .read<HomeCubit>()
+                                            .onPreview(
+                                                rootIndex: rootIndex,
+                                                childIndex: index);
+                                    }
+                                },)
                                 : ChildFolderView(
+                                    onTap: (int index, int rootIndex) async {
+                                      if (state.currentFolder != null &&
+                                          state.currentFolder![index]
+                                              .isFolderEntity) {
+                                        context.read<HomeCubit>().onOpenFolder(
+                                            childIndex: index,
+                                            rootIndex: rootIndex);
+                                      }else {
+                                        await context
+                                            .read<HomeCubit>()
+                                            .onPreview(
+                                                rootIndex: rootIndex,
+                                                childIndex: index);
+                                    }
+                                    },
                                     folders: state.currentFolder,
                                     modified: state.recents![state.stack[0]]
                                         .createdAtEntity,

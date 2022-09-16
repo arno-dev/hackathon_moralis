@@ -37,5 +37,6 @@
     "logout":"logout",
     "pushNotification":"Push notification",
     "myQrCode":"My QR Code",
-    "myAccount":"My Account"
+    "myAccount":"My Account",
+    "noName":"No Name"
 }

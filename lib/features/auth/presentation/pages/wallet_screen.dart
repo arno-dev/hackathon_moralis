@@ -24,7 +24,7 @@ class WalletPage extends StatelessWidget {
       appBar: DAppBar(
           title: tr('titleCloudmet'),
           titleStyle: Theme.of(context).textTheme.caption2,
-          leading: false),
+          ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -41,7 +41,7 @@ class WalletPage extends StatelessWidget {
                 SizedBox(height: 5.w),
                 BaseButton(
                   onTap: () {
-                    navService.pushNamed(AppRoute.importWallet);
+                    navService.pushNamed(AppRoute.importWalletRoute);
                 },
                     text: tr('importWallet'),
                     buttonWidth: 100.w,
@@ -88,7 +88,7 @@ class WalletPage extends StatelessWidget {
                                         onTap: () async {
                                           navService.goBack();
                                           await navService.pushNamed(
-                                              AppRoute.createWallet);
+                                              AppRoute.createWalletRoute);
                                         },
                                         isDisabled: !isChecked,
                                         text: tr('start'),
@@ -113,7 +113,7 @@ class WalletPage extends StatelessWidget {
                   borderColor: AppColors.primaryPurpleColor,
                   textColor: AppColors.primaryPurpleColor,
                 ),
-                SizedBox(height: 5.w),
+                SizedBox(height: 5.h),
               ],
             ),
           ),
