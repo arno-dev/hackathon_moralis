@@ -71,21 +71,31 @@ class HomeCubit extends Cubit<HomeState> {
       List<int> newStack = [rootIndex, childIndex];
       List<Images>? current = state.recents?[rootIndex].filetreeEntity
           ?.childrenEntity?[childIndex].childrenEntity;
+      String name = state.recents?[rootIndex].filetreeEntity
+              ?.childrenEntity?[childIndex].nameEntity ??
+          "";
+      List<String> nameStack = [name];
+      print(nameStack);
       emit(
         state.copyWith(
           stack: newStack,
           dataStatus: DataStatus.loaded,
           currentFolder: current,
+          nameStack: nameStack,
         ),
       );
     } else {
       List<int> newStack = [...state.stack, childIndex];
       List<Images>? current = state.currentFolder?[childIndex].childrenEntity;
+      String name = state.currentFolder?[childIndex].nameEntity ?? "";
+      List<String> nameStack = [...state.nameStack, name];
+      print(nameStack);
       emit(
         state.copyWith(
           stack: newStack,
           dataStatus: DataStatus.loaded,
           currentFolder: current,
+          nameStack: nameStack,
         ),
       );
     }
@@ -98,10 +108,13 @@ class HomeCubit extends Cubit<HomeState> {
         dataStatus: DataStatus.loaded,
         stack: [],
         currentFolder: null,
+        nameStack: [],
       ));
     }
     List<int> newStack = [...state.stack];
+    List<String> newNameStack = [...state.nameStack];
     newStack.removeAt(newStack.length - 1);
+    newNameStack.removeAt(newStack.length - 1);
     List<Images>? current =
         state.recents?[newStack[0]].filetreeEntity?.childrenEntity;
     for (var element in newStack.asMap().entries) {
@@ -109,31 +122,37 @@ class HomeCubit extends Cubit<HomeState> {
         current = current?[element.value].childrenEntity;
       }
     }
+    print(newNameStack);
     emit(state.copyWith(
       dataStatus: DataStatus.loaded,
       stack: newStack,
       currentFolder: current,
+      nameStack: newNameStack,
     ));
   }
 
   Future<void> onPreview(
       {required int rootIndex, required int childIndex}) async {
     String? newPath;
+    newPath = AppUrl.urlMoralis;
+    newPath = "$newPath${state.recents?[rootIndex].cidEntity}";
     if (state.stack.isEmpty) {
-      newPath = AppUrl.urlMoralis;
-      String? destinationPublic = state.recents?[rootIndex].ipfsKeyEntity;
       String? nameFile = state.recents?[rootIndex].filetreeEntity
           ?.childrenEntity?[childIndex].nameEntity;
-      newPath = "$newPath${state.recents?[rootIndex].cidEntity}/$nameFile";
-      if (destinationPublic != null) {
-        await previewImageUsecase(
-            PreviewImageParam(newPath, destinationPublic));
-      } else {
-        return emit(state.copyWith(dataStatus: DataStatus.error));
-      }
+      newPath = "$newPath/$nameFile";
     } else {
-      List<int> newStack = [...state.stack, childIndex];
-      List<Images>? current = state.currentFolder?[childIndex].childrenEntity;
+      for (String folderName in state.nameStack) {
+        newPath = "$newPath/$folderName";
+      }
+      String? fileName = state.currentFolder?[childIndex].nameEntity;
+      newPath = "$newPath/$fileName";
+    }
+    String? destinationPublic = state.recents?[rootIndex].ipfsKeyEntity;
+    print(newPath);
+    if (destinationPublic != null) {
+      await previewImageUsecase(PreviewImageParam(newPath, destinationPublic));
+    } else {
+      return emit(state.copyWith(dataStatus: DataStatus.error));
     }
   }
 

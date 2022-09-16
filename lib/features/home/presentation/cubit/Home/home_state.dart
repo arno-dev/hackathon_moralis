@@ -14,5 +14,6 @@ class HomeState with _$HomeState {
     String? urlPath,
     @Default("") String addFolder,
     @Default([]) List<int> stack,
+    @Default([]) List<String> nameStack,
   }) = _Loaded;
 }

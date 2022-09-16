@@ -122,6 +122,8 @@ class HomePage extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               } else if (state.dataStatus == DataStatus.loaded) {
                 List<ImagesFromLink>? recents = state.recents ?? [];
+                String name =
+                    state.nameStack.isNotEmpty ? state.nameStack.last : "";
                 return SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -139,7 +141,22 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   context.read<HomeCubit>().onBackFolder();
                                 },
-                                child: const Text("..."))
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      color: AppColors.primaryColor,
+                                      size: 14.sp,
+                                    ),
+                                    Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ))
                             : CustomButtonRecent(
                                 onPressed: () {},
                               ),
