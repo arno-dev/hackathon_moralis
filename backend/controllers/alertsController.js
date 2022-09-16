@@ -40,23 +40,29 @@ exports.getRegistrationTokenFromAddress = async (request, response) => {
 }
 
 async function sendPush(dest, message) {
+    console.log("Send push");
     const options = notification_options;
 
     // Get the token based on the destination address
-    try {
-        const firebaseToken = await alertDB.getData("/token/" + dest);
+    // try {
+    //     // 0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8
+    //     console.log(`firebase ${dest}`);
+    //     const firebaseToken = await alertDB.getData("/token/" + dest);
+    //     console.log(`firebase ${firebaseToken}`);
+    //     console.log(`body ${message}`);
 
-        admin.messaging().sendToDevice(firebaseToken, message, options)
-            .then(_ => {
-                return response.status(200).send("Notification sent successfully")
-            })
-            .catch(error => {
-                return response.status(500).send(error)
-            });
-    }
-    catch (e) {
-        console.log("No firebase token was found for : " + dest);
-    }
+    // }
+    // catch (e) {
+    //     console.log("No firebase token was found for : " + dest);
+    // }
+
+    admin.messaging().sendToDevice("czqYp_CgRDyjuk2mEgn0KM:APA91bH4OP0HGT9W0VmxauoSZAKWpgYnj2k2gdK8P-wVvs-VBOwjs0lhK6eDuXLj7VZqYq4l9otTa0d2QOnUa6yCufHtbMZtDFvwgzHVOXtssIWcQ3l-PpgT9P8b59I7tWa0OA5cdXCT", message)
+        .then(_ => {
+            console.warn("Notification sent successfully");
+        })
+        .catch(error => {
+            console.error("Notification error: " + error);
+        });
 }
 
 // send invite link via firebase cloud messaging
@@ -104,7 +110,13 @@ exports.saveAlert = async (alertType, address, payload) => {
     if (alertType == ALERT.AddedInContact) {
         // Grab the origin address
         const emitterAddress = payload["origin"];
-        const message = emitterAddress.substring(0, 10) + "[...] has added you in his contact";
+        const body = emitterAddress.substring(0, 10) + "[...] has added you in his contact";
+        const message = {
+            "notification": {
+                "title": "Added In Contact",
+                "body": body
+            },
+        };
 
         await insertAlertInDB(address, message, payload);
         await sendPush(address, message);
@@ -114,7 +126,16 @@ exports.saveAlert = async (alertType, address, payload) => {
         const emitterAddress = payload["origin"];
         const cid = payload["cid"];
         const link = payload["link"];
-        const message = emitterAddress.substring(0, 10) + "[...] shared with you a link " + link.substring(0, 10) + "[...] for accessing : " + cid.substring(0, 10) + "[...]";
+        const body = emitterAddress.substring(0, 10) + "[...] shared with you a link " + link.substring(0, 10) + "[...] for accessing : " + cid.substring(0, 10) + "[...]";
+        const message = {
+            "notification": {
+                "title": "Got Shared Link",
+                "body": body
+            },
+            "data": {
+                "link": link
+            }
+        };
 
         console.log("insertAlertInDB:: " + message);
         await insertAlertInDB(address, message, payload);
@@ -125,8 +146,15 @@ exports.saveAlert = async (alertType, address, payload) => {
         const emitterAddress = payload["origin"];
         const cid = payload["cid"];
         const link = payload["link"];
-        const message = emitterAddress.substring(0, 10) + "[...] is trying to access the link : " + link.substring(0, 10) + "[...]";
-
+        const body = emitterAddress.substring(0, 10) + "[...] is trying to access the link : " + link.substring(0, 10) + "[...]";
+        const message = {
+            "notification": {
+                "title": "Trying to access shared link",
+                "body": body
+            }, "data": {
+                "link": link
+            }
+        };
         await insertAlertInDB(address, message, payload);
         await sendPush(address, message);
     }
