@@ -13,13 +13,13 @@ async function loadIpfs() {
 }
 
 // TODO: moving this to orbit
-var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
-// let db
+// var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
+let db
 let orbitdb
+var isDBReady = false;
 // Moving to orbitDB
 async function main() {
     const { create } = await import('ipfs-core')
-    console.log("test");
     try {
         console.log("ipfs");
         const ipfs = await create({
@@ -37,17 +37,13 @@ async function main() {
         const existingDBAddress = "/orbitdb/zdpuAqpgGhd1zLt6fKfp3xw9sYsbosNNdHQ4ix4KmrDAVK2zw/test-db";
         const isValid = OrbitDB.isValidAddress(existingDBAddress);
         console.log("LOG:: we are checking if there's an existing DB")
-        // If it doesn't exist
-        if (isValid == false) {
-            console.log("LOG:: we are creating a new instance of Orbit DB")
-            orbitdb = await OrbitDB.createInstance(ipfs);
-            console.log("LOG:: we are creating a keyvalue store from Orbit DB")
-            db = await orbitdb.keyvalue("test-db");
-        }
-        else {
-            console.log("LOG:: we are creating an instance of Orbit DB from an existing address");
-            orbitdb = OrbitDB.parseAddress(existingDBAddress);
-        }
+        console.log("LOG:: we are creating a new instance of Orbit DB")
+        orbitdb = await OrbitDB.createInstance(ipfs);
+        console.log("LOG:: we are creating a doc store from Orbit DB");
+
+        db = await orbitdb.docstore("test-db");
+        console.log("LOG:: we are creating a doc store at address : " + db.address);
+        isDBReady = true;
         console.log("LOG:: Orbit DB init done");
     }
     catch (e) {
@@ -55,7 +51,7 @@ async function main() {
     }
 }
 
-// main();
+main();
 
 // Controllers
 const alertsController = require('./alertsController');
@@ -216,7 +212,7 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
             const ipfsInfo = await db.getData("/" + cid);
             const ipfsImages = ipfsInfo["paths"];
             const paths = await this.getImages(ipfsImages, cid);
-    
+
             files.push({
                 "ipfsKey": ipfsKey,
                 "origin": origin,
