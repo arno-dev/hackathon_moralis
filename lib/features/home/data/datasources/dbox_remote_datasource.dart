@@ -2,8 +2,6 @@ import 'dart:core';
 
 import 'package:d_box/core/services/push_notification_service.dart';
 import 'package:d_box/core/services/file_handler.dart';
-import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
-import 'package:d_box/features/home/data/models/save_images_model.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -15,17 +13,19 @@ import '../../../../core/util/response_helper.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../models/alerts_model.dart';
 import '../models/images_from_link_model.dart';
+import '../models/params/firebase_param/firebase_token_param.dart';
 import '../models/params/upload_image_param/upload_image_param.dart';
+import '../models/save_images_model.dart';
 
 abstract class DboxRemoteDataSource {
   Future<ImagesFromLinkModel> getImageFromLink(String link);
   Future<List<ImagesFromLinkModel>> getRecents(String recents);
   Future<SaveImagesModel> postSaveImages(UploadImageParam uploadImageParam);
-  Future<List<ImageParam>> pickImages();
-  Future<bool> initializeFirebaseMessaging(
+  Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});
   Future<List<AlertsModel>> getAlerts(String address);
+  Future<bool> saveFirebaseToken(FirebaseTokenParam firebaseTokenParam);
 }
 
 @LazySingleton(as: DboxRemoteDataSource)
@@ -71,16 +71,12 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   }
 
   @override
-  Future<List<ImageParam>> pickImages() async {
-    return await fileHandler.getMultiFiles(allowedExtensions: ["jpg", "png"]);
-  }
-
-  @override
-  Future<bool> initializeFirebaseMessaging(
+  Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification}) async {
     try {
       await notificationService.initializePlatformNotifications(
+        onGetToken,
         onMessageOpenedApp: onMessageOpenedApp,
         onSelectNotification: onSelectNotification,
       );
@@ -94,6 +90,18 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
   Future<List<AlertsModel>> getAlerts(String address) async {
     try {
       return await apiClient.getAlerts(address);
+    } on DioError catch (e) {
+      throw ResponseHelper.returnResponse(e);
+    } catch (e) {
+      throw ServerException(LocaleKeys.somethingWrong.tr());
+    }
+  }
+
+  @override
+  Future<bool> saveFirebaseToken(FirebaseTokenParam firebaseTokenParam) async {
+    try {
+      await apiClient.saveFirebaseToken(firebaseTokenParam.toMap());
+      return true;
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
     } catch (e) {

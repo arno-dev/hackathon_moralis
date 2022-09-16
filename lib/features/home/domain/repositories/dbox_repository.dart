@@ -1,3 +1,4 @@
+import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/domain/entities/alerts.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
@@ -12,12 +13,14 @@ abstract class DboxRepository {
   Future<Either<Failure, ImagesFromLink>> getImagesFromLink(String link);
   Future<Either<Failure, List<ImagesFromLink>>> getRecents();
   Future<Either<Failure, SaveImagesModel>> postSaveImages(
-      UploadImageParam uploadImageParam, String destinationPublic, String path);
+      UploadImageParam uploadImageParam,
+      String? destinationPublic,
+      String path);
   Future<Either<Failure, bool>> previewFile(
-    ImageParam data,
+    String url,
     String destinationPublic,
   );
-  Future<Either<Failure, List<ImageParam>>> pickImages();
+  Future<Either<Failure, List<ImageParam>>> pickFiles(PickFileType pickFileType);
   Future<Either<Failure, bool>> initializeFirebaseMessaging(
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});

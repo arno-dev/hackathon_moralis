@@ -33,14 +33,85 @@ class WalletPage extends StatelessWidget {
               children: [
                 Image.asset('assets/gifs/addfiles.gif',
                     gaplessPlayback: true, fit: BoxFit.fill),
-                Column(
-                  children: [
-                    Text(tr('welcomeToCloudmet'),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.title2),
-                    SizedBox(height: 5.w),
-                    Text(tr('welcomeContent'), textAlign: TextAlign.center)
-                  ],
+                Text(tr('welcomeToCloudmet'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title2),
+                SizedBox(height: 5.w),
+                Text(tr('welcomeContent'), textAlign: TextAlign.center),
+                SizedBox(height: 5.w),
+                BaseButton(
+                  onTap: () {
+                    navService.pushNamed(AppRoute.importWalletRoute);
+                },
+                    text: tr('importWallet'),
+                    buttonWidth: 100.w,
+                    backgroundColor: AppColors.primaryPurpleColor,
+                    textColor: Colors.white,
+                    buttonHeight: 13.w),
+                SizedBox(height: 3.w),
+                BaseButton(
+                  onTap: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (_) {
+                        return BlocProvider.value(
+                          value: context.read<AuthenticationCubit>(),
+                          child: DboxAlertDialog(
+                              title: 'Secure your wallet',
+                              titleColor: Colors.red,
+                              content: [
+                                Assets.images.security.image(),
+                                SizedBox(height: 5.w),
+                                DboxUnorderedList(
+                                  [
+                                    tr('secureYourWalletListText1'),
+                                    tr('secureYourWalletListText2')
+                                  ],
+                                  fontSize: 14,
+                                ),
+                                DboxCheckBox(
+                                  title: tr('iGotIt'),
+                                  onTab: (value) {
+                                    context
+                                        .read<AuthenticationCubit>()
+                                        .changeCheckValue(value);
+                                  },
+                                ),
+                                SizedBox(height: 3.w),
+                                BlocSelector<AuthenticationCubit,
+                                    AuthenticationState, bool>(
+                                  selector: (state) {
+                                    return state.isChecked;
+                                  },
+                                  builder: (context, isChecked) {
+                                    return BaseButton(
+                                        onTap: () async {
+                                          navService.goBack();
+                                          await navService.pushNamed(
+                                              AppRoute.createWalletRoute);
+                                        },
+                                        isDisabled: !isChecked,
+                                        text: tr('start'),
+                                        buttonWidth: 100.w,
+                                        backgroundColor:
+                                            AppColors.primaryPurpleColor,
+                                        textColor: Colors.white,
+                                        buttonHeight: 13.w);
+                                  },
+                                ),
+                                SizedBox(height: 3.w),
+                              ]),
+                        );
+                      },
+                    ).then((_) => context
+                        .read<AuthenticationCubit>()
+                        .changeCheckValue(false));
+                  },
+                  text: tr('createYourWallet'),
+                  buttonWidth: 100.w,
+                  buttonHeight: 13.w,
+                  borderColor: AppColors.primaryPurpleColor,
+                  textColor: AppColors.primaryPurpleColor,
                 ),
                 SizedBox(height: 5.w),
                 Column(

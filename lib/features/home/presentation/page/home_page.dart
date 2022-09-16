@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:d_box/core/constants/data_status.dart';
+import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
 import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
@@ -58,19 +59,30 @@ class HomePage extends StatelessWidget {
             DboxButtonBottomSheet(
               label: 'Upload Photos',
               onTap: () async {
-                await context.read<HomeCubit>().onPickImages();
-                Navigator.pop(context);
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.photos);
+                navService.goBack();
               },
             ),
             DboxButtonBottomSheet(
               label: 'Take Photos',
-              onTap: () {
+              onTap: () async {
                 // _dialogBuilder(context);
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.takePhoto);
+                navService.goBack();
               },
             ),
             DboxButtonBottomSheet(
               label: 'Upload files',
-              onTap: () {},
+              onTap: () async {
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.files);
+                navService.goBack();
+              },
             ),
             Platform.isIOS
                 ? const SizedBox(height: 20)
@@ -87,12 +99,33 @@ class HomePage extends StatelessWidget {
         builder: (context, state) {
           return BlocConsumer<HomeCubit, HomeState>(
             listener: ((context, state) {
-              if (state.listImages != null) {
-                _dialogBuilder(context: context);
+              if (state.isHasImage) {
+                Navigation.bottomSheetModel(context, [
+                  DboxButtonBottomSheet(
+                    label: 'Upload to cloud',
+                    onTap: () async {
+                      context.read<HomeCubit>().onSaveImage();
+                    },
+                  ),
+                  DboxButtonBottomSheet(
+                    label: 'Add address',
+                    onTap: () {
+                      _dialogBuilder(context: context);
+                    },
+                  ),
+                  DboxButtonBottomSheet(
+                    label: 'Scan QR Code',
+                    onTap: () {},
+                  ),
+                  Platform.isIOS
+                      ? const SizedBox(height: 20)
+                      : const SizedBox.shrink()
+                ]).then((value) => context.read<HomeCubit>().onCancelDialog());
+                // _dialogBuilder(context: context);
               }
             }),
             listenWhen: ((previous, current) {
-              return previous.listImages != current.listImages;
+              return previous.isHasImage != current.isHasImage;
             }),
             builder: (context, state) {
               if (state.dataStatus == DataStatus.initial) {
@@ -101,6 +134,8 @@ class HomePage extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               } else if (state.dataStatus == DataStatus.loaded) {
                 List<ImagesFromLink>? recents = state.recents ?? [];
+                String name =
+                    state.nameStack.isNotEmpty ? state.nameStack.last : "";
                 return SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -118,7 +153,22 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   context.read<HomeCubit>().onBackFolder();
                                 },
-                                child: const Text("..."))
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      color: AppColors.primaryColor,
+                                      size: 14.sp,
+                                    ),
+                                    Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ))
                             : CustomButtonRecent(
                                 onPressed: () {},
                               ),
@@ -182,16 +232,18 @@ Future<void> _dialogBuilder({
           title: isAddFolder ? "Add to folder" : 'Send to your friend',
           titleColor: Colors.black,
           content: [
-            DboxTextFieldDialog(
-              hintText: "Add people",
-              icons: Assets.icons.userplusicon.svg(
-                width: 8.w,
-                height: 8.w,
-              ),
-              onChange: (String text) {
-                context.read<HomeCubit>().onAddPeopleChange(text);
-              },
-            ),
+            isAddFolder
+                ? const SizedBox.shrink()
+                : DboxTextFieldDialog(
+                    hintText: "Add people",
+                    icons: Assets.icons.userplusicon.svg(
+                      width: 8.w,
+                      height: 8.w,
+                    ),
+                    onChange: (String text) {
+                      context.read<HomeCubit>().onAddPeopleChange(text);
+                    },
+                  ),
             DboxTextFieldDialog(
               hintText: "Add folder",
               icons: Assets.icons.foldericon.svg(
@@ -214,37 +266,35 @@ Future<void> _dialogBuilder({
               ),
             ),
             SizedBox(height: 15.w),
-            isAddFolder
-                ? const SizedBox.shrink()
-                : BlocSelector<HomeCubit, HomeState, String>(
-                    selector: (state) {
-                      return state.addPeople;
-                    },
-                    builder: (context, addPeople) {
-                      return BaseButton(
-                        text: tr('send'),
-                        buttonWidth: 100.w,
-                        backgroundColor: AppColors.primaryPurpleColor,
-                        isDisabled: addPeople == "",
-                        textColor: Colors.white,
-                        buttonHeight: 6.h,
-                        onTap: () async {
-                          await context.read<HomeCubit>().onSaveImage();
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
+            BlocSelector<HomeCubit, HomeState, String?>(
+              selector: (state) {
+                return state.addPeople;
+              },
+              builder: (context, addPeople) {
+                return BaseButton(
+                  text: tr('send'),
+                  buttonWidth: 100.w,
+                  backgroundColor: AppColors.primaryPurpleColor,
+                  isDisabled: !isAddFolder && addPeople != null,
+                  textColor: Colors.white,
+                  buttonHeight: 6.h,
+                  onTap: () async {
+                    await context.read<HomeCubit>().onSaveImage();
+                    navService.goBack();
+                  },
+                );
+              },
+            ),
             SizedBox(height: 3.w),
             BaseButton(
-              text: tr('cancel'),
+              text: isAddFolder ? "Not now" : tr('cancel'),
               onTap: () {
                 context.read<HomeCubit>().onCancelDialog();
-                Navigator.pop(context);
+                navService.goBack();
               },
               buttonWidth: 100.w,
               backgroundColor: Colors.white,
-              textColor: Colors.black,
+              textColor: isAddFolder ? Colors.red : Colors.black,
               buttonHeight: 6.h,
             ),
           ],

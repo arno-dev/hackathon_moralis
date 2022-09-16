@@ -42,4 +42,9 @@ abstract class ApiClient {
   Future<SaveImagesModel> postSaveImages(
     @Body() Map<String, dynamic> body,
   );
+
+  @POST(ApiPath.saveFirebaseToken)
+  Future<dynamic> saveFirebaseToken(
+    @Body() Map<String, dynamic> body,
+  );
 }

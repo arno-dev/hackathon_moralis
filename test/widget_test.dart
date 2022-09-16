@@ -21,10 +21,6 @@ void main() {
     late String wrongPrivateKey;
     setUpAll(() {
       walletService = WalletService();
-      String user1 = walletService.generateMnemonic();
-      WalletCredential wallet1 = walletService.getCredential(user1);
-      print(wallet1.privateKey);
-      print(wallet1.address);
       // wallet1 private key a221d61e1b8565b31e70a59d847fdf5c562298b866582b369e7ecbb4da275ac3
       // wallet1 address 0x219F0E14E0E4Cfb1f3a8eA54c0D1CCeD55ED7b7B
       privateKey =
