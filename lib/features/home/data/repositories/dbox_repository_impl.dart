@@ -1,3 +1,4 @@
+import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/data/models/alerts_model.dart';
 import 'package:d_box/features/home/data/datasources/dbox_local_datasource.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
@@ -51,12 +52,12 @@ class DboxRepositoryImpl implements DboxRepository {
   }
 
   @override
-  Future<Either<Failure, List<ImageParam>>> pickImages() async {
+  Future<Either<Failure, List<ImageParam>>> pickFiles(PickFileType pickFileType) async {
     try {
-      final data = await dboxLocalDataSource.pickFile();
+      final data = await dboxLocalDataSource.pickFile(pickFileType);
       return Right(data);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message.toString()));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
     }
   }
 
@@ -182,7 +183,6 @@ class DboxRepositoryImpl implements DboxRepository {
       PrivateKey privateKey = PrivateKey.decode(myIpfsCredential);
       // destination's ipfs public key
       PublicKey destinationPublicKey = PublicKey.decode(destinationPublic);
-      final test = destinationPublicKey.encode();
       final response = await dboxLocalDataSource.previewFile(
         url,
         privateKey,

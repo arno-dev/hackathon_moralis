@@ -2,7 +2,6 @@ import 'dart:core';
 
 import 'package:d_box/core/services/push_notification_service.dart';
 import 'package:d_box/core/services/file_handler.dart';
-import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -22,7 +21,6 @@ abstract class DboxRemoteDataSource {
   Future<ImagesFromLinkModel> getImageFromLink(String link);
   Future<List<ImagesFromLinkModel>> getRecents(String recents);
   Future<SaveImagesModel> postSaveImages(UploadImageParam uploadImageParam);
-  Future<List<ImageParam>> pickImages();
   Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(String?)? onSelectNotification});
@@ -70,11 +68,6 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     } catch (e) {
       throw ServerException(LocaleKeys.somethingWrong.tr());
     }
-  }
-
-  @override
-  Future<List<ImageParam>> pickImages() async {
-    return await fileHandler.getMultiFiles(allowedExtensions: ["jpg", "png"]);
   }
 
   @override

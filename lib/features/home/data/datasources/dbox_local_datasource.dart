@@ -9,10 +9,12 @@ import 'package:d_box/features/home/data/models/params/upload_image_param/image_
 import 'package:injectable/injectable.dart';
 import 'package:pinenacl/x25519.dart';
 
+import '../../../../core/constants/pick_file_type.dart';
+
 abstract class DboxLocalDataSource {
   Future<bool> previewFile(String url, AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic);
-  Future<List<ImageParam>> pickFile();
+  Future<List<ImageParam>> pickFile(PickFileType pickFileType);
   Future<String?> readIpfsKey();
   Future<WalletCredential?> readWalletCredential();
   String encryptFileContent(
@@ -38,9 +40,15 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
   );
 
   @override
-  Future<List<ImageParam>> pickFile({List<String>? allowedExtensions}) async {
-    return await fileHandler.getMultiFiles(
-        allowedExtensions: allowedExtensions);
+  Future<List<ImageParam>> pickFile(PickFileType pickFileType) async {
+    switch (pickFileType) {
+      case PickFileType.files:
+        return await fileHandler.getMultiFiles();
+      case PickFileType.photos:
+        return await fileHandler.imagePickerHandler();
+      case PickFileType.takePhoto:
+        return await fileHandler.imagePickerHandler(isPhotos: false);
+    }
   }
 
   @override

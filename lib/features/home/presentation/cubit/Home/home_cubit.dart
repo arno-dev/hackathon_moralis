@@ -1,3 +1,4 @@
+import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/core/constants/url.dart';
 import 'package:d_box/core/usecases/usecase.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
@@ -156,8 +157,8 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  Future<void> onPickImages() async {
-    final request = await pickImagesUsecase(NoParams());
+  Future<void> onPickImages(PickFileType pickFileType) async {
+    final request = await pickImagesUsecase(pickFileType);
     request.fold((error) => emit(state.copyWith(dataStatus: DataStatus.error)),
         (data) async {
       emit(state.copyWith(listImages: data, isHasImage: data.isNotEmpty));

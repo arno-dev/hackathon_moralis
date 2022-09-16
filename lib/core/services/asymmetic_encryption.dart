@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bip39/bip39.dart' as bip39;
 import "package:crypto/crypto.dart" show sha256;
 import 'package:injectable/injectable.dart';
@@ -55,7 +53,6 @@ class AsymmetricEncryption {
       String encryptedData,
       AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic) {
-    final completer = Completer<String>();
     final box =
         Box(myPrivateKey: sourcePrivateKey, theirPublicKey: destinationPublic);
     final decrypted = box.decrypt(EncryptedMessage.fromList(

@@ -24,8 +24,8 @@ class FileHandler {
 
   Future<void> getPreviewFile(String base64String, String filename) async {
     Directory dir = await getTemporaryDirectory();
-    dir.deleteSync(recursive: true);
-    dir.create();
+    // dir.deleteSync(recursive: true);
+    // dir.create();
     File file = File('${dir.path}/$filename');
     Uint8List bytes = base64Decode(base64String);
     await file.writeAsBytes(bytes);
@@ -44,15 +44,13 @@ class FileHandler {
     }
   }
 
-  Future<List<ImageParam>> getMultiFiles(
-      {List<String>? allowedExtensions}) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: allowedExtensions == null ? FileType.any : FileType.custom,
-      allowedExtensions: allowedExtensions,
-    );
+  Future<List<ImageParam>> getMultiFiles() async {
     List<ImageParam> files = [];
     double size = 0;
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+    );
     if (result != null) {
       for (var path in result.paths) {
         if (path != null) {
@@ -69,30 +67,53 @@ class FileHandler {
       }
     }
     if (size > 50) {
-      throw ServerException("Over size file");
+      throw CacheException("The maximum upload is 50MB");
     }
     return files;
   }
 
-  Future<List<ImageParam>> takePhoto() async {
+  Future<List<ImageParam>> imagePickerHandler({bool isPhotos = true}) async {
     List<ImageParam> response = [];
-    final XFile? pickedFile = await imagePicker.pickImage(
-      source: ImageSource.camera,
-      maxWidth: 100.w,
-      maxHeight: 100.h,
-      imageQuality: 50,
-    );
+    List<XFile> files = [];
+    double size = 0;
 
-    String? path = pickedFile?.path;
-    if (path != null) {
+    if (!isPhotos) {
+      final XFile? takePhoto = await imagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 100.w,
+        maxHeight: 100.h,
+        imageQuality: 50,
+      );
+      if (takePhoto == null) {
+        return response;
+      }
+      files.add(takePhoto);
+    } else {
+      List<XFile>? pickfiles = await imagePicker.pickMultiImage(
+        maxWidth: 100.w,
+        maxHeight: 100.h,
+        imageQuality: 50,
+      );
+      if (pickfiles == null) {
+        return response;
+      }
+      files = pickfiles;
+    }
+
+    for (XFile pickedFile in files) {
+      String? path = pickedFile.path;
       File file = File(path);
+      size += getFileSizeInMb(file);
       List<int> imageBytes = await file.readAsBytes();
       String imageBase64 = base64Encode(imageBytes);
       ImageParam imageParam =
           ImageParam(path: path.split("/").last, content: imageBase64);
       response.add(imageParam);
-      return response;
     }
+    if (size > 50) {
+      throw CacheException("The maximum upload is 50MB");
+    }
+
     return response;
   }
 

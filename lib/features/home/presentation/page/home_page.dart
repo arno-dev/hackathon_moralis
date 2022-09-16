@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:d_box/core/constants/data_status.dart';
+import 'package:d_box/core/constants/pick_file_type.dart';
 import 'package:d_box/features/home/domain/entities/images_from_link.dart';
 import 'package:d_box/features/home/presentation/cubit/account/my_account_cubit.dart';
 import 'package:d_box/features/home/presentation/cubit/cubit/push_notification_cubit.dart';
@@ -58,19 +59,30 @@ class HomePage extends StatelessWidget {
             DboxButtonBottomSheet(
               label: 'Upload Photos',
               onTap: () async {
-                await context.read<HomeCubit>().onPickImages();
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.photos);
                 navService.goBack();
               },
             ),
             DboxButtonBottomSheet(
               label: 'Take Photos',
-              onTap: () {
+              onTap: () async {
                 // _dialogBuilder(context);
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.takePhoto);
+                navService.goBack();
               },
             ),
             DboxButtonBottomSheet(
               label: 'Upload files',
-              onTap: () {},
+              onTap: () async {
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.files);
+                navService.goBack();
+              },
             ),
             Platform.isIOS
                 ? const SizedBox(height: 20)
