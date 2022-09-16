@@ -13,8 +13,8 @@ async function loadIpfs() {
 }
 
 // TODO: moving this to orbit
-// var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
-let db
+var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
+// let db
 let orbitdb
 // Moving to orbitDB
 async function main() {
@@ -52,10 +52,10 @@ async function main() {
     }
     catch (e) {
         console.log("error " + e);
-    }
+    }   
 }
 
-main();
+// main();
 
 // Controllers
 const alertsController = require('./alertsController');
