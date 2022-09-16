@@ -1,3 +1,4 @@
+"use strict";
 
 const { default: Moralis } = require("moralis");
 const { JsonDB, Config } = require('node-json-db');
@@ -5,8 +6,56 @@ const { getIPFSCid } = require('../utils/utils');
 const merge = require('deepmerge');
 const { nanoid } = require('nanoid');
 const e = require("express");
+const OrbitDB = require('orbit-db');
 
-var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
+async function loadIpfs() {
+    return node
+}
+
+// TODO: moving this to orbit
+// var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
+let db
+let orbitdb
+// Moving to orbitDB
+async function main() {
+    const { create } = await import('ipfs-core')
+    console.log("test");
+    try {
+        console.log("ipfs");
+        const ipfs = await create({
+            start: true,
+            EXPERIMENTAL: {
+                pubsub: true,
+            },
+        });
+        console.log("iporbitdbfs");
+        // orbitdb = await OrbitDB.createInstance(ipfs);
+        // console.log("db");
+        // db = await orbitdb.keyvalue("test-db");
+        // console.log("address  : " + db.address.toString());
+        // Locally i'm using this orbit DB address but should be changed
+        const existingDBAddress = "/orbitdb/zdpuAqpgGhd1zLt6fKfp3xw9sYsbosNNdHQ4ix4KmrDAVK2zw/test-db";
+        const isValid = OrbitDB.isValidAddress(existingDBAddress);
+        console.log("LOG:: we are checking if there's an existing DB")
+        // If it doesn't exist
+        if (isValid == false) {
+            console.log("LOG:: we are creating a new instance of Orbit DB")
+            orbitdb = await OrbitDB.createInstance(ipfs);
+            console.log("LOG:: we are creating a keyvalue store from Orbit DB")
+            db = await orbitdb.keyvalue("test-db");
+        }
+        else {
+            console.log("LOG:: we are creating an instance of Orbit DB from an existing address");
+            orbitdb = OrbitDB.parseAddress(existingDBAddress);
+        }
+        console.log("LOG:: Orbit DB init done");
+    }
+    catch (e) {
+        console.log("error " + e);
+    }
+}
+
+main();
 
 // Controllers
 const alertsController = require('./alertsController');
@@ -47,7 +96,7 @@ exports.saveIpfsPathToDB = async (request, response, next) => {
         "paths": imagePath["data"],
         "ipfsKey": ipfsKey
     };
-    await db.push("/ipfs/" + cid + "/paths", ipfsData)
+    await db.push("" + cid + "/paths", ipfsData)
 
     request.body = {
         "cid": cid,
@@ -168,7 +217,7 @@ exports.getImagesFromLink = async (request, response) => {
     try {
         const imagesFromLink = await db.getData("/links/" + link);
         const { cid, ipfsKey, origin, dest } = imagesFromLink;
-        const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
+        const ipfsInfo = await db.getData("" + cid + "/paths");
         const ipfsImages = ipfsInfo[cid]["paths"];
         paths = await this.getImages(ipfsImages, cid);
 
@@ -201,7 +250,7 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
 
             const imagesFromLink = await db.getData("/links/" + link);
             const { cid, ipfsKey, origin, dest } = imagesFromLink;
-            const ipfsInfo = await db.getData("/ipfs/" + cid + "/paths");
+            const ipfsInfo = await db.getData("" + cid + "/paths");
             const ipfsImages = ipfsInfo[cid]["paths"];
             paths = await this.getImages(ipfsImages, cid);
             files.push({
@@ -230,7 +279,7 @@ exports.getImagesFromAddress = async (request, response) => {
     try {
         const imagesFromAddress = await db.getData("/images/" + address);
         const cid = imagesFromAddress["cid"];
-        // const ipfsInfo = await db.getData("/ipfs/" + cid);
+        // const ipfsInfo = await db.getData("" + cid);
         // const ipfsKey = imagesFromLink["ipfsKey"];
         const ipfsImages = imagesFromAddress["imagePath"];
         paths = await this.getImages(ipfsImages, cid);

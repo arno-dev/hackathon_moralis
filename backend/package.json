@@ -16,10 +16,12 @@
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "firebase-admin": "^11.0.1",
+    "ipfs": "^0.64.0",
     "json-url": "^3.0.0",
-    "moralis": "^2.2.0",
+    "moralis": "^2.4.0",
     "nanoid": "^3.3.4",
-    "node-json-db": "^2.1.1",
-    "nodemon": "^2.0.19"
+    "node-json-db": "^2.1.2",
+    "nodemon": "^2.0.19",
+    "orbit-db": "^0.28.7"
   }
 }
