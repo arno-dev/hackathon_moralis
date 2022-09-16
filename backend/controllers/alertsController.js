@@ -73,13 +73,18 @@ exports.getAlerts = async (request, response) => {
     }
     return response.sendStatus(204);
 }
-
 exports.saveAlert = async (alertType, address, payload) => {
     console.log("SaveAlert::(" + alertType + ", " + address + ", " + payload);
     if (alertType == ALERT.AddedInContact) {
         // Grab the origin address
         const emitterAddress = payload["origin"];
-        const message = emitterAddress.substring(0, 10) + "[...] has added you in his contact";
+        const body = emitterAddress.substring(0, 10) + "[...] has added you in his contact";
+        const message = {
+            "notification": {
+                "title": "Added In Contact",
+                "body": body
+            },
+        };
 
         await insertAlertInDB(address, message, payload);
         await sendPush(address, message);
@@ -89,7 +94,16 @@ exports.saveAlert = async (alertType, address, payload) => {
         const emitterAddress = payload["origin"];
         const cid = payload["cid"];
         const link = payload["link"];
-        const message = emitterAddress.substring(0, 10) + "[...] shared with you a link " + link.substring(0, 10) + "[...] for accessing : " + cid.substring(0, 10) + "[...]";
+        const body = emitterAddress.substring(0, 10) + "[...] shared with you a link " + link.substring(0, 10) + "[...] for accessing : " + cid.substring(0, 10) + "[...]";
+        const message = {
+            "notification": {
+                "title": "Got Shared Link",
+                "body": body
+            },
+            "data": {
+                "link": link
+            }
+        };
 
         console.log("insertAlertInDB:: " + message);
         await insertAlertInDB(address, message, payload);
@@ -100,8 +114,15 @@ exports.saveAlert = async (alertType, address, payload) => {
         const emitterAddress = payload["origin"];
         const cid = payload["cid"];
         const link = payload["link"];
-        const message = emitterAddress.substring(0, 10) + "[...] is trying to access the link : " + link.substring(0, 10) + "[...]";
-
+        const body = emitterAddress.substring(0, 10) + "[...] is trying to access the link : " + link.substring(0, 10) + "[...]";
+        const message = {
+            "notification": {
+                "title": "Trying to access shared link",
+                "body": body
+            }, "data": {
+                "link": link
+            }
+        };
         await insertAlertInDB(address, message, payload);
         await sendPush(address, message);
     }
