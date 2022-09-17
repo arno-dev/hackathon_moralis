@@ -5,5 +5,6 @@ class AlertsState with _$AlertsState {
   const factory AlertsState({
     @Default(DataStatus.initial) DataStatus dataStatus,
     List<Alerts>? alerts,
+    String? errorMessage
   }) = _Initial;
 }

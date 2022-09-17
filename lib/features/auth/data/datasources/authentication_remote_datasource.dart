@@ -5,47 +5,48 @@ import '../../../../core/models/wallet_credential.dart';
 import '../../../../core/services/wallet_service.dart';
 import '../../../../generated/locale_keys.g.dart';
 
-abstract class AuthenticationRemoteDataSource{
- List<String> getMnemonic();
- WalletCredential getCredential({required List<String> mnemonic} );
- WalletCredential getCredentialFromPrivate({required String privateKey}); 
+abstract class AuthenticationRemoteDataSource {
+  List<String> getMnemonic();
+  WalletCredential getCredential({required List<String> mnemonic});
+  WalletCredential getCredentialFromPrivate({required String privateKey});
 }
 
 @LazySingleton(as: AuthenticationRemoteDataSource)
-
-class AuthenticationRemoteDataSourceImpl extends AuthenticationRemoteDataSource {
+class AuthenticationRemoteDataSourceImpl
+    extends AuthenticationRemoteDataSource {
   final WalletService walletService;
 
   AuthenticationRemoteDataSourceImpl({required this.walletService});
   @override
-  List<String> getMnemonic()  {
+  List<String> getMnemonic() {
     try {
       final data = walletService.generateMnemonic();
-       List<String> res = data.split(" ");
+      List<String> res = data.split(" ");
       return res;
-    }  catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+    } catch (e) {
+      throw ServerException(LocaleKeys.errorMessages_generateMnemonic.tr());
     }
   }
-  
+
   @override
-  WalletCredential getCredential({required List<String> mnemonic})  {
-  try {
-    final convertData = mnemonic.join(" ");
+  WalletCredential getCredential({required List<String> mnemonic}) {
+    try {
+      final convertData = mnemonic.join(" ");
       final data = walletService.getCredential(convertData);
       return data;
-    }  catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+    } catch (e) {
+      throw ServerException(LocaleKeys.errorMessages_getCredential.tr());
     }
   }
-  
+
   @override
   WalletCredential getCredentialFromPrivate({required String privateKey}) {
-     try {
+    try {
       final data = walletService.getCredentialFromPrivate(privateKey);
       return data;
-    }  catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+    } catch (e) {
+      throw ServerException(
+          LocaleKeys.errorMessages_getCredentialFromPrivatekey.tr());
     }
   }
 }

@@ -1,9 +1,13 @@
+import 'package:d_box/core/error/exceptions.dart';
 import 'package:d_box/core/models/wallet_credential.dart';
 import 'package:d_box/core/services/asymmetic_encryption.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 import '../../../../core/constants/local_storage_path.dart';
 import '../../../../core/services/secure_storage.dart';
+import '../../../../generated/locale_keys.g.dart';
 
 abstract class AuthenticationLocalDataSource {
   Future<bool> saveCredential({required WalletCredential credential});
@@ -22,8 +26,10 @@ class AuthenticationLocalDataSourceImpl extends AuthenticationLocalDataSource {
       await secureStorage.writeSecureData(
           LocalStoragePath.walletCredential, credential);
       return true;
-    } catch (e) {
-      return false;
+    } on PlatformException catch (e) {
+      String? message = e.message;
+      message ??= LocaleKeys.errorMessages_saveCredential.tr();
+      throw CacheException(message);
     }
   }
 
@@ -36,8 +42,12 @@ class AuthenticationLocalDataSourceImpl extends AuthenticationLocalDataSource {
       await secureStorage.writeSecureData(
           LocalStoragePath.ipfsCredential, encodeData);
       return true;
+    } on PlatformException catch (e) {
+      String? message = e.message;
+      message ??= LocaleKeys.errorMessages_saveIpfsCredential.tr();
+      throw CacheException(message);
     } catch (e) {
-      return false;
+      throw CacheException(e.toString());
     }
   }
 }

@@ -18,28 +18,27 @@ class CongratulationsPage extends StatelessWidget {
       appBar: DAppBar(
           title: tr('congretulations'),
           titleStyle: Theme.of(context).textTheme.caption1,),
-      body: SafeArea(
-          child: SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Container(
-            margin: EdgeInsets.only(left: 5.w, right: 5.w),
-            child: Column(
-              children: [
-                Image.asset('assets/gifs/bingo.gif',
-                    gaplessPlayback: true, fit: BoxFit.fill),
-                SizedBox(height: 5.w),
-                Text(tr('congretulationsContentText'),
-                    textAlign: TextAlign.center),
-                SizedBox(height: 30.w),
-                BaseButton(
-                  onTap: ()=> navService.pushNamedAndRemoveUntil(AppRoute.homeRoute),
-                    text: tr('done'),
-                    buttonWidth: 100.w,
-                    backgroundColor: AppColors.primaryPurpleColor,
-                    textColor: Colors.white,
-                    buttonHeight: 13.w),
-              ],
-            )),
-      )),
+        margin: EdgeInsets.only(left: 5.w, right: 5.w),
+        child: Column(
+          children: [
+            Image.asset('assets/gifs/bingo.gif',
+                gaplessPlayback: true, fit: BoxFit.fill),
+            SizedBox(height: 5.w),
+            Text(tr('congretulationsContentText'),
+                textAlign: TextAlign.center),
+            SizedBox(height: 30.w),
+            BaseButton(
+              onTap: ()=> navService.pushNamedAndRemoveUntil(AppRoute.homeRoute),
+                text: tr('done'),
+                buttonWidth: 100.w,
+                backgroundColor: AppColors.primaryPurpleColor,
+                textColor: Colors.white,
+                buttonHeight: 13.w),
+          ],
+        )),
+      ),
     );
   }
 }

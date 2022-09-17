@@ -1,6 +1,5 @@
 import 'package:d_box/core/models/wallet_credential.dart';
 import 'package:d_box/core/services/asymmetic_encryption.dart';
-import 'package:d_box/core/services/file_handler.dart';
 import 'package:d_box/core/services/wallet_service.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -9,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pinenacl/api/authenticated_encryption.dart';
 import 'package:http/http.dart' as http;
-import 'widget_test.mocks.dart';
 
 @GenerateMocks([http.Client, FilePicker, ImagePicker])
 void main() {
@@ -62,10 +60,6 @@ void main() {
     late PrivateKey skWallet1;
     late PrivateKey skWallet2;
     late PrivateKey skWallet3;
-    late FileHandler fileHandler;
-    late MockFilePicker mockFilePicker;
-    late MockClient mockClient;
-    late MockImagePicker mockImagePicker;
 
     setUpAll(() {
       asymmetricEncryption = AsymmetricEncryption();
@@ -92,18 +86,9 @@ void main() {
       skWallet3 = asymmetricEncryption
           .generatePrivateKeyFromWalletPrivate(walletCredential3.privateKey);
 
-      // mock injection
-      mockFilePicker = MockFilePicker();
-      mockClient = MockClient();
-      mockImagePicker = MockImagePicker();
-      // For handling file
-      fileHandler = FileHandler(mockFilePicker, mockClient, mockImagePicker);
     });
 
     group("Test integrity of the keys", () {
-      late MockFilePicker mockFilePicker;
-      late MockClient mockClient;
-      late MockImagePicker mockImagePicker;
       setUpAll(() {});
       test("if address are expected from mneumonics", () {
         expect("0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8",
@@ -180,37 +165,6 @@ void main() {
               reason:
                   "Wallet 3 shouldn't be able to decipher the secret message");
         }
-      });
-
-      test("Encrypting IPFS file", () {
-        String actual = "This is image base 64";
-        String secretMessageFromOnetoTwo = "Secret message from Wallet 1 to 2";
-
-        // This will be shared / retrieved along the future encrypted IPFS File
-        String encryptedMessageFromOnetoTwo = asymmetricEncryption.encryptData(
-            secretMessageFromOnetoTwo, skWallet1, skWallet2.publicKey);
-        // mock injection
-        mockFilePicker = MockFilePicker();
-        mockClient = MockClient();
-        mockImagePicker = MockImagePicker();
-
-        fileHandler = FileHandler(mockFilePicker, mockClient, mockImagePicker);
-        final encryptImage =
-            fileHandler.encryption(actual, secretMessageFromOnetoTwo);
-
-        expect(encryptImage.compareTo(actual) != 0, true,
-            reason: "encrypted image and base image should be different now");
-
-        // We can share the 'encryptedMessageFromOnetoTwo' safely, but only the destination public address can decipher
-        String decipherMessageFromOnetoTwo = asymmetricEncryption.decryptData(
-            encryptedMessageFromOnetoTwo, skWallet1, skWallet2.publicKey);
-
-        expect(decipherMessageFromOnetoTwo, secretMessageFromOnetoTwo,
-            reason: "decrypted key and secret message should be the same");
-
-        final baseImage =
-            fileHandler.decryption(encryptImage, decipherMessageFromOnetoTwo);
-        expect(actual, baseImage);
       });
     });
   });

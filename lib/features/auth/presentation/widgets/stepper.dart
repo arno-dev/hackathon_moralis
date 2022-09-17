@@ -5,7 +5,7 @@
 import 'package:d_box/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
-// TODO(dragostis): Missing functionality:
+// (dragostis): Missing functionality:
 //   * mobile horizontal mode with adding/removing steps
 //   * alternative labeling
 //   * stepper feedback in the case of high-latency interactions

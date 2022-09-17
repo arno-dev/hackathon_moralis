@@ -17,45 +17,48 @@ import '../widgets/d_stepper.dart';
 class AuthenticationScreen extends StatelessWidget {
   const AuthenticationScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthenticationCubit, AuthenticationState>(
       listener: (context, state) {
-        if(state.dataStatus == DataStatus.isVerify){
+        if (state.dataStatus == DataStatus.isVerify) {
           navService.pushNamedAndRemoveUntil(AppRoute.congratulationsRoute);
         }
       },
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
-            onTap: () => (state.firstStep)
+            onTap: () => (state.isCreateWallPage)
                 ? navService.goBack()
-                : context.read<AuthenticationCubit>().firstStep(true),
+                : context
+                    .read<AuthenticationCubit>()
+                    .handlerPages(isCreateWallPage: true),
             centerTitle: false,
-            title: (state.firstStep)
+            title: (state.isCreateWallPage)
                 ? LocaleKeys.createWallet.tr()
                 : LocaleKeys.confirmSecretRecoveryPhrase.tr(),
           ),
           body: DCustomStepper(
-            isValidated: state.firstStep
+            isValidated: state.isCreateWallPage
                 ? false
-                : (state.newMnemonic!.contains("") || state.firstStep),
-            onTap: (state.firstStep || !state.newMnemonic!.contains(""))
+                : (state.newMnemonic!.contains("") || state.isCreateWallPage),
+            onTap: (state.isCreateWallPage || !state.newMnemonic!.contains(""))
                 ? (index) async {
                     if (index == 0) {
-                      context.read<AuthenticationCubit>().firstStep(false);
+                      context
+                          .read<AuthenticationCubit>()
+                          .handlerPages(isCreateWallPage: false);
                     } else {
-                    await context
+                      await context
                           .read<AuthenticationCubit>()
                           .saveCredential();
                     }
                   }
                 : null,
             lineColor: AppColors.primaryPurpleColor,
-            currentIndex: (state.firstStep) ? 0 : 1,
+            currentIndex: (state.isCreateWallPage) ? 0 : 1,
             stepSize: 30,
-            textWidth: 30.w, 
+            textWidth: 30.w,
             stepperhorizontal: 10.w,
             listOfContentText: [
               LocaleKeys.secureWallet.tr(),
@@ -95,23 +98,20 @@ class AuthenticationScreen extends StatelessWidget {
                   const SizedBox(
                     height: 18,
                   ),
-                  BlocProvider.value(
-                    value: context.read<AuthenticationCubit>(),
-                    child: AuthenticateGridView(
-                      isValidated: state.dataStatus == DataStatus.error,
-                      dataList: state.newMnemonic ?? [],
-                      onRemove: (index) {
-                        context
-                            .read<AuthenticationCubit>()
-                            .updateNewMnemonic(index);
-                      },
-                      onAdd: (index) {
-                        context
-                            .read<AuthenticationCubit>()
-                            .updateNewMnemonic(index, isAdding: true);
-                      },
-                    ),
-                  )
+                  AuthenticateGridView(
+                    isValidated: state.dataStatus == DataStatus.error,
+                    dataList: state.newMnemonic ?? [],
+                    onRemove: (index) {
+                      context
+                          .read<AuthenticationCubit>()
+                          .updateNewMnemonic(index);
+                    },
+                    onAdd: (index) {
+                      context
+                          .read<AuthenticationCubit>()
+                          .updateNewMnemonic(index, isAdding: true);
+                    },
+                  ),
                 ],
               ),
             ],

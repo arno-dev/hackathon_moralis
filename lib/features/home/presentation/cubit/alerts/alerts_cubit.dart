@@ -14,12 +14,18 @@ class AlertsCubit extends Cubit<AlertsState> {
   final GetAlertsUseCase getAlertsUseCase;
   AlertsCubit(this.getAlertsUseCase) : super(const AlertsState());
 
+  Future<void> onDismissErorr() async {
+    await Future<void>.delayed(const Duration(seconds: 5));
+    emit(state.copyWith(errorMessage: null));
+  }
+
   Future<void> getAlerts() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     final request = await getAlertsUseCase(NoParams());
     request.fold(
       (error) {
-        emit(state.copyWith(dataStatus: DataStatus.error));
+        emit(state.copyWith(
+            dataStatus: DataStatus.error, errorMessage: error.message));
       },
       (data) {
         emit(state.copyWith(

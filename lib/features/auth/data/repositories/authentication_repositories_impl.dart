@@ -19,8 +19,12 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
   @override
   Future<Either<Failure, List<String>>> getMnemonic() async {
-    final res = authenticationRemoteDataSource.getMnemonic();
-    return Right(res);
+    try {
+      final res = authenticationRemoteDataSource.getMnemonic();
+      return Right(res);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
   }
 
   Future<bool> _saveCredential(WalletCredential res) async {
@@ -40,16 +44,24 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       final response = await _saveCredential(res);
       return Right(response);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(e.message));
+    } on CacheException catch (e) {
+      throw CacheFailure(e.message);
     }
   }
 
   @override
   Future<Either<Failure, bool>> verifyCredentialFromPrivateKey(
       {required String privateKey}) async {
-    WalletCredential res = authenticationRemoteDataSource
-        .getCredentialFromPrivate(privateKey: privateKey);
-    final response = await _saveCredential(res);
-    return Right(response);
+    try {
+      WalletCredential res = authenticationRemoteDataSource
+          .getCredentialFromPrivate(privateKey: privateKey);
+      final response = await _saveCredential(res);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on CacheException catch (e) {
+      throw CacheFailure(e.message);
+    }
   }
 }

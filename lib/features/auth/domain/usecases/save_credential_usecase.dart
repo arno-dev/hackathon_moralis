@@ -6,14 +6,12 @@ import '../../../../core/usecases/usecase.dart';
 import '../repositories/authentication_repositories.dart';
 
 @lazySingleton
-
 class SaveCredentialUseCase implements UseCase<bool, List<String>> {
   final AuthenticationRepository authenticationRepository;
 
   SaveCredentialUseCase({required this.authenticationRepository});
   @override
   Future<Either<Failure, bool>> call(List<String> params) async {
-    return  authenticationRepository.verifyCredential(mnemonic: params);
+    return await authenticationRepository.verifyCredential(mnemonic: params);
   }
-  
 }

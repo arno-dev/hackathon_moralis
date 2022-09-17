@@ -59,7 +59,7 @@ class _ShareBottomSheetWidgetState extends State<ShareBottomSheetWidget> {
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => BlocProvider<HomeCubit>.value(
                   value: context.read<HomeCubit>(),
-                  child: DboxQRView(),
+                  child: const DboxQRView(),
                 ),
               ));
             },

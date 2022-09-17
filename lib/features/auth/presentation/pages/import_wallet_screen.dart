@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../generated/locale_keys.g.dart';
 import '../cubit/authentication_cubit_cubit.dart';
 
 class ImportWalletPage extends StatelessWidget {
@@ -21,58 +22,61 @@ class ImportWalletPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthenticationCubit, AuthenticationState>(
-      listener: (context, state){
-        if(state.dataStatus == DataStatus.isVerify) navService.pushNamedAndRemoveUntil(AppRoute.homeRoute);
+      listener: (context, state) {
+        if (state.dataStatus == DataStatus.isVerify) {
+          navService.pushNamedAndRemoveUntil(AppRoute.homeRoute);
+        }
       },
       builder: (context, state) {
         return Scaffold(
           appBar: DAppBar(
-            onTap: ()=> navService.goBack(),
+            onTap: () => navService.goBack(),
             title: tr('importWallet'),
             titleStyle: Theme.of(context).textTheme.caption2,
             centerTitle: false,
           ),
-          body: SafeArea(
-              child: SingleChildScrollView(
+          body: SingleChildScrollView(
             child: Container(
-              margin: EdgeInsets.only(left: 5.w, right: 5.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 10.w),
-                  Center(child: Assets.images.importwallet.image()),
-                  SizedBox(height: 15.w),
-                  Text(tr('importYourWalletWithSecret'),
-                      style: Theme.of(context).textTheme.subtitle3),
-                  Text(tr('recoveryPhrase'),
-                      style: Theme.of(context).textTheme.subtitle3),
-                  SizedBox(height: 5.w),
-                  DboxTextField(
-                      isPassword: true,
-                      height: 60,
-                      hintText: tr('enterYourSecretRecoveryPhraseHere'),
-                      controller:
-                          context.read<AuthenticationCubit>().secretController),
-                  SizedBox(height: 3.w),
-                  DboxCheckBox(
-                    title: tr('rememberMe'),
-                    onTab: (value) {},
-                  ),
-                  SizedBox(height: 10.w),
-                    BaseButton(
-                    onTap:  () async  =>  await context.read<AuthenticationCubit>().saveCredentialFromPrivateKey(),
-                    text: tr('import'),
-                    buttonWidth: 100.w,
-                    buttonHeight: 13.w,
-                    backgroundColor: AppColors.primaryPurpleColor,
-                    textColor: Colors.white,
-                    isDisabled: !state.isInputValidated,
-                  ),
-                  SizedBox(height: 5.w),
-                ],
+          margin: EdgeInsets.only(left: 5.w, right: 5.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 10.w),
+              Center(child: Assets.images.importwallet.image()),
+              SizedBox(height: 15.w),
+              Text(tr('importYourWalletWithSecret'),
+                  style: Theme.of(context).textTheme.subtitle3),
+              Text(tr('recoveryPhrase'),
+                  style: Theme.of(context).textTheme.subtitle3),
+              SizedBox(height: 5.w),
+              DboxTextField(
+                  height: 60,
+                  hintText: tr('enterYourSecretRecoveryPhraseHere'),
+                  errorText: state.error,
+                  controller:
+                      context.read<AuthenticationCubit>().secretController),
+              SizedBox(height: 3.w),
+              DboxCheckBox(
+                title: tr('rememberMe'),
+                onTab: (value) {},
               ),
+              SizedBox(height: 10.w),
+              BaseButton(
+                onTap: () async => await context
+                    .read<AuthenticationCubit>()
+                    .saveCredentialFromPrivateKey(),
+                text: LocaleKeys.import.tr(),
+                buttonWidth: 100.w,
+                buttonHeight: 13.w,
+                backgroundColor: AppColors.primaryPurpleColor,
+                textColor: Colors.white,
+                isDisabled: !state.isInputValidated,
+              ),
+              SizedBox(height: 5.w),
+            ],
+          ),
             ),
-          )),
+          ),
         );
       },
     );

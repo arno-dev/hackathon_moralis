@@ -1,15 +1,18 @@
 import 'dart:core';
 
 import 'package:d_box/core/constants/local_storage_path.dart';
+import 'package:d_box/core/error/exceptions.dart';
 import 'package:d_box/core/models/wallet_credential.dart';
 import 'package:d_box/core/services/asymmetic_encryption.dart';
 import 'package:d_box/core/services/file_handler.dart';
 import 'package:d_box/core/services/secure_storage.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pinenacl/x25519.dart';
 
 import '../../../../core/constants/pick_file_type.dart';
+import '../../../../generated/locale_keys.g.dart';
 
 abstract class DboxLocalDataSource {
   Future<bool> previewFile(String url, AsymmetricPrivateKey sourcePrivateKey,
@@ -41,13 +44,17 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
 
   @override
   Future<List<ImageParam>> pickFile(PickFileType pickFileType) async {
-    switch (pickFileType) {
-      case PickFileType.files:
-        return await fileHandler.getMultiFiles();
-      case PickFileType.photos:
-        return await fileHandler.imagePickerHandler();
-      case PickFileType.takePhoto:
-        return await fileHandler.imagePickerHandler(isPhotos: false);
+    try {
+      switch (pickFileType) {
+        case PickFileType.files:
+          return await fileHandler.getMultiFiles();
+        case PickFileType.photos:
+          return await fileHandler.imagePickerHandler();
+        case PickFileType.takePhoto:
+          return await fileHandler.imagePickerHandler(isPhotos: false);
+      }
+    } catch (e) {
+      throw CacheException(LocaleKeys.errorMessages_pickFile.tr());
     }
   }
 
@@ -56,8 +63,12 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
       String content,
       AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic) {
-    return asymmetricEncryption.encryptData(
-        content, sourcePrivateKey, destinationPublic);
+    try {
+      return asymmetricEncryption.encryptData(
+          content, sourcePrivateKey, destinationPublic);
+    } catch (e) {
+      throw CacheException(LocaleKeys.errorMessages_encryptFile.tr());
+    }
   }
 
   @override
@@ -65,23 +76,35 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
       String encryptcontent,
       AsymmetricPrivateKey sourcePrivateKey,
       AsymmetricPublicKey destinationPublic) {
-    return asymmetricEncryption.decryptData(
-        encryptcontent, sourcePrivateKey, destinationPublic);
+    try {
+      return asymmetricEncryption.decryptData(
+          encryptcontent, sourcePrivateKey, destinationPublic);
+    } catch (e) {
+      throw CacheException(LocaleKeys.errorMessages_decryptFile.tr());
+    }
   }
 
   @override
   Future<String?> readIpfsKey() async {
-    String? rawData = await secureStorage
-        .readSecureData<String?>(LocalStoragePath.ipfsCredential);
-    return rawData;
+    try {
+      String? rawData = await secureStorage
+          .readSecureData<String?>(LocalStoragePath.ipfsCredential);
+      return rawData;
+    } catch (e) {
+      throw CacheException(LocaleKeys.errorMessages_readIpfs.tr());
+    }
   }
 
   @override
   Future<WalletCredential?> readWalletCredential() async {
-    Map<String, dynamic>? rawData =
-        await secureStorage.readSecureData(LocalStoragePath.walletCredential);
-    if (rawData != null) return WalletCredential.fromJson(rawData);
-    return null;
+    try {
+      Map<String, dynamic>? rawData =
+          await secureStorage.readSecureData(LocalStoragePath.walletCredential);
+      if (rawData != null) return WalletCredential.fromJson(rawData);
+      return null;
+    } catch (e) {
+      throw CacheException(LocaleKeys.errorMessages_readWallet.tr());
+    }
   }
 
   @override
@@ -94,7 +117,7 @@ class DboxLocalDataSourceImpl extends DboxLocalDataSource {
       await fileHandler.getPreviewFile(base64String, url.split("/").last);
       return true;
     } catch (e) {
-      return false;
+      throw CacheException(LocaleKeys.errorMessages_previewError.tr());
     }
   }
 }

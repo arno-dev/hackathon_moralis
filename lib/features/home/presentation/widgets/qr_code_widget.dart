@@ -15,7 +15,7 @@ import '../../../../generated/assets.gen.dart';
 import '../cubit/Home/home_cubit.dart';
 
 class DboxQRView extends StatefulWidget {
-  DboxQRView({Key? key}) : super(key: key);
+  const DboxQRView({Key? key}) : super(key: key);
 
   @override
   State<DboxQRView> createState() => _DboxQRViewState();

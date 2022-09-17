@@ -23,9 +23,9 @@ abstract class DboxRemoteDataSource {
   Future<ImagesFromLinkModel> getImageFromLink(String link);
   Future<List<ImagesFromLinkModel>> getRecents(String recents);
   Future<SaveImagesModel> postSaveImages(UploadImageParam uploadImageParam);
-  Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
+  Future<String?> initializeFirebaseMessaging(
       {void Function(RemoteMessage)? onMessageOpenedApp,
-       void Function(NotificationPayloadModel?)? onSelectNotification});
+      void Function(NotificationPayloadModel?)? onSelectNotification});
   Future<List<AlertsModel>> getAlerts(String address);
   Future<bool> saveFirebaseToken(FirebaseTokenParam firebaseTokenParam);
 }
@@ -46,7 +46,7 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
     } catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+      throw ServerException(LocaleKeys.errorMessages_getImagesFromLink.tr());
     }
   }
 
@@ -57,7 +57,7 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
     } catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+      throw ServerException(LocaleKeys.errorMessages_getRecent.tr());
     }
   }
 
@@ -68,24 +68,22 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     try {
       return await apiClient.postSaveImages(body);
     } catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+      throw ServerException(LocaleKeys.errorMessages_saveImages.tr());
     }
   }
 
   @override
-  Future<bool> initializeFirebaseMessaging(void Function(String?) onGetToken,
+  Future<String?> initializeFirebaseMessaging(
       {void Function(RemoteMessage)? onMessageOpenedApp,
       void Function(NotificationPayloadModel?)? onSelectNotification}) async {
     try {
-      await notificationService.initializePlatformNotifications(
-        onGetToken,
+      return await notificationService.initializePlatformNotifications(
         onMessageOpenedApp: onMessageOpenedApp,
         onSelectNotification: (String? stringPayload) {
           if (stringPayload != null) {
             Map<String, dynamic> payload = jsonDecode(stringPayload);
             if (payload.isEmpty) {
               onSelectNotification!(null);
-              
             } else {
               onSelectNotification!(NotificationPayloadModel.fromJson(payload));
             }
@@ -94,9 +92,8 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
           }
         },
       );
-      return true;
     } catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+      throw ServerException(LocaleKeys.errorMessages_initializeFirebase.tr());
     }
   }
 
@@ -107,7 +104,7 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
     } catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+      throw ServerException(LocaleKeys.errorMessages_getAlerts.tr());
     }
   }
 
@@ -119,7 +116,7 @@ class DboxRemoteDataSourceImpl extends DboxRemoteDataSource {
     } on DioError catch (e) {
       throw ResponseHelper.returnResponse(e);
     } catch (e) {
-      throw ServerException(LocaleKeys.somethingWrong.tr());
+      throw ServerException(LocaleKeys.errorMessages_saveFirebase.tr());
     }
   }
 }

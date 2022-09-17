@@ -16,5 +16,6 @@ class HomeState with _$HomeState {
     @Default([]) List<int> stack,
     @Default([]) List<String> nameStack,
     @Default(false) bool isHasQrAddress,
+    String? errorMessage,
   }) = _Loaded;
 }

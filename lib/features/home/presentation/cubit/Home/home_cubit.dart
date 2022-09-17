@@ -1,5 +1,4 @@
 import 'package:d_box/core/constants/pick_file_type.dart';
-import 'package:d_box/core/constants/url.dart';
 import 'package:d_box/core/usecases/usecase.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/image_param.dart';
 import 'package:d_box/features/home/data/models/params/upload_image_param/upload_image_param.dart';
@@ -7,13 +6,16 @@ import 'package:d_box/features/home/domain/usecases/pick_images_usecase.dart';
 import 'package:d_box/features/home/domain/usecases/preview_image_usecase.dart';
 import 'package:d_box/features/home/domain/usecases/recenst_usecase.dart';
 import 'package:d_box/features/home/domain/usecases/save_images_usecase.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import '../../../../../core/constants/api_path.dart';
 import '../../../../../core/constants/data_status.dart';
+import '../../../../../generated/locale_keys.g.dart';
 import '../../../domain/entities/images.dart';
 import '../../../domain/entities/images_from_link.dart';
 import '../../../../home/domain/usecases/image_from_link_usecase.dart';
@@ -38,22 +40,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   QRViewController? qrController;
 
-  Future<void> getUserFromLink(String link) async {
-    emit(state.copyWith(dataStatus: DataStatus.loading));
-    final request =
-        await getImagesFromLinkUsecase(GetImagesFromLinkParams(link));
-    request.fold(
-      (error) {
-        emit(state.copyWith(dataStatus: DataStatus.error));
-      },
-      (imagesFromLink) {
-        emit(state.copyWith(
-          dataStatus: DataStatus.loaded,
-          imagesFromLink: imagesFromLink,
-          currentFolder: imagesFromLink.filetreeEntity?.childrenEntity,
-        ));
-      },
-    );
+  Future<void> onDismissErorr() async {
+    await Future<void>.delayed(const Duration(seconds: 5));
+    emit(state.copyWith(errorMessage: null));
   }
 
   Future<void> getRecents() async {
@@ -61,7 +50,8 @@ class HomeCubit extends Cubit<HomeState> {
     final request = await getRecentsUsecase(NoParams());
     request.fold(
       (error) {
-        emit(state.copyWith(dataStatus: DataStatus.error));
+        emit(state.copyWith(
+            dataStatus: DataStatus.error, errorMessage: error.message));
       },
       (data) {
         emit(state.copyWith(
@@ -72,8 +62,7 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  Future<void> onOpenFolder(
-      {required int rootIndex, required int childIndex}) async {
+  void onOpenFolder({required int rootIndex, required int childIndex}) {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     if (state.stack.isEmpty) {
       List<int> newStack = [rootIndex, childIndex];
@@ -83,7 +72,6 @@ class HomeCubit extends Cubit<HomeState> {
               ?.childrenEntity?[childIndex].nameEntity ??
           "";
       List<String> nameStack = [name];
-      print(nameStack);
       emit(
         state.copyWith(
           stack: newStack,
@@ -97,7 +85,6 @@ class HomeCubit extends Cubit<HomeState> {
       List<Images>? current = state.currentFolder?[childIndex].childrenEntity;
       String name = state.currentFolder?[childIndex].nameEntity ?? "";
       List<String> nameStack = [...state.nameStack, name];
-      print(nameStack);
       emit(
         state.copyWith(
           stack: newStack,
@@ -109,7 +96,7 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  Future<void> onBackFolder() async {
+  void onBackFolder() {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     if (state.stack.length <= 2) {
       return emit(state.copyWith(
@@ -130,7 +117,6 @@ class HomeCubit extends Cubit<HomeState> {
         current = current?[element.value].childrenEntity;
       }
     }
-    print(newNameStack);
     emit(state.copyWith(
       dataStatus: DataStatus.loaded,
       stack: newStack,
@@ -144,7 +130,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(state.copyWith(dataStatus: DataStatus.loading));
 
     String? newPath;
-    newPath = AppUrl.urlMoralis;
+    newPath = ApiPath.urlMoralis;
     newPath = "$newPath${state.recents?[rootIndex].cidEntity}";
     if (state.stack.isEmpty) {
       String? nameFile = state.recents?[rootIndex].filetreeEntity
@@ -158,22 +144,22 @@ class HomeCubit extends Cubit<HomeState> {
       newPath = "$newPath/$fileName";
     }
     String? destinationPublic = state.recents?[rootIndex].ipfsKeyEntity;
-    print(newPath);
     if (destinationPublic != null) {
       await previewImageUsecase(PreviewImageParam(newPath, destinationPublic));
-    emit(state.copyWith(dataStatus: DataStatus.loaded));
-
+      emit(state.copyWith(dataStatus: DataStatus.loaded));
     } else {
-      return emit(state.copyWith(dataStatus: DataStatus.error));
+      return emit(state.copyWith(
+          dataStatus: DataStatus.error,
+          errorMessage: LocaleKeys.errorMessages_previewInvalid.tr()));
     }
   }
 
   Future<void> onPickImages(PickFileType pickFileType) async {
     final request = await pickImagesUsecase(pickFileType);
-    request.fold((error){
-        emit(state.copyWith(dataStatus: DataStatus.error));
-      },
-        (data) async {
+    request.fold((error) {
+      emit(state.copyWith(
+          dataStatus: DataStatus.error, errorMessage: error.message));
+    }, (data) async {
       emit(state.copyWith(listImages: data, isHasImage: data.isNotEmpty));
     });
   }
@@ -186,13 +172,17 @@ class HomeCubit extends Cubit<HomeState> {
       path: addFolderController.text,
     ));
     saveImageResponse.fold(
-      (errorMessage){
-        emit(state.copyWith(dataStatus: DataStatus.error));
+      (error) {
+        emit(state.copyWith(
+            dataStatus: DataStatus.error, errorMessage: error.message));
       },
       (response) async {
         emit(state.copyWith(
-          dataStatus: DataStatus.loaded,
-            addPeople: null, addFolder: "", listImages: [], isHasImage: false));
+            dataStatus: DataStatus.loaded,
+            addPeople: null,
+            addFolder: "",
+            listImages: [],
+            isHasImage: false));
         await getRecents();
       },
     );

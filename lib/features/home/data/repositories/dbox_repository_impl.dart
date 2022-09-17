@@ -43,17 +43,21 @@ class DboxRepositoryImpl implements DboxRepository {
       if (wallet != null) {
         address = wallet.address;
       } else {
-        return Left(ServerFailure(LocaleKeys.somethingWrong.tr()));
+        return Left(
+            ServerFailure(LocaleKeys.errorMessages_somethingWrong.tr()));
       }
       final data = await dboxRemoteDataSource.getRecents(address);
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, List<ImageParam>>> pickFiles(PickFileType pickFileType) async {
+  Future<Either<Failure, List<ImageParam>>> pickFiles(
+      PickFileType pickFileType) async {
     try {
       final data = await dboxLocalDataSource.pickFile(pickFileType);
       return Right(data);
@@ -133,28 +137,30 @@ class DboxRepositoryImpl implements DboxRepository {
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message.toString()));
     }
   }
 
   @override
   Future<Either<Failure, bool>> initializeFirebaseMessaging(
       {void Function(RemoteMessage message)? onMessageOpenedApp,
-       void Function(NotificationPayload?)? onSelectNotification}) async {
+      void Function(NotificationPayload?)? onSelectNotification}) async {
     try {
-      final data = await dboxRemoteDataSource.initializeFirebaseMessaging(
-        (token) async {
-          final wallet = await dboxLocalDataSource.readWalletCredential();
-          await dboxRemoteDataSource.saveFirebaseToken(FirebaseTokenParam(
-            address: wallet?.address,
-            token: token,
-          ));
-        },
+      final wallet = await dboxLocalDataSource.readWalletCredential();
+      final token = await dboxRemoteDataSource.initializeFirebaseMessaging(
         onMessageOpenedApp: onMessageOpenedApp,
         onSelectNotification: onSelectNotification,
       );
-      return Right(data);
+      await dboxRemoteDataSource.saveFirebaseToken(FirebaseTokenParam(
+        address: wallet?.address,
+        token: token,
+      ));
+      return const Right(true);
     } on ServerException catch (e) {
-      return Left(ServerFailure(e.message.toString()));
+      return Left(ServerFailure(e.message));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message.toString()));
     }
   }
 
@@ -170,6 +176,8 @@ class DboxRepositoryImpl implements DboxRepository {
       return Right(data);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message.toString()));
     }
   }
 
@@ -192,16 +200,16 @@ class DboxRepositoryImpl implements DboxRepository {
       return Right(response);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message.toString()));
-    } catch (e) {
-      return Left(ServerFailure(LocaleKeys.somethingWrong.tr()));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message.toString()));
     }
   }
 
-    @override
+  @override
   Future<Either<Failure, String>> getMyQrCode() async {
     try {
       String? myIpfsCredentialString = await dboxLocalDataSource.readIpfsKey();
-      PrivateKey privateKey = PrivateKey.decode(myIpfsCredentialString??"");
+      PrivateKey privateKey = PrivateKey.decode(myIpfsCredentialString ?? "");
       String publicKey = privateKey.publicKey.encode();
       final wallet = await dboxLocalDataSource.readWalletCredential();
       String address = "";
@@ -211,8 +219,10 @@ class DboxRepositoryImpl implements DboxRepository {
 
       String qrString = '$address-+-$publicKey';
       return Right(qrString);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message.toString()));
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message.toString()));
+    } catch (e) {
+      return Left(CacheFailure(LocaleKeys.errorMessages_getQrCode.tr()));
     }
   }
 }

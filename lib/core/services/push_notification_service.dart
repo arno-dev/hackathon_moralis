@@ -16,7 +16,6 @@ class PushNotificationService {
 
   Future<String?> _registerNotification(
     void Function(RemoteMessage)? onMessageOpenedApp,
-    void Function(String?) onGetToken,
   ) async {
     try {
       FirebaseMessaging.onBackgroundMessage(messageHandler);
@@ -28,14 +27,12 @@ class PushNotificationService {
       );
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         final token = await messaging.getToken();
-        print(token);
-        onGetToken(token);
 
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
           showLocalNotification(
               body: message.notification?.body ?? "",
               title: message.notification?.title ?? "",
-              payload: convertPayload(message.data));
+              payload: _convertPayload(message.data));
         });
 
         FirebaseMessaging.onMessageOpenedApp.listen(onMessageOpenedApp);
@@ -43,13 +40,12 @@ class PushNotificationService {
       } else {
         throw ServerException("User declined or has not accepted permission");
       }
-    } catch (_) {
-      rethrow;
+    } catch (e) {
+      throw ServerException(e.toString());
     }
   }
 
-  Future<void> initializePlatformNotifications(
-    void Function(String?) onGetToken, {
+  Future<String?> initializePlatformNotifications( {
     void Function(RemoteMessage)? onMessageOpenedApp,
     void Function(String?)? onSelectNotification,
   }) async {
@@ -67,7 +63,14 @@ class PushNotificationService {
           ?.requestPermission();
       flutterLocalNotificationsPlugin.initialize(initializationSettings,
           onSelectNotification: onSelectNotification);
-      _registerNotification(onMessageOpenedApp, onGetToken);
+
+      final details = await flutterLocalNotificationsPlugin
+          .getNotificationAppLaunchDetails();
+      if (details != null && details.didNotificationLaunchApp) {
+        onSelectNotification!(details.payload);
+      }
+      final token = await _registerNotification(onMessageOpenedApp);
+      return token;
     } catch (_) {
       rethrow;
     }
@@ -88,14 +91,8 @@ class PushNotificationService {
     );
   }
 
-  String convertPayload(Map<String, dynamic> payload) {
+  String _convertPayload(Map<String, dynamic> payload) {
     return jsonEncode(payload);
-  }
-
-  void _onSelectNotification(String? payload) {
-    if (payload != null) {
-      debugPrint(payload);
-    }
   }
 
   Future<NotificationDetails> _notificationDetails() async {
@@ -110,12 +107,6 @@ class PushNotificationService {
 
     IOSNotificationDetails iosNotificationDetails =
         const IOSNotificationDetails();
-
-    final details =
-        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-    if (details != null && details.didNotificationLaunchApp) {
-      _onSelectNotification(details.payload);
-    }
 
     NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics, iOS: iosNotificationDetails);

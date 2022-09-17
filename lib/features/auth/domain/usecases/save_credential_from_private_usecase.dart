@@ -12,7 +12,7 @@ class SaveCredentialFromPrivateKeyUseCase implements UseCase<bool, String> {
   SaveCredentialFromPrivateKeyUseCase({required this.authenticationRepository});
   @override
   Future<Either<Failure, bool>> call(String params) async {
-    return  authenticationRepository.verifyCredentialFromPrivateKey(privateKey: params);
+    return await authenticationRepository.verifyCredentialFromPrivateKey(
+        privateKey: params);
   }
-  
 }

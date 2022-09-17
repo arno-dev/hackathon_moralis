@@ -1,5 +1,4 @@
 import 'package:d_box/core/config/themes/app_text_theme.dart';
-import 'package:d_box/core/constants/colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';

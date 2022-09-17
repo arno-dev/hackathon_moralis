@@ -9,14 +9,14 @@ class ResponseHelper {
     try {
       if (dioError.error.runtimeType == SocketException &&
           dioError.type == DioErrorType.other) {
-        return SocketException(dioError.message);
+        return ServerException(dioError.message);
       } else {
         return ServerException(
           dioError.message,
         );
       }
     } catch (e) {
-      return ServerException(LocaleKeys.somethingWrong.tr());
+      return ServerException(LocaleKeys.errorMessages_somethingWrong.tr());
     }
   }
 }
