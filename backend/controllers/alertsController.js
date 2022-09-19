@@ -29,55 +29,16 @@ exports.saveRegistrationToken = async (request, response) => {
         return response.sendStatus(500)
     }
 }
-// get firebase token from address
-exports.getRegistrationTokenFromAddress = async (request, response) => {
-    const { address } = request.params;
-    if (!address) {
-        return response.status(400);
-    }
-    const firebaseToken = await alertDB.getData("/token/" + address);
-    return response.send({ "token": firebaseToken });
-}
 
 async function sendPush(dest, message) {
     console.log("Send push");
     const options = notification_options;
-
-    // Get the token based on the destination address
-    // try {
-    //     // 0xFE2b19a3545f25420E3a5DAdf11b5582b5B3aBA8
-    //     console.log(`firebase ${dest}`);
-    //     const firebaseToken = await alertDB.getData("/token/" + dest);
-    //     console.log(`firebase ${firebaseToken}`);
-    //     console.log(`body ${message}`);
-
-    // }
-    // catch (e) {
-    //     console.log("No firebase token was found for : " + dest);
-    // }
-
-    admin.messaging().sendToDevice("czqYp_CgRDyjuk2mEgn0KM:APA91bH4OP0HGT9W0VmxauoSZAKWpgYnj2k2gdK8P-wVvs-VBOwjs0lhK6eDuXLj7VZqYq4l9otTa0d2QOnUa6yCufHtbMZtDFvwgzHVOXtssIWcQ3l-PpgT9P8b59I7tWa0OA5cdXCT", message)
+    admin.messaging().sendToDevice(firebaseToken, message, options)
         .then(_ => {
-            console.warn("Notification sent successfully");
+            console.log("Notification sent successfully");
         })
         .catch(error => {
-            console.error("Notification error: " + error);
-        });
-}
-
-// send invite link via firebase cloud messaging
-exports.sendNotifications = async (request, response) => {
-    const { registrationToken, message } = request.body
-    const options = notification_options
-    if (!registrationToken || !message) {
-        return response.status(400)
-    }
-    admin.messaging().sendToDevice(registrationToken, message, options)
-        .then(data => {
-            return response.status(200).send(data)
-        })
-        .catch(error => {
-            return response.status(500).send(error)
+            console.log("Notification error : " + error);
         });
 }
 
@@ -104,7 +65,6 @@ exports.getAlerts = async (request, response) => {
         return response.send([]);
     }
 }
-
 exports.saveAlert = async (alertType, address, payload) => {
     console.log("SaveAlert::(" + alertType + ", " + address + ", " + payload);
     if (alertType == ALERT.AddedInContact) {
