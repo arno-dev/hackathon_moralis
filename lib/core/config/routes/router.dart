@@ -12,6 +12,7 @@ import '../../../features/home/presentation/cubit/alerts/alerts_cubit.dart';
 import '../../../features/home/presentation/cubit/detail/detail_cubit.dart';
 import '../../../features/home/presentation/cubit/push_notification/push_notification_cubit.dart';
 import '../../../features/home/presentation/page/home_page.dart';
+import '../../../features/home/presentation/widgets/qr_code_widget.dart';
 import '../DI/configure_dependencies.dart';
 
 class AppRoute {
@@ -22,6 +23,8 @@ class AppRoute {
   static const String homeRoute = "/home";
   static const String notifications = "/notifications";
   static const String detailRoute = "/detail";
+  static const String scanQrRoute = "/scanQr";
+
   static Route<dynamic>? routeGenerate(
       RouteSettings settings, TickerProvider tickerProvider) {
     switch (settings.name) {
@@ -82,6 +85,12 @@ class AppRoute {
                   ],
                   child: const DetailPage(),
                 ));
+
+      case scanQrRoute:
+        return MaterialPageRoute(
+          builder: (_) => const DboxQRView(),
+          fullscreenDialog: true,
+        );
       default:
         return null;
     }

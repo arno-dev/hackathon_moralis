@@ -30,13 +30,19 @@ class HomeCubit extends Cubit<HomeState> {
   final PickImagesUsecase pickImagesUsecase;
   final SaveImagesUsecase saveImagesUsecase;
   final PreviewImageUsecase previewImageUsecase;
-  HomeCubit(this.getImagesFromLinkUsecase, this.getRecentsUsecase,
-      this.pickImagesUsecase, this.saveImagesUsecase, this.previewImageUsecase)
-      : super(const HomeState());
 
   TextEditingController searchController = TextEditingController();
-  TextEditingController addPeopleController = TextEditingController(text: "");
+  TextEditingController addPeopleController = TextEditingController();
   TextEditingController addFolderController = TextEditingController(text: "");
+  HomeCubit(this.getImagesFromLinkUsecase, this.getRecentsUsecase,
+      this.pickImagesUsecase, this.saveImagesUsecase, this.previewImageUsecase)
+      : super(const HomeState()) {
+    addPeopleController.addListener(() {
+      if (addPeopleController.text.isEmpty && state.isDisableUpload) {
+        emit(state.copyWith(isDisableUpload: false));
+      }
+    });
+  }
 
   QRViewController? qrController;
 
@@ -150,8 +156,7 @@ class HomeCubit extends Cubit<HomeState> {
       previewImage.fold(
         (error) {
           return emit(state.copyWith(
-              dataStatus: DataStatus.error,
-              errorMessage: error.message));
+              dataStatus: DataStatus.error, errorMessage: error.message));
         },
         (response) {
           return emit(state.copyWith(dataStatus: DataStatus.loaded));
@@ -178,47 +183,51 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> onSaveImage() async {
     emit(state.copyWith(dataStatus: DataStatus.loading));
     final saveImageResponse = await saveImagesUsecase(SaveImagesParams(
-      destinationPublic: state.addPeople,
+      destinationPublic:
+          addPeopleController.text.isEmpty ? null : addPeopleController.text,
       uploadImageParam: UploadImageParam(images: state.listImages),
       path: addFolderController.text,
     ));
     saveImageResponse.fold(
       (error) {
+        onCancelDialog();
         emit(state.copyWith(
             dataStatus: DataStatus.error, errorMessage: error.message));
       },
       (response) async {
+        onCancelDialog();
         emit(state.copyWith(
-            dataStatus: DataStatus.loaded,
-            addPeople: null,
-            addFolder: "",
-            listImages: [],
-            isHasImage: false));
+          dataStatus: DataStatus.loaded,
+        ));
         await getRecents();
       },
     );
   }
 
   void onCancelDialog() {
+    addPeopleController.text = "";
+    addFolderController.text = "";
     emit(state.copyWith(
-      addFolder: "",
-      addPeople: null,
       listImages: [],
       isHasImage: false,
       isHasQrAddress: false,
+      isDisableUpload: true,
     ));
   }
 
-  void onAddPeopleChange(String text) {
-    emit(state.copyWith(addPeople: text));
-  }
-
-  void onAddFolderChange(String text) {
-    emit(state.copyWith(addFolder: text));
-  }
-
   void onQrCode(String text) {
-    String addPeople = text.toString();
-    emit(state.copyWith(addPeople: addPeople, isHasQrAddress: true));
+    addPeopleController.text = text;
+    emit(state.copyWith(
+      isHasQrAddress: true,
+      isHasImage: false,
+    ));
+  }
+
+  @override
+  Future<void> close() {
+    searchController.dispose();
+    addPeopleController.dispose();
+    addFolderController.dispose();
+    return super.close();
   }
 }

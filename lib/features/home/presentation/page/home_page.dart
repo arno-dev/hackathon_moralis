@@ -6,6 +6,7 @@ import '../../../../core/config/DI/configure_dependencies.dart';
 import '../../../../core/config/routes/router.dart';
 import '../../../../core/constants/colors.dart';
 import '../../../../core/constants/data_status.dart';
+import '../../../../core/constants/pick_file_type.dart';
 import '../../../../core/util/navigation.dart';
 import '../../../../core/widgets/d_appbar.dart';
 import '../../../../core/widgets/loading.dart';
@@ -16,6 +17,7 @@ import '../../domain/entities/images_from_link.dart';
 import '../cubit/Home/home_cubit.dart';
 import '../cubit/account/my_account_cubit.dart';
 import '../cubit/push_notification/push_notification_cubit.dart';
+import '../widgets/add_info_view.dart';
 import '../widgets/error_view.dart';
 import '../widgets/main_view.dart';
 import '../widgets/share_bottom_sheet.dart';
@@ -68,18 +70,57 @@ class HomePage extends StatelessWidget {
             if (state.isHasImage) {
               Navigation.bottomSheetModel(
                 context,
-                BlocProvider.value(
-                  value: context.read<HomeCubit>(),
-                  child: const ShareBottomSheetWidget(),
+                ShareBottomSheetWidget(
+                  onUploadToCloud: () async {
+                    await context.read<HomeCubit>().onSaveImage();
+                  },
+                  onAddAddress: () {
+                    Navigation.dBoxShowDialog(
+                      context,
+                      AddInfo(
+                        isAddFolder: false,
+                        onSaveImage: () async {
+                          await context.read<HomeCubit>().onSaveImage();
+                        },
+                        addFolderController:
+                            context.read<HomeCubit>().addFolderController,
+                        addPeopleController:
+                            context.read<HomeCubit>().addPeopleController,
+                        isDisableSend: state.isDisableUpload,
+                      ),
+                    );
+                  },
+                  onScanQrCode: (qrCode) {
+                    context.read<HomeCubit>().onQrCode(qrCode.toString());
+                  },
                 ),
-              ).then((value) => {context.read<HomeCubit>().onCancelDialog()});
+              );
             }
+
+            if (state.isHasQrAddress) {
+              Navigation.dBoxShowDialog(
+                context,
+                AddInfo(
+                  isAddFolder: true,
+                  addFolderController:
+                      context.read<HomeCubit>().addFolderController,
+                  addPeopleController:
+                      context.read<HomeCubit>().addPeopleController,
+                  onSaveImage: () async {
+                    await context.read<HomeCubit>().onSaveImage();
+                  },
+                  isDisableSend: state.isDisableUpload,
+                ),
+              );
+            }
+
             if (state.errorMessage != null) {
               await context.read<HomeCubit>().onDismissErorr();
             }
           }),
           listenWhen: ((previous, current) {
             return previous.isHasImage != current.isHasImage ||
+                previous.isHasQrAddress != current.isHasQrAddress ||
                 previous.errorMessage != current.errorMessage;
           }),
           builder: (context, state) {
@@ -111,11 +152,25 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          context.read<HomeCubit>().onCancelDialog();
           Navigation.bottomSheetModel(
             context,
-            BlocProvider.value(
-              value: context.read<HomeCubit>(),
-              child: const UploadBottomSheetWidget(),
+            UploadBottomSheetWidget(
+              onTakePhoto: () async {
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.takePhoto);
+              },
+              onUploadFiles: () async {
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.files);
+              },
+              onUploadPhotos: () async {
+                await context
+                    .read<HomeCubit>()
+                    .onPickImages(PickFileType.photos);
+              },
             ),
           );
         },
