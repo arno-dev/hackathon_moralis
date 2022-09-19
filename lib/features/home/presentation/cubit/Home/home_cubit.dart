@@ -145,8 +145,18 @@ class HomeCubit extends Cubit<HomeState> {
     }
     String? destinationPublic = state.recents?[rootIndex].ipfsKeyEntity;
     if (destinationPublic != null) {
-      await previewImageUsecase(PreviewImageParam(newPath, destinationPublic));
-      emit(state.copyWith(dataStatus: DataStatus.loaded));
+      final previewImage = await previewImageUsecase(
+          PreviewImageParam(newPath, destinationPublic));
+      previewImage.fold(
+        (error) {
+          return emit(state.copyWith(
+              dataStatus: DataStatus.error,
+              errorMessage: error.message));
+        },
+        (response) {
+          return emit(state.copyWith(dataStatus: DataStatus.loaded));
+        },
+      );
     } else {
       return emit(state.copyWith(
           dataStatus: DataStatus.error,
@@ -155,6 +165,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future<void> onPickImages(PickFileType pickFileType) async {
+    emit(state.copyWith(isHasImage: false));
     final request = await pickImagesUsecase(pickFileType);
     request.fold((error) {
       emit(state.copyWith(

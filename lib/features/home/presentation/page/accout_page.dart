@@ -34,7 +34,7 @@ class AccountPage extends StatelessWidget {
                 ),
               )
             : DboxAlertDialog(
-                title: tr('myAccount'),
+                title: LocaleKeys.myAccount.tr(),
                 contentPadding: 0,
                 actionsPadding: 0,
                 content: [
