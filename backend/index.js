@@ -47,9 +47,5 @@ app.post('/v2/saveRegistrationToken', alertsController.saveRegistrationToken)
 
 app.listen(PORT || 3000, async () => {
   console.log("listening on localhost:3000");
-  await Moralis.start({
-    apiKey: MORALIS_API_KEY,
-  })
-
   await imagesController.main();
 });
