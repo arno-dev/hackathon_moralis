@@ -8,6 +8,10 @@ const { nanoid } = require('nanoid');
 const e = require("express");
 const OrbitDB = require('orbit-db');
 const axios = require("axios");
+const {
+    MORALIS_API_KEY
+} = process.env;
+
 
 async function loadIpfs() {
     return node

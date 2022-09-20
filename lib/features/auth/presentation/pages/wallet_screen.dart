@@ -14,6 +14,7 @@ import '../../../../core/widgets/d_box_alert_dialog.dart';
 import '../../../../core/widgets/d_box_check_box.dart';
 import '../../../../core/widgets/d_box_un_ordered_list.dart';
 import '../../../../generated/assets.gen.dart';
+import '../../../../generated/locale_keys.g.dart';
 import '../cubit/authentication_cubit_cubit.dart';
 
 class WalletPage extends StatelessWidget {
@@ -23,7 +24,7 @@ class WalletPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: DAppBar(
-        title: tr('titleCloudmet'),
+        title: LocaleKeys.titleCloudmet.tr(),
         titleStyle: Theme.of(context).textTheme.caption2,
       ),
       body: SingleChildScrollView(
@@ -31,19 +32,19 @@ class WalletPage extends StatelessWidget {
           margin: EdgeInsets.only(left: 5.w, right: 5.w),
           child: Column(
             children: [
-              Image.asset('assets/gifs/addfiles.gif',
+              Image.asset(Assets.gifs.addfiles.path,
                   gaplessPlayback: true, fit: BoxFit.fill),
-              Text(tr('welcomeToCloudmet'),
+              Text(LocaleKeys.welcomeToCloudmet.tr(),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.title2),
               SizedBox(height: 5.w),
-              Text(tr('welcomeContent'), textAlign: TextAlign.center),
+              Text(LocaleKeys.welcomeContent.tr(), textAlign: TextAlign.center),
               SizedBox(height: 5.w),
               BaseButton(
                   onTap: () {
                     navService.pushNamed(AppRoute.importWalletRoute);
                   },
-                  text: tr('importWallet'),
+                  text: LocaleKeys.importWallet.tr(),
                   buttonWidth: 100.w,
                   backgroundColor: AppColors.primaryPurpleColor,
                   textColor: Colors.white,
@@ -63,13 +64,13 @@ class WalletPage extends StatelessWidget {
                                   SizedBox(height: 5.w),
                                   DboxUnorderedList(
                                     [
-                                      tr('secureYourWalletListText1'),
-                                      tr('secureYourWalletListText2')
+                                      LocaleKeys.secureYourWalletListText1.tr(),
+                                      LocaleKeys.secureYourWalletListText2.tr()
                                     ],
                                     fontSize: 14,
                                   ),
                                   DboxCheckBox(
-                                    title: tr('iGotIt'),
+                                    title: LocaleKeys.iGotIt.tr(),
                                     onTab: (value) {
                                       context
                                           .read<AuthenticationCubit>()
@@ -90,7 +91,7 @@ class WalletPage extends StatelessWidget {
                                                 AppRoute.createWalletRoute);
                                           },
                                           isDisabled: !isChecked,
-                                          text: tr('start'),
+                                          text: LocaleKeys.start.tr(),
                                           buttonWidth: 100.w,
                                           backgroundColor:
                                               AppColors.primaryPurpleColor,
@@ -105,7 +106,7 @@ class WalletPage extends StatelessWidget {
                           .read<AuthenticationCubit>()
                           .changeCheckValue(false));
                 },
-                text: tr('createYourWallet'),
+                text: LocaleKeys.createYourWallet.tr(),
                 buttonWidth: 100.w,
                 buttonHeight: 13.w,
                 borderColor: AppColors.primaryPurpleColor,

@@ -32,14 +32,20 @@ exports.saveRegistrationToken = async (request, response) => {
 
 async function sendPush(dest, message) {
     console.log("Send push");
-    const options = notification_options;
-    admin.messaging().sendToDevice(firebaseToken, message, options)
-        .then(_ => {
-            console.log("Notification sent successfully");
-        })
-        .catch(error => {
-            console.log("Notification error : " + error);
-        });
+    try {
+        const firebaseToken = await alertDB.getData("/token/" + dest);
+        const options = notification_options;
+        admin.messaging().sendToDevice(firebaseToken, message, options)
+            .then(_ => {
+                console.log("Notification sent successfully");
+            })
+            .catch(error => {
+                console.log("Notification error : " + error);
+            });
+    } catch (error) {
+        console.log("Notification error : " + error);
+    }
+
 }
 
 

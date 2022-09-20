@@ -46,7 +46,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on CacheException catch (e) {
-      throw CacheFailure(e.message);
+      return Left(CacheFailure(e.message));
     }
   }
 
@@ -61,7 +61,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on CacheException catch (e) {
-      throw CacheFailure(e.message);
+      return Left(CacheFailure(e.message));
     }
   }
 }

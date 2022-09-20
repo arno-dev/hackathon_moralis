@@ -37,7 +37,7 @@ class AuthenticationLocalDataSourceImpl extends AuthenticationLocalDataSource {
   Future<bool> saveIpfsCredential({required String ipfsCredential}) async {
     try {
       PrivateKey ipfsKey = asymmetricEncryption
-          .generatePrivateKeyFromWalletPrivate(LocalStoragePath.ipfsCredential);
+          .generatePrivateKeyFromWalletPrivate(ipfsCredential);
       String encodeData = ipfsKey.encode();
       await secureStorage.writeSecureData(
           LocalStoragePath.ipfsCredential, encodeData);

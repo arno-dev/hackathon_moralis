@@ -31,7 +31,7 @@ class ImportWalletPage extends StatelessWidget {
         return Scaffold(
           appBar: DAppBar(
             onTap: () => navService.goBack(),
-            title: tr('importWallet'),
+            title: LocaleKeys.importWallet.tr(),
             titleStyle: Theme.of(context).textTheme.caption2,
             centerTitle: false,
           ),
@@ -44,20 +44,20 @@ class ImportWalletPage extends StatelessWidget {
               SizedBox(height: 10.w),
               Center(child: Assets.images.importwallet.image()),
               SizedBox(height: 15.w),
-              Text(tr('importYourWalletWithSecret'),
+              Text(LocaleKeys.importYourWalletWithSecret.tr(),
                   style: Theme.of(context).textTheme.subtitle3),
-              Text(tr('recoveryPhrase'),
+              Text(LocaleKeys.recoveryPhrase.tr(),
                   style: Theme.of(context).textTheme.subtitle3),
               SizedBox(height: 5.w),
               DboxTextField(
                   height: 60,
-                  hintText: tr('enterYourSecretRecoveryPhraseHere'),
+                  hintText: LocaleKeys.enterYourSecretRecoveryPhraseHere.tr(),
                   errorText: state.error,
                   controller:
                       context.read<AuthenticationCubit>().secretController),
               SizedBox(height: 3.w),
               DboxCheckBox(
-                title: tr('rememberMe'),
+                title: LocaleKeys.rememberMe.tr(),
                 onTab: (value) {},
               ),
               SizedBox(height: 10.w),
