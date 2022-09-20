@@ -13,31 +13,19 @@ async function loadIpfs() {
     return node
 }
 
-// TODO: moving this to orbit
-// var db = new JsonDB(new Config("tempDatabase", true, false, '/'));
 let db
 let orbitdb
 var isDBReady = false;
-// Moving to orbitDB
 
 exports.main = async () => {
     const { create } = await import('ipfs-core')
     try {
-        console.log("ipfs");
         const ipfs = await create({
             start: true,
             EXPERIMENTAL: {
                 pubsub: true,
             },
         });
-        console.log("iporbitdbfs");
-        // orbitdb = await OrbitDB.createInstance(ipfs);
-        // console.log("db");
-        // db = await orbitdb.keyvalue("test-db");
-        // console.log("address  : " + db.address.toString());
-        // Locally i'm using this orbit DB address but should be changed
-        const existingDBAddress = "/orbitdb/zdpuAqpgGhd1zLt6fKfp3xw9sYsbosNNdHQ4ix4KmrDAVK2zw/test-db";
-        const isValid = OrbitDB.isValidAddress(existingDBAddress);
         console.log("LOG:: we are checking if there's an existing DB")
         console.log("LOG:: we are creating a new instance of Orbit DB")
         orbitdb = await OrbitDB.createInstance(ipfs);
@@ -133,7 +121,6 @@ exports.createShareableLink = async (request, response) => {
     try {
 
         const shareLink = await db.query((doc) => doc._id == "/sharing/" + origin + "/" + dest + "/" + cid)[0];
-        // const shareLink = await db.getData("/sharing/" + origin + "/" + dest + "/" + cid);
         const { cid, link } = shareLink;
         await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link, "createdAt": createdAt });
         return response.send(shareLink);
@@ -176,12 +163,9 @@ exports.getImagesFromLink = async (request, response) => {
     }
 
     try {
-        // This can 
-        // const imagesFromLink = await db.getData("/links/" + link);
         const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
         const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
         const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
-        // const ipfsInfo = await db.getData("/" + cid);
         const ipfsImages = ipfsInfo["doc"]["paths"];
         const paths = await this.getImages(ipfsImages, cid);
 
@@ -205,19 +189,11 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
     }
 
     try {
-        // const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
-
-        // const linksAddressedToMyself = await db.getData("/receivers/" + address + "/links");
-
-        // await db.put({ _id: "/receivers/" + dest + "/links/" + ID, type: "links", doc: shareData });dest
-        
         const linksAddressedToMyselfRaw = await db.query((doc) => doc.type == "links" && doc.dest == address);
-        // const linksAddressedToMyselfRaw = await db.query((doc) => doc._id == "/receivers/" + address + "/links[]")[0];
         var linksAddressedToMyself = []; 
         for (var i = 0; i < linksAddressedToMyselfRaw.length; i++) {
             linksAddressedToMyself.push(linksAddressedToMyselfRaw[i]["doc"]);
         }
-        // const linksAddressedToMyself = linksAddressedToMyselfRaw.map((e) => e["doc"]);
         // Now we want to grab all the files from those links
         const linksUniqueAddressedToMyself = [...new Set(linksAddressedToMyself)];
         var files = [];
@@ -231,15 +207,6 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
             // const ipfsInfo = await db.getData("/" + cid);
             const ipfsImages = ipfsInfo["doc"]["paths"];
 
-            /*
-
-        const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
-        const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
-        const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
-        // const ipfsInfo = await db.getData("/" + cid);
-        const ipfsImages = ipfsInfo["doc"]["paths"];
-        const paths = await this.getImages(ipfsImages, cid);
-        */
             const paths = await this.getImages(ipfsImages, cid);
 
             files.push({
