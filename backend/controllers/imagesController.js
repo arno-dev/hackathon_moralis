@@ -208,7 +208,7 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
         for (var i = 0; i < linksUniqueAddressedToMyself.length; i++) {
             const { link } = linksUniqueAddressedToMyself[i];
 
-            console.log("LOG:: doc : " + doc);
+            console.log("LOG:: link : " + link);
             const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
             // const imagesFromLink = await db.getData("/links/" + link);
             const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
@@ -428,7 +428,7 @@ async function insertAlertInDB(address, message, payload) {
 
     var docs = [];
     try {
-        doc = await db.query((doc) => doc._id == "/alerts/" + address + "/messages")[0];
+        const doc = await db.query((doc) => doc._id == "/alerts/" + address + "/messages")[0];
         docs = doc["doc"];
     }
     catch (e) {
