@@ -75,13 +75,13 @@ class AlertsPage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
-                                        width: 74.w,
+                                        width: 70.w,
                                         child: Text(
                                           listOfAlert[index]
                                               .messageEntity
                                               .notificationEntity
                                               .bodyEnitity,
-                                          maxLines: 2,
+                                          maxLines: 1,
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,

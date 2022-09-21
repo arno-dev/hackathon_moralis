@@ -150,35 +150,44 @@ class HomePage extends StatelessWidget {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<HomeCubit>().onCancelDialog();
-          Navigation.bottomSheetModel(
-            context,
-            UploadBottomSheetWidget(
-              onTakePhoto: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.takePhoto);
-              },
-              onUploadFiles: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.files);
-              },
-              onUploadPhotos: () async {
-                await context
-                    .read<HomeCubit>()
-                    .onPickImages(PickFileType.photos);
-              },
-            ),
-          );
+      floatingActionButton: BlocSelector<HomeCubit, HomeState, DataStatus>(
+        selector: (state) {
+          return state.dataStatus;
         },
-        backgroundColor: AppColors.primaryPurpleColor,
-        child: const Icon(
-          Icons.add,
-          size: 30,
-        ),
+        builder: (context, dataStatus) {
+          return dataStatus == DataStatus.loaded
+              ? FloatingActionButton(
+                  onPressed: () {
+                    context.read<HomeCubit>().onCancelDialog();
+                    Navigation.bottomSheetModel(
+                      context,
+                      UploadBottomSheetWidget(
+                        onTakePhoto: () async {
+                          await context
+                              .read<HomeCubit>()
+                              .onPickImages(PickFileType.takePhoto);
+                        },
+                        onUploadFiles: () async {
+                          await context
+                              .read<HomeCubit>()
+                              .onPickImages(PickFileType.files);
+                        },
+                        onUploadPhotos: () async {
+                          await context
+                              .read<HomeCubit>()
+                              .onPickImages(PickFileType.photos);
+                        },
+                      ),
+                    );
+                  },
+                  backgroundColor: AppColors.primaryPurpleColor,
+                  child: const Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                )
+              : const SizedBox.shrink();
+        },
       ),
       bottomNavigationBar: BlocSelector<HomeCubit, HomeState, String?>(
         selector: (state) {

@@ -37,44 +37,45 @@ class ImportWalletPage extends StatelessWidget {
           ),
           body: SingleChildScrollView(
             child: Container(
-          margin: EdgeInsets.only(left: 5.w, right: 5.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 10.w),
-              Center(child: Assets.images.importwallet.image()),
-              SizedBox(height: 15.w),
-              Text(LocaleKeys.importYourWalletWithSecret.tr(),
-                  style: Theme.of(context).textTheme.subtitle3),
-              Text(LocaleKeys.recoveryPhrase.tr(),
-                  style: Theme.of(context).textTheme.subtitle3),
-              SizedBox(height: 5.w),
-              DboxTextField(
-                  height: 60,
-                  hintText: LocaleKeys.enterYourSecretRecoveryPhraseHere.tr(),
-                  errorText: state.error,
-                  controller:
-                      context.read<AuthenticationCubit>().secretController),
-              SizedBox(height: 3.w),
-              DboxCheckBox(
-                title: LocaleKeys.rememberMe.tr(),
-                onTab: (value) {},
+              margin: EdgeInsets.only(left: 5.w, right: 5.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 10.w),
+                  Center(child: Assets.images.importwallet.image()),
+                  SizedBox(height: 15.w),
+                  Text(LocaleKeys.importYourWalletWithSecret.tr(),
+                      style: Theme.of(context).textTheme.subtitle3),
+                  // Text(LocaleKeys.recoveryPhrase.tr(),
+                  //     style: Theme.of(context).textTheme.subtitle3),
+                  SizedBox(height: 5.w),
+                  DboxTextField(
+                      height: 6.5.h,
+                      fontSize: 13.sp,
+                      hintText: LocaleKeys.enterYourPriveteKeyHere.tr(),
+                      errorText: state.error,
+                      controller:
+                          context.read<AuthenticationCubit>().secretController),
+                  SizedBox(height: 3.w),
+                  DboxCheckBox(
+                    title: LocaleKeys.rememberMe.tr(),
+                    onTab: (value) {},
+                  ),
+                  SizedBox(height: 10.w),
+                  BaseButton(
+                    onTap: () async => await context
+                        .read<AuthenticationCubit>()
+                        .saveCredentialFromPrivateKey(),
+                    text: LocaleKeys.import.tr(),
+                    buttonWidth: 100.w,
+                    buttonHeight: 13.w,
+                    backgroundColor: AppColors.primaryPurpleColor,
+                    textColor: Colors.white,
+                    isDisabled: !state.isInputValidated,
+                  ),
+                  SizedBox(height: 5.w),
+                ],
               ),
-              SizedBox(height: 10.w),
-              BaseButton(
-                onTap: () async => await context
-                    .read<AuthenticationCubit>()
-                    .saveCredentialFromPrivateKey(),
-                text: LocaleKeys.import.tr(),
-                buttonWidth: 100.w,
-                buttonHeight: 13.w,
-                backgroundColor: AppColors.primaryPurpleColor,
-                textColor: Colors.white,
-                isDisabled: !state.isInputValidated,
-              ),
-              SizedBox(height: 5.w),
-            ],
-          ),
             ),
           ),
         );

@@ -1,4 +1,3 @@
-
 import 'package:d_box/features/home/presentation/widgets/root_folder.view.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +95,9 @@ class MainView extends StatelessWidget {
                       folders: currentFolder,
                       modified: recents[stack[0]].createdAtEntity,
                       rootIndex: stack[0])
-              : const EmtryFileWidget(),
+              : const Expanded(
+                  child: EmtryFileWidget(),
+                ),
         ],
       ),
     );

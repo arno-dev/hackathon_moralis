@@ -1,7 +1,8 @@
 class ApiPath {
   //base url
   static const String urlMoralis = "https://ipfs.moralis.io:2053/ipfs/";
-  static const String baseUrl = "https://c1a0-103-43-76-42.ap.ngrok.io";
+  static const String baseUrl = "https://dbox.ap.ngrok.io";
+  // static const String baseUrl = "https://cloudmet-dbox.herokuapp.com";
   // static const String baseUrl = "http://localhost:3000";
   //api path
   static const String imagesFromLink = "/v2/images/link/{link}";
