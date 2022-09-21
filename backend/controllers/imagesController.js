@@ -35,6 +35,7 @@ exports.main = async () => {
         console.log("LOG:: we are creating a doc store from Orbit DB");
 
         const ipfs_db = await orbitdb.docstore("ipfs-db");
+        console.log("LOG:: ipfs_db.address " + ipfs_db.address);
         db = await orbitdb.open(ipfs_db.address.toString())
         await db.load()
         // await db.put({ _id: 'gaddasg' +  Math.random() , doc: Math.random() });
@@ -203,13 +204,14 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
         for (var i = 0; i < linksUniqueAddressedToMyself.length; i++) {
             const { link } = linksUniqueAddressedToMyself[i];
 
+            console.log("LOG:: doc : " + doc);
             const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
             // const imagesFromLink = await db.getData("/links/" + link);
             const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
             const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
             // const ipfsInfo = await db.getData("/" + cid);
             const ipfsImages = ipfsInfo["doc"]["paths"];
-
+            console.log("LOG:: ipfsImages : " + JSON.stringify(ipfsImages));
             const paths = await this.getImages(ipfsImages, cid);
 
             files.push({
