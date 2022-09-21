@@ -205,8 +205,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void onCancelDialog() {
-    addPeopleController.text = "";
-    addFolderController.text = "";
+    addPeopleController.clear();
+    addFolderController.clear();
     emit(state.copyWith(
       listImages: [],
       isHasImage: false,

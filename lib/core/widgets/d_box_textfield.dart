@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class DboxTextField extends StatelessWidget {
   final String hintText;
@@ -48,6 +49,7 @@ class DboxTextField extends StatelessWidget {
         ),
         filled: true,
         fillColor: color,
+        contentPadding: EdgeInsets.symmetric(horizontal: 3.w),
         // contentPadding:
         //     !isSearch ? const EdgeInsets.only(left: 15, right: 15) : null,
         hintStyle: TextStyle(fontSize: fontSize, color: Colors.grey),

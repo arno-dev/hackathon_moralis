@@ -1,5 +1,6 @@
 import 'package:d_box/core/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../core/widgets/base_button.dart';
 import 'dotted_button.dart';
@@ -11,7 +12,7 @@ class GridButton extends StatelessWidget {
       this.index,
       this.isDottedButton = true,
       required this.borderColor,
-this.textColor,
+      this.textColor,
       this.onTap});
   final String? text;
   final int? index;
@@ -25,13 +26,22 @@ this.textColor,
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-       (index != null)? SizedBox(
-          width: 22,
-          child: Text("$index.",textAlign: TextAlign.end, style: TextStyle(color:textColor ),),
-        ) : Container(),
-        const SizedBox(width: 5,),
+        (index != null)
+            ? SizedBox(
+                width: 22,
+                child: Text(
+                  "$index.",
+                  textAlign: TextAlign.end,
+                  style: TextStyle(color: textColor),
+                ),
+              )
+            : Container(),
+        const SizedBox(
+          width: 5,
+        ),
         isDottedButton
             ? DottedButton(
+                buttonWidth: 28.w,
                 borderColor: borderColor,
                 onTap: () {
                   if (onTap != null && index != null) {
@@ -40,6 +50,7 @@ this.textColor,
                 })
             : BaseButton(
                 text: text,
+                buttonWidth: 28.w,
                 textColor: AppColors.primaryPurpleColor,
                 borderColor: borderColor,
                 onTap: () {
