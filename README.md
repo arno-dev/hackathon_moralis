@@ -2,9 +2,8 @@
 
 A Flutter project allowing user to send secured media files to each other.
 
-
-
-The credentials are ***intentionally*** exposed for the sake of the hackathon. After the judge period is passed, we will removed the app from the Appstore Connect (push notification), Moralis (dApp) and Firebase (messaging / push notifications).
+The app is currently hosted on our local server and exposed through ngrok.
+The credentials are ***intentionally*** exposed for the sake of the hackathon. After the judge period is passed, we will cut our ngrok tunnel, and remove the app from the Appstore Connect (push notification), Moralis (dApp), Firebase (messaging / push notifications).
 
 ❌ Please Don't do this
 
@@ -18,7 +17,7 @@ The project is separated in :
 
 Below the app flow explained
 
-❌ INSERT AN IMAGE ❌ 
+![Moralis Hackathon App Flow](./hackathon_flow_vertical.png "AppFLow")
 
 ## ✅ Features
 
@@ -357,7 +356,7 @@ Salong Lin ([Along](mailto:saolong@comet.la))
 
 Phongshili Ailyavong ([Li](mailto:li@comet.la))
 
-Nero Sengtianthr ([Beer](mailto:beer@comet.la))
+Special thanks for wireframing and design from Souchittra ([Ta](mailto:ta@comet.la))
 
 ## Resources
 
