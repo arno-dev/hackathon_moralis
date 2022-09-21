@@ -31,7 +31,6 @@ exports.main = async () => {
             },
         });
         console.log("LOG:: we are checking if there's an existing DB")
-        console.log("LOG:: we are creating a new instance of Orbit DB")
         orbitdb = await OrbitDB.createInstance(ipfs);
         console.log("LOG:: we are creating a doc store from Orbit DB");
 
