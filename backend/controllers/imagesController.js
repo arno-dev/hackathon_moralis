@@ -400,12 +400,12 @@ exports.saveRegistrationToken = async (request, response) => {
 async function sendPush(dest, message) {
     console.log("Send push");
     try {
-        const tokens = await db.query((doc) => doc._id == "/token/" + address)[0];
+        const tokens = await db.query((doc) => doc._id == "/token/" + dest)[0];
         const { firebaseToken } = tokens["doc"];
 
         // const firebaseToken = await alertDB.getData("/token/" + dest);
         const options = notification_options;
-        admin.messaging().sendToDevice(firebaseToken, message, options)
+        admin.messaging().sendToDevice(c, message, options)
             .then(_ => {
                 console.log("Notification sent successfully");
             })
