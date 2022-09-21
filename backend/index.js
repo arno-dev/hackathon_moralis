@@ -6,7 +6,6 @@ const app = express()
 
 // Controllers
 const imagesController = require('./controllers/imagesController');
-// const alertsController = require('./controllers/alertsController');
 
 // Parse JSON bodies (as sent by API clients)
 app.use(
