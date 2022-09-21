@@ -1,13 +1,17 @@
 "use strict";
 
 const { default: Moralis } = require("moralis");
-const { JsonDB, Config } = require('node-json-db');
 const { getIPFSCid } = require('../utils/utils');
 const merge = require('deepmerge');
 const { nanoid } = require('nanoid');
 const e = require("express");
 const OrbitDB = require('orbit-db');
 const axios = require("axios");
+const ALERT = require('../utils/alertType.js');
+const { admin, notification_options } = require("../utils/firebase-config")
+
+// var alertDB = new JsonDB(new Config("alertDatabase", true, false, '/'));
+
 const {
     MORALIS_API_KEY
 } = process.env;
@@ -31,11 +35,11 @@ exports.main = async () => {
             },
         });
         console.log("LOG:: we are checking if there's an existing DB")
-        console.log("LOG:: we are creating a new instance of Orbit DB")
         orbitdb = await OrbitDB.createInstance(ipfs);
         console.log("LOG:: we are creating a doc store from Orbit DB");
 
         const ipfs_db = await orbitdb.docstore("ipfs-db");
+        console.log("LOG:: ipfs_db.address " + ipfs_db.address);
         db = await orbitdb.open(ipfs_db.address.toString())
         await db.load()
         // await db.put({ _id: 'gaddasg' +  Math.random() , doc: Math.random() });
@@ -55,7 +59,7 @@ exports.main = async () => {
 const alertsController = require('./alertsController');
 
 // Ty[e]
-const ALERT = require('../utils/alertType.js');
+// const ALERT = require('../utils/alertType.js');
 
 exports.uploadImagesToIpfs = async (request, response, next) => {
     const { images, origin, dest, encryptIpfsKey } = request.body;
@@ -64,7 +68,7 @@ exports.uploadImagesToIpfs = async (request, response, next) => {
         return response.sendStatus(400);
     }
     const options = request.body.images;
-   
+
     try {
         const imagePath = await axios.post('https://deep-index.moralis.io/api/v2/ipfs/uploadFolder',
             JSON.stringify(options),
@@ -119,14 +123,14 @@ exports.createShareableLink = async (request, response) => {
         return response.sendStatus(400);
     }
     var ID = nanoid();
-    
+
     // We will create our share links
     const createdAt = new Date().toISOString();
     try {
 
         const shareLink = await db.query((doc) => doc._id == "/sharing/" + origin + "/" + dest + "/" + cid)[0];
         const { cid, link } = shareLink;
-        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link, "createdAt": createdAt });
+        await saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": link, "createdAt": createdAt });
         return response.send(shareLink);
     }
     catch (e) {
@@ -137,7 +141,7 @@ exports.createShareableLink = async (request, response) => {
         // We want to store the receivers so they can retrieve all the links shared to themselves
 
         await db.put({ _id: "/receivers/" + dest + "/links/" + ID, type: "links", dest: dest, doc: shareData });
-        await alertsController.saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "createdAt": createdAt });
+        await saveAlert(ALERT.GotSharedLink, dest, { "origin": origin, "ipfsKey": ipfsKey, "cid": cid, "link": ID, "createdAt": createdAt });
 
         return response.send(shareData);
     }
@@ -194,7 +198,7 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
 
     try {
         const linksAddressedToMyselfRaw = await db.query((doc) => doc.type == "links" && doc.dest == address);
-        var linksAddressedToMyself = []; 
+        var linksAddressedToMyself = [];
         for (var i = 0; i < linksAddressedToMyselfRaw.length; i++) {
             linksAddressedToMyself.push(linksAddressedToMyselfRaw[i]["doc"]);
         }
@@ -204,13 +208,14 @@ exports.getRecentImagesSharedWithMyself = async (request, response) => {
         for (var i = 0; i < linksUniqueAddressedToMyself.length; i++) {
             const { link } = linksUniqueAddressedToMyself[i];
 
+            console.log("LOG:: link : " + link);
             const imagesFromLink = await db.query((doc) => doc._id == "/links/" + link)[0];
             // const imagesFromLink = await db.getData("/links/" + link);
             const { cid, ipfsKey, origin, dest } = imagesFromLink["doc"];
             const ipfsInfo = await db.query((doc) => doc._id == "/" + cid)[0];
             // const ipfsInfo = await db.getData("/" + cid);
             const ipfsImages = ipfsInfo["doc"]["paths"];
-
+            console.log("LOG:: ipfsImages : " + JSON.stringify(ipfsImages));
             const paths = await this.getImages(ipfsImages, cid);
 
             files.push({
@@ -359,4 +364,133 @@ function mergeChildren(tree) {
         }
         return newArray;
     };
+}
+
+// ---- ALerts ---- 
+function now() {
+    return new Date().toISOString();
+}
+
+
+// save firebase token
+exports.saveRegistrationToken = async (request, response) => {
+    const { address, token } = request.body;
+    if (!address || !token) {
+        return response.sendStatus(400);
+    }
+    try {
+        await db.put({ _id: "/token/" + address, doc: token })
+        return response.status(200).send({ message: "Save token success." });
+    } catch (error) {
+        return response.sendStatus(500)
+    }
+}
+
+async function sendPush(dest, message) {
+    console.log("Send push");
+    try {
+        const tokens = await db.query((doc) => doc._id == "/token/" + dest)[0];
+        const { doc } = tokens;
+
+        const options = notification_options;
+        admin.messaging().sendToDevice(doc, message, options)
+            .then(_ => {
+                console.log("Notification sent successfully");
+            })
+            .catch(error => {
+                console.log("Notification error : " + error);
+            });
+    } catch (error) {
+        console.log("Notification error : " + error);
+    }
+
+}
+
+
+async function insertAlertInDB(address, message, payload) {
+    const alertData = {
+        "message": message,
+        "payload": payload,
+        "createdAt": now()
+    };
+
+    var docs = [];
+    try {
+        const doc = await db.query((doc) => doc._id == "/alerts/" + address + "/messages")[0];
+        docs = doc["doc"];
+    }
+    catch (e) {
+        console.log("LOG:: no alerts available");
+    }
+    docs.push(alertData);
+    await db.put({ _id: "/alerts/" + address + "/messages", doc: docs })
+}
+
+exports.getAlerts = async (request, response) => {
+    const { address } = request.params;
+    if (!address) {
+        return response.sendStatus(400);
+    }
+    try {
+        const doc = await db.query((doc) => doc._id == "/alerts/" + address + "/messages")[0];
+        const shareLink = doc["doc"];
+        return response.send(shareLink);
+    }
+    catch (e) {
+        return response.send([]);
+    }
+}
+async function saveAlert(alertType, address, payload) {
+    console.log("SaveAlert::(" + alertType + ", " + address + ", " + payload);
+    if (alertType == ALERT.AddedInContact) {
+        // Grab the origin address
+        const emitterAddress = payload["origin"];
+        const body = emitterAddress.substring(0, 10) + "[...] has added you in his contact";
+        const message = {
+            "notification": {
+                "title": "Added In Contact",
+                "body": body
+            },
+        };
+
+        await insertAlertInDB(address, message, payload);
+        await sendPush(address, message);
+    }
+    else if (alertType == ALERT.GotSharedLink) {
+        // Grab the origin address
+        const emitterAddress = payload["origin"];
+        const cid = payload["cid"];
+        const link = payload["link"];
+        const body = emitterAddress.substring(0, 10) + "[...] shared with you a link " + link.substring(0, 10) + "[...] for accessing : " + cid.substring(0, 10) + "[...]";
+        const message = {
+            "notification": {
+                "title": "Got Shared Link",
+                "body": body
+            },
+            "data": {
+                "link": link
+            }
+        };
+
+        console.log("insertAlertInDB:: " + message);
+        await insertAlertInDB(address, message, payload);
+        await sendPush(address, message);
+    }
+    else if (alertType == ALERT.TryingAccessSharedLink) {
+        // Grab the origin address
+        const emitterAddress = payload["origin"];
+        const cid = payload["cid"];
+        const link = payload["link"];
+        const body = emitterAddress.substring(0, 10) + "[...] is trying to access the link : " + link.substring(0, 10) + "[...]";
+        const message = {
+            "notification": {
+                "title": "Trying to access shared link",
+                "body": body
+            }, "data": {
+                "link": link
+            }
+        };
+        await insertAlertInDB(address, message, payload);
+        await sendPush(address, message);
+    }
 }
