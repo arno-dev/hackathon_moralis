@@ -405,7 +405,7 @@ async function sendPush(dest, message) {
 
         // const firebaseToken = await alertDB.getData("/token/" + dest);
         const options = notification_options;
-        admin.messaging().sendToDevice(c, message, options)
+        admin.messaging().sendToDevice(firebaseToken, message, options)
             .then(_ => {
                 console.log("Notification sent successfully");
             })
