@@ -380,7 +380,6 @@ exports.saveRegistrationToken = async (request, response) => {
     }
     try {
         await db.put({ _id: "/token/" + address, doc: token })
-        // await alertDB.push("/token/" + address, token);
         return response.status(200).send({ message: "Save token success." });
     } catch (error) {
         return response.sendStatus(500)
@@ -393,7 +392,6 @@ async function sendPush(dest, message) {
         const tokens = await db.query((doc) => doc._id == "/token/" + dest)[0];
         const { doc } = tokens;
 
-        // const firebaseToken = await alertDB.getData("/token/" + dest);
         const options = notification_options;
         admin.messaging().sendToDevice(doc, message, options)
             .then(_ => {
@@ -426,7 +424,6 @@ async function insertAlertInDB(address, message, payload) {
     }
     docs.push(alertData);
     await db.put({ _id: "/alerts/" + address + "/messages", doc: docs })
-    // await alertDB.push("/alerts/" + address + '/messages[]', alertData, true);
 }
 
 exports.getAlerts = async (request, response) => {
@@ -437,7 +434,6 @@ exports.getAlerts = async (request, response) => {
     try {
         const doc = await db.query((doc) => doc._id == "/alerts/" + address + "/messages")[0];
         const shareLink = doc["doc"];
-        // const shareLink = await alertDB.getData("/alerts/" + address + "/messages");
         return response.send(shareLink);
     }
     catch (e) {
