@@ -367,16 +367,6 @@ function mergeChildren(tree) {
 }
 
 // ---- ALerts ---- 
-
-
-/// Create a notification table 
-/*
-There will be differnt type of alerts :
-- someone added you in his list of contacts
-- someone is trying to share a link with you
-- someone is trying to access to a link you share
-*/
-
 function now() {
     return new Date().toISOString();
 }
