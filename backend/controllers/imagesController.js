@@ -401,11 +401,11 @@ async function sendPush(dest, message) {
     console.log("Send push");
     try {
         const tokens = await db.query((doc) => doc._id == "/token/" + dest)[0];
-        const { firebaseToken } = tokens["doc"];
+        const { doc } = tokens;
 
         // const firebaseToken = await alertDB.getData("/token/" + dest);
         const options = notification_options;
-        admin.messaging().sendToDevice(firebaseToken, message, options)
+        admin.messaging().sendToDevice(doc, message, options)
             .then(_ => {
                 console.log("Notification sent successfully");
             })
